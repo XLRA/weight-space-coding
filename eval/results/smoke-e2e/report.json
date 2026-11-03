@@ -1,0 +1,124 @@
+{
+ "name": "smoke-e2e",
+ "config": {
+  "submission": "/opt/wsp/runs/e2e-1/submission",
+  "tensors": [
+   "model.language_model.layers.15.mlp.down_proj.weight.npy"
+  ],
+  "samples": 1,
+  "models": [
+   "original",
+   "edited"
+  ],
+  "limit_per_set": 5
+ },
+ "models": {
+  "code": {
+   "edited": {
+    "all": {
+     "answers": 10,
+     "pass@1": 20.0,
+     "cut": 50.0,
+     "loop": 60.0,
+     "mean_tokens": 16955.9,
+     "failures": {
+      "cut_at_max_tokens": 5,
+      "pass": 2,
+      "wrong_interface": 1,
+      "wrong_answer": 1,
+      "syntax_error": 1
+     }
+    },
+    "mbpp+": {
+     "answers": 5,
+     "pass@1": 0.0,
+     "cut": 60.0,
+     "loop": 60.0,
+     "mean_tokens": 19939.2,
+     "failures": {
+      "cut_at_max_tokens": 3,
+      "wrong_interface": 1,
+      "wrong_answer": 1
+     }
+    },
+    "humaneval+": {
+     "answers": 5,
+     "pass@1": 40.0,
+     "cut": 40.0,
+     "loop": 60.0,
+     "mean_tokens": 13972.6,
+     "failures": {
+      "cut_at_max_tokens": 2,
+      "pass": 2,
+      "syntax_error": 1
+     }
+    }
+   },
+   "original": {
+    "all": {
+     "answers": 10,
+     "pass@1": 20.0,
+     "cut": 50.0,
+     "loop": 60.0,
+     "mean_tokens": 17304.5,
+     "failures": {
+      "cut_at_max_tokens": 5,
+      "pass": 2,
+      "wrong_interface": 1,
+      "wrong_answer": 1,
+      "runtime_error": 1
+     }
+    },
+    "mbpp+": {
+     "answers": 5,
+     "pass@1": 0.0,
+     "cut": 40.0,
+     "loop": 60.0,
+     "mean_tokens": 14013.8,
+     "failures": {
+      "cut_at_max_tokens": 2,
+      "wrong_interface": 1,
+      "wrong_answer": 1,
+      "runtime_error": 1
+     }
+    },
+    "humaneval+": {
+     "answers": 5,
+     "pass@1": 40.0,
+     "cut": 60.0,
+     "loop": 60.0,
+     "mean_tokens": 20595.2,
+     "failures": {
+      "cut_at_max_tokens": 3,
+      "pass": 2
+     }
+    }
+   }
+  }
+ },
+ "paired": {
+  "code": {
+   "all": {
+    "problems": 10,
+    "diff": 0.0,
+    "se": 0.0,
+    "fail_to_pass": 0,
+    "pass_to_fail": 0
+   },
+   "mbpp+": {
+    "problems": 5,
+    "diff": 0.0,
+    "se": 0.0,
+    "fail_to_pass": 0,
+    "pass_to_fail": 0
+   },
+   "humaneval+": {
+    "problems": 5,
+    "diff": 0.0,
+    "se": 0.0,
+    "fail_to_pass": 0,
+    "pass_to_fail": 0
+   }
+  }
+ }
+}

@@ -1,0 +1,8 @@
+<|im_start|>user
+Write a function to find the longest chain which can be formed from the given set of pairs.
+Your code should pass this test:
+assert max_chain_length([Pair(5, 24), Pair(15, 25),Pair(27, 40), Pair(50, 60)], 4) == 3
+
+Write a complete, self-contained Python 3 solution. Put your final code in a single ```python block at the end of your answer.<|im_end|>
+<|im_start|>assistant
+<think>

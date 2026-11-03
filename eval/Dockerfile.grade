@@ -1,0 +1,9 @@
+# wsp-grade:1, the grader for the held-out suites beyond MBPP+ / HumanEval+ (only grading runs in it).
+# math-verify and its parser at the paper's versions; the IFEval checkers' dependencies, with NLTK's
+# punkt_tab (plain-text tokenizer parameters, no pickle) baked in, since grading has no network.
+FROM wsp-runtime:1
+RUN pip install --no-cache-dir math-verify==0.9.0 latex2sympy2_extended==1.11.0 antlr4-python3-runtime==4.13.2 \
+        nltk==3.9.1 langdetect==1.0.9 immutabledict==4.2.1 \
+ && python3 -m nltk.downloader -d /usr/local/share/nltk_data punkt_tab \
+ && pip freeze > /opt/wsp-grade-freeze.txt
+ENTRYPOINT []

@@ -1,0 +1,12 @@
+{
+ "submission": "/opt/wsp/runs/e2e-1/submission",
+ "tensors": [
+  "model.language_model.layers.15.mlp.down_proj.weight.npy"
+ ],
+ "samples": 1,
+ "models": [
+  "original",
+  "edited"
+ ],
+ "limit_per_set": 5
+}
