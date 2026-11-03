@@ -1,0 +1,19 @@
+{
+ "submission": "/opt/wsp/runs/e2e-1/submission",
+ "tensors": [
+  "model.language_model.layers.15.mlp.down_proj.weight.npy"
+ ],
+ "suites": {
+  "code": 1,
+  "mmlupro": 1,
+  "ifeval": 1,
+  "lcb": 1,
+  "math500": 1
+ },
+ "models": [
+  "original",
+  "edited"
+ ],
+ "limit_per_set": 5,
+ "presence_penalty": 0.0
+}
