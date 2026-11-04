@@ -4,6 +4,7 @@
     evaluate.py prepare [--suites all]        build final/ and check every grader (reference answers)
     evaluate.py run <name> --submission DIR [--suites code] [--samples N] [--models original,edited]
                         [--reuse-original NAME]   copy the unedited model's answers from results/NAME
+                        [--gpu 5090|5080]         default 5090 (llama-swap paused); see harness/gpus.py
     evaluate.py report <name>                 grade and summarize results/<name>/ again
 
 Suites (default samples per problem; `run` takes them in this order, each for both models before
@@ -15,7 +16,7 @@ the next):
   math500  MATH-500                                                            4
 `--suites all` runs every suite; the paper's Experiment 8 used the samples above for MATH-500,
 IFEval and MMLU-Pro (prompts and readings: suites.py). `run` generates with the editing runs'
-protocol (eval_gen.py, on the 5090, llama-swap paused), grades in the no-GPU sandbox, and writes
+protocol (eval_gen.py, on the 5090 with llama-swap paused, or on the 5080), grades in the no-GPU sandbox, and writes
 results/<name>/report.md and report.json: the score averaged over samples, the cut-at-token-limit
 share next to every score, and the paired difference edited - original over problems with its
 standard error.
@@ -37,14 +38,16 @@ import numpy as np
 
 import suites as S
 
+sys.path.insert(0, "/opt/wsp/harness")
+from gpus import GPUS  # noqa: E402
+
 WSP = "/opt/wsp"
 EVAL = f"{WSP}/eval"
 MODEL_DIR = f"{WSP}/models/qwen3.5-0.8b"
 HARNESS = f"{WSP}/harness"
 IMAGE = "wsp-runtime:1"
 GRADE_IMAGE = "wsp-grade:1"  # Dockerfile.grade: wsp-runtime:1 + math-verify and the IFEval checkers' dependencies
-GPU = "nvidia.com/gpu=GPU-<uuid>"  # the RTX 5090
-F = "`" * 3
+F ="`" * 3
 INSTRUCTION = ("Write a complete, self-contained Python 3 solution. Put your final code in a single ```python block "
                "at the end of your answer.")
 FUNC_TIMEOUT = 30  # seconds for a problem's whole EvalPlus test script
@@ -252,7 +255,8 @@ def reuse_original(src_name, out, spec, limit, presence):
     return reused
 
 
-def run(name, submission, spec, models, limit, presence, reuse=None):
+def run(name, submission, spec, models, limit, presence, reuse=None, gpu_name="5090"):
+    gpu = GPUS[gpu_name]
     out = f"{EVAL}/results/{name}"
     os.makedirs(out, exist_ok=True)
     sub = f"{out}/submission"
@@ -266,15 +270,16 @@ def run(name, submission, spec, models, limit, presence, reuse=None):
     if missing:
         raise SystemExit(f"run `evaluate.py prepare --suites {','.join(missing)}` first")
     cfg = {"submission": os.path.realpath(submission), "tensors": sorted(tensors), "suites": spec,
-           "models": models, "limit_per_set": limit, "presence_penalty": presence}
+           "models": models, "limit_per_set": limit, "presence_penalty": presence, "gpu": gpu_name}
     if reuse:
         cfg["original_from"] = reuse
     json.dump(cfg, open(f"{out}/config.json", "w"), indent=1)
-    lock = open(f"{WSP}/runs/.gpu.lock", "w")
+    lock_path = f"{WSP}/runs/{gpu['lock']}"
+    lock = open(lock_path, "w")
     try:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
     except BlockingIOError:
-        raise SystemExit("another run holds the GPU (/opt/wsp/runs/.gpu.lock)")
+        raise SystemExit(f"another run or evaluation holds the {gpu_name} ({lock_path})")
     if reuse and "original" in models:
         reuse_original(reuse, out, spec, limit, presence)
     stopped = False
@@ -282,13 +287,14 @@ def run(name, submission, spec, models, limit, presence, reuse=None):
     # pkill -TERM: exit through the finally below, so the container goes and llama-swap comes back
     signal.signal(signal.SIGTERM, lambda *_: sys.exit("stopped (SIGTERM)"))
     try:
-        if running("llama-swap"):
+        if gpu["llama_swap"] and running("llama-swap"):
             print("stopping llama-swap to free the 5090", flush=True)
             sh("docker", "stop", "llama-swap", timeout=180)
             stopped = True
         sh("docker", "rm", "-f", name_c, check=False)
         subprocess.run(["docker", "run", "--rm", "--name", name_c, "--network", "none", "--shm-size", "8g",
-                        "--memory", "24g", "--device", GPU, "-e", "PYTHONPATH=/harness", "-e", "HF_HUB_OFFLINE=1",
+                        "--memory", "24g", "--device", gpu["device"], "-e", "PYTHONPATH=/harness",
+                        "-e", "HF_HUB_OFFLINE=1", "-e", f"WSP_GPU_MEMORY={gpu['eval_memory']}",
                         "-e", "VLLM_NO_USAGE_STATS=1", "-e", "DO_NOT_TRACK=1", "-e", f"WSP_PRESENCE={presence}",
                         "-v", f"{MODEL_DIR}:/model:ro", "-v", f"{EVAL}/final:/eval:ro", "-v", f"{out}:/out",
                         "-v", f"{sub}:/submission:ro", "-v", f"{HARNESS}:/harness:ro", "-v", f"{EVAL}:/evalbin:ro",
@@ -347,6 +353,7 @@ def report(name):
              + (f"; SMOKE TEST, first {cfg['limit_per_set']} problems per set only" if cfg.get("limit_per_set") else "")
              + (f"; the original model's answers are reused from {cfg['original_from']}" if cfg.get("original_from")
                 else "")
+             + f"; generated on the RTX {cfg.get('gpu', '5090')}"
              + ".", "", "Cut = answers that hit the 32,768-token limit. Paired diff = edited - original, averaged per "
              "problem over its samples, with its standard error over problems."]
     for suite in [s for s in SUITES if s in graded]:
@@ -392,6 +399,8 @@ def main():
                    help="0 = the editing runs' coding setting; the paper's Experiment 8 used 1.5")
     r.add_argument("--reuse-original", metavar="NAME",
                    help="copy the unedited model's answers from results/NAME (same samples, limit and presence penalty)")
+    r.add_argument("--gpu", choices=sorted(GPUS), default="5090",
+                   help="5090 (default; llama-swap is paused) or 5080 (beside other services)")
     p = sub.add_parser("report")
     p.add_argument("name")
     a = ap.parse_args()
@@ -407,7 +416,7 @@ def main():
         if set(models) - {"original", "edited"}:
             raise SystemExit("--models takes original and/or edited")
         run(a.name, a.submission, {s: a.samples or SUITES[s] for s in chosen}, models, a.limit, a.presence_penalty,
-            a.reuse_original)
+            a.reuse_original, a.gpu)
     else:
         report(a.name)
 

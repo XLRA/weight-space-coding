@@ -10,6 +10,9 @@ import subprocess
 import sys
 import time
 
+sys.path.insert(0, "/opt/wsp/harness")
+from gpus import GPUS  # noqa: E402
+
 EVAL = "/opt/wsp/eval"
 
 
@@ -67,9 +70,11 @@ def show(name):
             if running:
                 lines.append(f"current batch (up to 512 answers) running for {minutes(now - os.path.getmtime(log))}; "
                              "the bars move only when it ends, ~40-50 min when most answers loop to 32k tokens")
-    gpu = sh("nvidia-smi", "-i", "1", "--query-gpu=name,utilization.gpu,memory.used", "--format=csv,noheader")
+    g = GPUS[cfg.get("gpu", "5090")]
+    gpu = sh("nvidia-smi", "-i", str(g["index"]), "--query-gpu=name,utilization.gpu,memory.used,memory.total",
+             "--format=csv,noheader")
     swap = sh("docker", "inspect", "-f", "{{.State.Status}}", "llama-swap")
-    lines.append(f"GPU: {gpu}   llama-swap: {swap}")
+    lines.append(f"GPU: {gpu}   " + (f"llama-swap: {swap}" if g["llama_swap"] else "(shared with other services)"))
     report = f"{out}/report.md"
     if os.path.exists(report):
         lines.append(f"finished: {report}")

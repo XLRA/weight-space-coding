@@ -1,4 +1,4 @@
-"""Progress of an agent run: python3 progress.py <run> [--watch SECONDS]
+"""Progress of agent runs: python3 progress.py <run> [<run> ...] [--watch SECONDS]
 
 Passes used, turns, code runs and tokens from runs/<run>/state.json; the forward pass running now and the
 answers it has written so far; the agent's latest explanation; the last lines of driver.log; the 5090 and
@@ -13,6 +13,9 @@ import subprocess
 import sys
 import textwrap
 import time
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from gpus import GPUS  # noqa: E402
 
 RUNS = "/opt/wsp/runs"
 
@@ -57,18 +60,26 @@ def current_request(run, now):
         return []
     n = ns[-1]
     r = json.load(open(f"{req}/fwd_{n}.json"))
-    probs = r.get("problems")
-    if probs is None and r.get("problems_file"):
-        try:
-            probs = json.load(open(r["problems_file"].replace("/work", f"{run}/work", 1)))
-        except (OSError, ValueError):
-            probs = None
+    def items(key):
+        v = r.get(key)
+        if v is None and r.get(f"{key}_file"):
+            try:
+                v = json.load(open(r[f"{key}_file"].replace("/work", f"{run}/work", 1)))
+            except (OSError, ValueError):
+                return None
+        return v or []
+
+    probs, own = items("problems"), items("prompts")
     k = r.get("n", 1)
     what = f"{r['type']}, model {r['model']}"
     if r.get("baseline"):
         what += f", baseline {r['baseline']}"
-    if probs is not None:
-        what += f", {len(probs)} problems x {k} sample{'s' if k != 1 else ''}"
+    if r["type"] == "generate" and probs is not None and own is not None:
+        what += f", {len(probs)} problems + {len(own)} own prompts" if own else f", {len(probs)} problems"
+        what += f" x {k} sample{'s' if k != 1 else ''}"
+        probs = probs + own
+    else:
+        probs = None
     if r.get("texts") is not None:
         what += f", {len(r['texts'])} texts"
     lines = [f"Forward pass {n} running for {minutes(now - os.path.getmtime(f'{req}/fwd_{n}.json'))}: {what}"]
@@ -83,7 +94,7 @@ def current_request(run, now):
                 lines.append(f"  {v:<9} {bar(0, 1)} {'generating' if before_done else 'waiting'}")
                 before_done = False
             else:
-                lines.append(f"  {v:<9} {bar(d, total or d)} {d}/{total or '?'} answers, done")
+                lines.append(f"  {v:<9} {bar(min(d, total or d), total or d)} {d}/{total or '?'} answers, done")
         lines.append("  (each model's answers are written when all of them are finished)")
     return lines
 
@@ -105,7 +116,8 @@ def latest_explanation(run, width, max_lines):
     return [f"Agent, {head}:"] + ["  " + l for l in out]
 
 
-def show(name):
+def show(name, compact=False):
+    """compact (several runs at once): shorter explanation and log."""
     run = f"{RUNS}/{name}"
     width = min(shutil.get_terminal_size((110, 40)).columns, 130)
     now = time.time()
@@ -117,7 +129,8 @@ def show(name):
     status = st["status"] if alive or st["status"] != "running" else "running, but the driver is NOT RUNNING"
     lines = [f"Agent run {name}  {time.strftime('%Y-%m-%d %H:%M:%S UTC', time.gmtime(now))}  {status}"
              + (f", started {minutes(now - start)} ago" if start else ""),
-             f"{cfg['model']} effort {cfg['effort']}, presence penalty {cfg.get('presence_penalty', 0)}"
+             f"{cfg['model']} effort {cfg['effort']}, RTX {cfg.get('gpu', '5090')}, "
+             f"presence penalty {cfg.get('presence_penalty', 0)}"
              + (f", from {cfg['start_from']}" if cfg.get("start_from") else ""), ""]
     p, P = st["passes_used"], cfg["passes"]
     lines.append(f"forward passes {bar(p, P)} {p}/{P}")
@@ -131,14 +144,19 @@ def show(name):
     lines.append("")
     lines += current_request(run, now) or ["No forward pass running; the agent is working in its kernel."]
     lines.append("")
-    lines += latest_explanation(run, width, 9)
+    lines += latest_explanation(run, width, 5 if compact else 9)
     lines.append("")
     lines.append("driver.log:")
-    lines += ["  " + l[:width - 2] for l in log[-6:]]
+    lines += ["  " + l[:width - 2] for l in log[-(3 if compact else 6):]]
     lines.append("")
-    gpu = sh("nvidia-smi", "-i", "1", "--query-gpu=name,utilization.gpu,memory.used", "--format=csv,noheader")
-    swap = sh("docker", "inspect", "-f", "{{.State.Status}}", "llama-swap")
-    lines.append(f"GPU: {gpu}   llama-swap: {swap} (stopped while the run uses the 5090)")
+    g = cfg.get("gpu", "5090")
+    gpu = sh("nvidia-smi", "-i", str(GPUS[g]["index"]), "--query-gpu=name,utilization.gpu,memory.used,memory.total",
+             "--format=csv,noheader")
+    if GPUS[g]["llama_swap"]:
+        swap = sh("docker", "inspect", "-f", "{{.State.Status}}", "llama-swap")
+        lines.append(f"GPU: {gpu}   llama-swap: {swap} (stopped while the run uses the 5090)")
+    else:
+        lines.append(f"GPU: {gpu} (shared with other services)")
     if st["status"] == "done":
         sub = os.listdir(f"{run}/submission")
         lines.append(f"finished: {len(sub)} files in {run}/submission, report in {run}/final_answer.md")
@@ -146,10 +164,14 @@ def show(name):
 
 
 def main():
-    name = sys.argv[1]
-    every = int(sys.argv[sys.argv.index("--watch") + 1]) if "--watch" in sys.argv else 0
+    args = sys.argv[1:]
+    every = 0
+    if "--watch" in args:
+        i = args.index("--watch")
+        every = int(args[i + 1])
+        del args[i:i + 2]
     while True:
-        text = show(name)
+        text = ("\n\n" + "=" * 100 + "\n\n").join(show(n, compact=len(args) > 1) for n in args)
         if not every:
             print(text)
             return

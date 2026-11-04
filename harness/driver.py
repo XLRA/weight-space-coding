@@ -9,6 +9,7 @@
     [--start-from DIR]        a new run starts with DIR's edit (a submission/) in /work/edited, and keeps a
                               read-only copy in /start that "model": "start" and "baseline": "start" run
     [--brief FILE]            text added to the prompt under THIS RUN (copied to runs/<run>/brief.md)
+    [--gpu 5090|5080]         the GPU of the run's GPU server (default 5090; see gpus.py)
 
 Starts the kernel container for /opt/wsp/runs/<run>/, sends the editor prompt (prompt.txt), and
 loops. Each agent reply must hold one ```python block, run in the kernel, or one ```forward
@@ -17,10 +18,11 @@ ends when the forward-pass budget is used and the agent replies without a block;
 then copied to submission/. Running the driver again on a run that did not finish resumes it in
 a fresh conversation (a handoff) with a fresh kernel.
 
-The GPU server starts when the agent first asks for a forward pass. llama-swap is stopped while
-the run holds the 5090. The run gives the 5090 back (and starts llama-swap again) when it has not
-used it for --gpu-idle-minutes, while it waits for a subscription usage limit to reset, and when
-the driver exits.
+The GPU server starts when the agent first asks for a forward pass. On the 5090, llama-swap is
+stopped while the run holds the card; on the 5080, other services keep running beside it.
+The run gives the GPU back (and starts llama-swap again) when it has not used it for
+--gpu-idle-minutes, while it waits for a subscription usage limit to reset, and when the driver
+exits. One run or evaluation per GPU at a time.
 
 Backends: claude-code uses Claude Code's headless mode on the Claude subscription that the user
 wspagent signed in with (`claude auth login`); anthropic uses the Messages API with the key in
@@ -45,6 +47,7 @@ import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import kernel_client  # noqa: E402
+from gpus import GPUS  # noqa: E402
 
 WSP = "/opt/wsp"
 MODEL_DIR = f"{WSP}/models/qwen3.5-0.8b"
@@ -53,7 +56,6 @@ HARNESS = f"{WSP}/harness"
 CACHE = f"{WSP}/cache"
 SECRETS = f"{WSP}/secrets/anthropic.env"
 IMAGE = "wsp-runtime:1"
-GPU = "nvidia.com/gpu=GPU-<uuid>"  # the RTX 5090
 OUT_CHARS = 10_000
 MAX_NEW = 32768
 FULL_ATTN = {3, 7, 11, 15, 19, 23}
@@ -65,7 +67,8 @@ PRICES = {"claude-opus-5-5": (4.0, 20.0, 0.20, 8.0)}
 DEFAULTS = dict(passes=50, backend="claude-code", replay=None, model="claude-opus-5-5", effort="max", max_usd=None,
                 handoff_every=40, max_turns=1000, max_code_runs=300, kernel_seconds=900, kernel_memory_gb=20,
                 max_output_tokens=128000, max_context=600_000, gpu_idle_minutes=30,
-                claude_bin="/home/wspagent/.local/bin/claude", presence_penalty=0.0, start_from=None, brief=None)
+                claude_bin="/home/wspagent/.local/bin/claude", presence_penalty=0.0, start_from=None, brief=None,
+                gpu="5090")
 AGENT_USER = "wspagent"
 # Claude Code's replies when a subscription limit is reached, e.g. "Claude AI usage limit reached|<epoch>"
 # or "You've hit your session limit · resets 5am".
@@ -408,14 +411,15 @@ class Run:
     # --- containers ---
 
     def lock_gpu(self):
-        self.lock = open(f"{WSP}/runs/.gpu.lock", "w")
+        path = f"{WSP}/runs/{GPUS[self.cfg['gpu']]['lock']}"
+        self.lock = open(path, "w")
         try:
             fcntl.flock(self.lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
-            raise SystemExit("another run holds the GPU (/opt/wsp/runs/.gpu.lock)")
+            raise SystemExit(f"another run or evaluation holds the {self.cfg['gpu']} ({path})")
 
     def pause_llama_swap(self):
-        if running("llama-swap"):
+        if GPUS[self.cfg["gpu"]]["llama_swap"] and running("llama-swap"):
             self.log("stopping llama-swap to free the 5090")
             sh("docker", "stop", "llama-swap", timeout=180)
             self.stopped_llama = True
@@ -433,7 +437,8 @@ class Run:
             self.gpu_used_at = time.time()
 
     def release_gpu(self, why):
-        """Stop the GPU server and give the 5090 back to llama-swap; the next forward pass starts it again."""
+        """Stop the GPU server and give the GPU back (on the 5090, to llama-swap); the next forward pass starts it
+        again."""
         if self.gpu_used_at is not None or running(self.gpu_name):
             sh("docker", "rm", "-f", self.gpu_name, check=False)
             self.log(f"GPU released ({why})")
@@ -488,9 +493,11 @@ class Run:
         for fn in ("server.ready", "server.alive"):
             if os.path.exists(f"{req}/{fn}"):
                 os.remove(f"{req}/{fn}")
+        gpu = GPUS[self.cfg["gpu"]]
         sh("docker", "run", "-d", "--name", self.gpu_name, "--network", "none", "--shm-size", "8g",
-           "--memory", "20g", "--device", GPU, "-e", "PYTHONPATH=/harness", "-e", "HF_HUB_OFFLINE=1",
+           "--memory", "20g", "--device", gpu["device"], "-e", "PYTHONPATH=/harness", "-e", "HF_HUB_OFFLINE=1",
            "-e", "VLLM_NO_USAGE_STATS=1", "-e", "DO_NOT_TRACK=1", "-e", f"WSP_PRESENCE={self.cfg['presence_penalty']}",
+           "-e", f"WSP_GPU_MEMORY={gpu['run_memory']}",
            "-v", f"{MODEL_DIR}:/model:ro", "-v", f"{PRACTICE}:/practice:ro", "-v", f"{self.dir}/work:/work",
            "-v", f"{self.dir}/start:/start:ro", "-v", f"{req}:/requests", "-v", f"{HARNESS}:/harness:ro",
            "-v", f"{CACHE}:/root/.cache",
@@ -559,7 +566,8 @@ class Run:
         signal.signal(signal.SIGTERM, lambda *a: sys.exit(143))
         try:
             self.log(f"starting the kernel for run {self.name} ({'resumed' if resumed else 'new'}, "
-                     f"{self.cfg['backend']} backend, {self.cfg['model']}, effort {self.cfg['effort']})")
+                     f"{self.cfg['backend']} backend, {self.cfg['model']}, effort {self.cfg['effort']}, "
+                     f"GPU {self.cfg['gpu']})")
             self.start_kernel()
             if resumed:
                 self.new_conversation("the driver was restarted", kernel_kept=False)
@@ -1037,12 +1045,14 @@ def main():
     ap.add_argument("--max-turns", type=int)
     ap.add_argument("--max-code-runs", type=int)
     ap.add_argument("--kernel-seconds", type=int)
+    ap.add_argument("--kernel-memory-gb", type=int, help="the kernel container's memory limit (default 20)")
     ap.add_argument("--max-context", type=int)
     ap.add_argument("--gpu-idle-minutes", type=float)
     ap.add_argument("--claude-bin", help="the claude executable (tests use a stand-in)")
     ap.add_argument("--presence-penalty", type=float)
     ap.add_argument("--start-from", help="a submission/ folder whose edit a new run starts from")
     ap.add_argument("--brief", help="a text file added to the prompt under THIS RUN")
+    ap.add_argument("--gpu", choices=sorted(GPUS), help="the GPU of the run's GPU server (default 5090)")
     args = ap.parse_args()
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*", args.run):
         raise SystemExit("run names use letters, digits, '.', '_' and '-'")

@@ -44,7 +44,8 @@ def main():
     models, spec = sys.argv[1].split(","), json.loads(sys.argv[2])
     limit = int(sys.argv[3]) if len(sys.argv) > 3 else 0
     tok = AutoTokenizer.from_pretrained("/model")
-    llm = LLM(model="/model", language_model_only=True, max_model_len=MAX_NEW + 4096, gpu_memory_utilization=0.9,
+    llm = LLM(model="/model", language_model_only=True, max_model_len=MAX_NEW + 4096,
+              gpu_memory_utilization=float(os.environ.get("WSP_GPU_MEMORY", "0.9")),
               max_num_seqs=256, enable_prefix_caching=False, seed=0, worker_extension_cls="wsp_ext.WspWorkerExtension")
     edits = sorted(glob.glob("/submission/*.npy"))
     print(f"suites {spec}; {len(edits)} edited tensors; sampling {SAMPLING}", flush=True)

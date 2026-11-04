@@ -8,7 +8,8 @@ Generation uses vLLM. Edited weights are swapped into the running engine in plac
 so "original", "edited", "start" (a run's starting edit, /start) and "both" (a baseline, original
 or start, then edited) share one engine. Teacher-forced reads and generation activations use a
 Hugging Face copy of the model kept in the same weight state. The presence penalty is
-$WSP_PRESENCE (0 by default).
+$WSP_PRESENCE (0 by default), and vLLM's share of GPU memory $WSP_GPU_MEMORY (0.62, the 5090's,
+by default; see gpus.py).
 
 Hidden-state index h: 0 = embeddings, h = l + 1 = output of decoder layer l (tensor names
 model.language_model.layers.l.*), so h runs 0..24. MLP activations are the inputs of
@@ -90,7 +91,8 @@ PROBLEMS = {}
 
 def init():
     global llm, vllm_state, hf, hf_state
-    llm = LLM(model=MODEL, language_model_only=True, max_model_len=MAX_NEW + 4096, gpu_memory_utilization=0.62,
+    llm = LLM(model=MODEL, language_model_only=True, max_model_len=MAX_NEW + 4096,
+              gpu_memory_utilization=float(os.environ.get("WSP_GPU_MEMORY", "0.62")),
               max_num_seqs=256, enable_prefix_caching=False, seed=0,
               worker_extension_cls="wsp_ext.WspWorkerExtension")
 
