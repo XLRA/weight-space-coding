@@ -3,6 +3,7 @@
 
     evaluate.py prepare [--suites all]        build final/ and check every grader (reference answers)
     evaluate.py run <name> --submission DIR [--suites code] [--samples N] [--models original,edited]
+                        [--reuse-original NAME]   copy the unedited model's answers from results/NAME
     evaluate.py report <name>                 grade and summarize results/<name>/ again
 
 Suites (default samples per problem; `run` takes them in this order, each for both models before
@@ -230,7 +231,28 @@ def grade(out_dir, raw_name, suite):
     return rows
 
 
-def run(name, submission, spec, models, limit, presence):
+def reuse_original(src_name, out, spec, limit, presence):
+    """Copy the unedited model's answers from results/<src_name>. They do not depend on the edit, so with the
+    same samples, problem limit and presence penalty (and the same seeds, fixed by problem and sample) they
+    stand in for a new generation; eval_gen.py then skips them as done."""
+    src = f"{EVAL}/results/{src_name}"
+    cfg = json.load(open(f"{src}/config.json"))
+    if cfg.get("limit_per_set", 0) != limit or cfg.get("presence_penalty", 0.0) != presence:
+        raise SystemExit(f"--reuse-original {src_name}: it has --limit {cfg.get('limit_per_set', 0)} and presence "
+                         f"penalty {cfg.get('presence_penalty', 0.0)}; this run {limit} and {presence}")
+    reused = {}
+    for suite, n in spec.items():
+        fn = "gen_original.raw.jsonl" if suite == "code" else f"gen_{suite}_original.raw.jsonl"
+        if cfg.get("suites", {}).get(suite) != n or not os.path.exists(f"{src}/{fn}"):
+            print(f"{suite}: nothing to reuse from {src_name} (not run there with {n} samples)", flush=True)
+        elif not os.path.exists(f"{out}/{fn}"):  # a resumed run keeps what it has
+            shutil.copy(f"{src}/{fn}", f"{out}/{fn}")
+            reused[suite] = sum(1 for _ in open(f"{out}/{fn}"))
+            print(f"{suite}: reusing {reused[suite]} original answers from {src_name}", flush=True)
+    return reused
+
+
+def run(name, submission, spec, models, limit, presence, reuse=None):
     out = f"{EVAL}/results/{name}"
     os.makedirs(out, exist_ok=True)
     sub = f"{out}/submission"
@@ -243,14 +265,18 @@ def run(name, submission, spec, models, limit, presence):
     missing = [s for s in spec if s != "code" and not os.path.exists(f"{EVAL}/final/suites/{s}.jsonl")]
     if missing:
         raise SystemExit(f"run `evaluate.py prepare --suites {','.join(missing)}` first")
-    json.dump({"submission": os.path.realpath(submission), "tensors": sorted(tensors), "suites": spec,
-               "models": models, "limit_per_set": limit, "presence_penalty": presence},
-              open(f"{out}/config.json", "w"), indent=1)
+    cfg = {"submission": os.path.realpath(submission), "tensors": sorted(tensors), "suites": spec,
+           "models": models, "limit_per_set": limit, "presence_penalty": presence}
+    if reuse:
+        cfg["original_from"] = reuse
+    json.dump(cfg, open(f"{out}/config.json", "w"), indent=1)
     lock = open(f"{WSP}/runs/.gpu.lock", "w")
     try:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
     except BlockingIOError:
         raise SystemExit("another run holds the GPU (/opt/wsp/runs/.gpu.lock)")
+    if reuse and "original" in models:
+        reuse_original(reuse, out, spec, limit, presence)
     stopped = False
     name_c = f"wsp-eval-{name}"
     # pkill -TERM: exit through the finally below, so the container goes and llama-swap comes back
@@ -319,6 +345,8 @@ def report(name):
              f"Submission {cfg.get('submission')} ({len(cfg.get('tensors', []))} tensors); samples per problem "
              + ", ".join(f"{s} {n}" for s, n in spec.items()) + f"; presence penalty {cfg.get('presence_penalty', 0)}"
              + (f"; SMOKE TEST, first {cfg['limit_per_set']} problems per set only" if cfg.get("limit_per_set") else "")
+             + (f"; the original model's answers are reused from {cfg['original_from']}" if cfg.get("original_from")
+                else "")
              + ".", "", "Cut = answers that hit the 32,768-token limit. Paired diff = edited - original, averaged per "
              "problem over its samples, with its standard error over problems."]
     for suite in [s for s in SUITES if s in graded]:
@@ -362,6 +390,8 @@ def main():
     r.add_argument("--limit", type=int, default=0, help="only the first N problems of each set (smoke tests)")
     r.add_argument("--presence-penalty", type=float, default=0.0,
                    help="0 = the editing runs' coding setting; the paper's Experiment 8 used 1.5")
+    r.add_argument("--reuse-original", metavar="NAME",
+                   help="copy the unedited model's answers from results/NAME (same samples, limit and presence penalty)")
     p = sub.add_parser("report")
     p.add_argument("name")
     a = ap.parse_args()
@@ -376,7 +406,8 @@ def main():
         models = a.models.split(",")
         if set(models) - {"original", "edited"}:
             raise SystemExit("--models takes original and/or edited")
-        run(a.name, a.submission, {s: a.samples or SUITES[s] for s in chosen}, models, a.limit, a.presence_penalty)
+        run(a.name, a.submission, {s: a.samples or SUITES[s] for s in chosen}, models, a.limit, a.presence_penalty,
+            a.reuse_original)
     else:
         report(a.name)
 

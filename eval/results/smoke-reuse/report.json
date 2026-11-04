@@ -1,0 +1,103 @@
+{
+ "name": "smoke-reuse",
+ "config": {
+  "submission": "/opt/wsp/runs/pilot-10/submission",
+  "tensors": [
+   "model.language_model.layers.10.mlp.down_proj.weight.npy",
+   "model.language_model.layers.13.mlp.down_proj.weight.npy",
+   "model.language_model.layers.14.mlp.down_proj.weight.npy"
+  ],
+  "suites": {
+   "mmlupro": 1,
+   "ifeval": 1
+  },
+  "models": [
+   "original",
+   "edited"
+  ],
+  "limit_per_set": 5,
+  "presence_penalty": 0.0,
+  "original_from": "smoke-suites"
+ },
+ "models": {
+  "mmlupro": {
+   "original": {
+    "all": {
+     "answers": 5,
+     "pass@1": 20.0,
+     "cut": 80.0,
+     "loop": 80.0,
+     "mean_tokens": 26517.4,
+     "failures": {
+      "cut_at_max_tokens": 3,
+      "wrong_answer": 1,
+      "pass": 1
+     }
+    }
+   },
+   "edited": {
+    "all": {
+     "answers": 5,
+     "pass@1": 20.0,
+     "cut": 0.0,
+     "loop": 0.0,
+     "mean_tokens": 7170.2,
+     "failures": {
+      "wrong_answer": 3,
+      "pass": 1,
+      "no_answer": 1
+     }
+    }
+   }
+  },
+  "ifeval": {
+   "original": {
+    "all": {
+     "answers": 5,
+     "pass@1": 0.0,
+     "cut": 100.0,
+     "loop": 100.0,
+     "mean_tokens": 32768.0,
+     "failures": {
+      "cut_at_max_tokens": 5
+     },
+     "instruction_level": 0.0
+    }
+   },
+   "edited": {
+    "all": {
+     "answers": 5,
+     "pass@1": 80.0,
+     "cut": 0.0,
+     "loop": 0.0,
+     "mean_tokens": 2275.6,
+     "failures": {
+      "pass": 4,
+      "not_followed": 1
+     },
+     "instruction_level": 87.5
+    }
+   }
+  }
+ },
+ "paired": {
+  "mmlupro": {
+   "all": {
+    "problems": 5,
+    "diff": 0.0,
+    "se": 31.62,
+    "fail_to_pass": 1,
+    "pass_to_fail": 1
+   }
+  },
+  "ifeval": {
+   "all": {
+    "problems": 5,
+    "diff": 80.0,
+    "se": 20.0,
+    "fail_to_pass": 4,
+    "pass_to_fail": 0
+   }
+  }
+ }
+}

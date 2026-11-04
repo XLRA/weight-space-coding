@@ -5,6 +5,11 @@
     driver.py <run> --backend anthropic --max-usd 300 [--passes 50] ...     (Claude API, billed per token)
     driver.py <run> --backend replay --replay replies.json [--passes 2]    (harness tests, no model)
 
+    [--presence-penalty 1.5]  the generation passes' presence penalty (default 0), also stated in the prompt
+    [--start-from DIR]        a new run starts with DIR's edit (a submission/) in /work/edited, and keeps a
+                              read-only copy in /start that "model": "start" and "baseline": "start" run
+    [--brief FILE]            text added to the prompt under THIS RUN (copied to runs/<run>/brief.md)
+
 Starts the kernel container for /opt/wsp/runs/<run>/, sends the editor prompt (prompt.txt), and
 loops. Each agent reply must hold one ```python block, run in the kernel, or one ```forward
 block, validated here, run by the GPU server, graded in a no-GPU sandbox and summarized. The run
@@ -60,7 +65,7 @@ PRICES = {"claude-opus-5-5": (4.0, 20.0, 0.20, 8.0)}
 DEFAULTS = dict(passes=50, backend="claude-code", replay=None, model="claude-opus-5-5", effort="max", max_usd=None,
                 handoff_every=40, max_turns=1000, max_code_runs=300, kernel_seconds=900, kernel_memory_gb=20,
                 max_output_tokens=128000, max_context=600_000, gpu_idle_minutes=30,
-                claude_bin="/home/wspagent/.local/bin/claude")
+                claude_bin="/home/wspagent/.local/bin/claude", presence_penalty=0.0, start_from=None, brief=None)
 AGENT_USER = "wspagent"
 # Claude Code's replies when a subscription limit is reached, e.g. "Claude AI usage limit reached|<epoch>"
 # or "You've hit your session limit · resets 5am".
@@ -312,7 +317,7 @@ class ReplayBackend:
 class Run:
     def __init__(self, name, args):
         self.name, self.dir = name, f"{WSP}/runs/{name}"
-        for sub in ("work", "ctl", "requests", "turns", "messages", "submission"):
+        for sub in ("work", "work/edited", "start", "ctl", "requests", "turns", "messages", "submission"):
             os.makedirs(f"{self.dir}/{sub}", exist_ok=True)
         self.cfg = dict(DEFAULTS)
         if os.path.exists(f"{self.dir}/config.json"):
@@ -320,12 +325,30 @@ class Run:
         self.cfg.update({k: v for k, v in vars(args).items() if v is not None and k in DEFAULTS})
         if self.cfg["backend"] == "anthropic" and self.cfg["max_usd"] is None:
             raise SystemExit("pass --max-usd: the driver stops (resumably) once the estimated API spend reaches it")
+        for key in ("start_from", "brief"):
+            if self.cfg[key]:
+                self.cfg[key] = os.path.realpath(self.cfg[key])
         json.dump(self.cfg, open(f"{self.dir}/config.json", "w"), indent=1)
         self.state = dict(status="new", turn=0, conv=0, conv_turns=0, passes_used=0, code_runs=0, requests=0,
                           usd=0.0, tokens={}, invalid_streak=0, refusals=0, turns_after_budget=0, context=0,
                           limit_waits=0, limit_wait_seconds=0)
         if os.path.exists(f"{self.dir}/state.json"):
             self.state.update(json.load(open(f"{self.dir}/state.json")))
+        start = self.cfg["start_from"]
+        if start and not glob.glob(f"{self.dir}/start/*.npy"):
+            files = [f for f in os.listdir(start) if f.endswith(".npy") or f == "manifest.json"]
+            if not any(f.endswith(".npy") for f in files):
+                raise SystemExit(f"--start-from {start} has no .npy edits")
+            for f in files:
+                shutil.copy(f"{start}/{f}", f"{self.dir}/start/{f}")
+                if self.state["status"] == "new":
+                    shutil.copy(f"{start}/{f}", f"{self.dir}/work/edited/{f}")
+            report = f"{os.path.dirname(start)}/final_answer.md"  # the earlier run's own report, if it has one
+            if os.path.exists(report):
+                shutil.copy(report, f"{self.dir}/start/report.md")
+        self.has_start = bool(glob.glob(f"{self.dir}/start/*.npy"))
+        if self.cfg["brief"] and not os.path.exists(f"{self.dir}/brief.md"):
+            shutil.copy(self.cfg["brief"], f"{self.dir}/brief.md")
         self.kernel_name, self.gpu_name = f"wsp-kernel-{name}", f"wsp-gpu-{name}"
         self.sock = f"{self.dir}/ctl/kernel.sock"
         self.problems = {}
@@ -334,8 +357,12 @@ class Run:
                 for line in open(f"{PRACTICE}/{fn}"):
                     self.problems[json.loads(line)["id"]] = True
         prompt = open(f"{HARNESS}/prompt.txt").read().strip()
+        if os.path.exists(f"{self.dir}/brief.md"):
+            prompt += "\n\nTHIS RUN.\n" + open(f"{self.dir}/brief.md").read().strip()
         for key in ("passes", "max_code_runs", "kernel_seconds", "kernel_memory_gb", "handoff_every"):
             prompt = prompt.replace("{{%s}}" % {"passes": "N_PASSES"}.get(key, key.upper()), str(self.cfg[key]))
+        pp = float(self.cfg["presence_penalty"])
+        prompt = prompt.replace("{{PRESENCE}}", f"presence penalty {pp:g}" if pp else "no presence penalty")
         assert "{{" not in prompt, "unfilled placeholder in prompt.txt"
         self.prompt = prompt
         self.stopped_llama = False
@@ -435,7 +462,7 @@ class Run:
            "--tmpfs", "/tmp:rw,size=4g,mode=1777", "--memory", mem, "--memory-swap", mem, "--pids-limit", "1024",
            "--cpus", "12", "-e", "OMP_NUM_THREADS=12", "-e", "HOME=/tmp", "-e", "HF_HUB_OFFLINE=1",
            "-v", f"{MODEL_DIR}:/model:ro", "-v", f"{PRACTICE}:/practice:ro", "-v", f"{self.dir}/work:/work",
-           "-v", f"{self.dir}/ctl:/ctl", "-v", f"{HARNESS}:/harness:ro",
+           "-v", f"{self.dir}/start:/start:ro", "-v", f"{self.dir}/ctl:/ctl", "-v", f"{HARNESS}:/harness:ro",
            IMAGE, "python3", "-W", "ignore", "/harness/kernel_server.py")
         t0 = time.time()
         while time.time() - t0 < 300:
@@ -463,9 +490,10 @@ class Run:
                 os.remove(f"{req}/{fn}")
         sh("docker", "run", "-d", "--name", self.gpu_name, "--network", "none", "--shm-size", "8g",
            "--memory", "20g", "--device", GPU, "-e", "PYTHONPATH=/harness", "-e", "HF_HUB_OFFLINE=1",
-           "-e", "VLLM_NO_USAGE_STATS=1", "-e", "DO_NOT_TRACK=1",
+           "-e", "VLLM_NO_USAGE_STATS=1", "-e", "DO_NOT_TRACK=1", "-e", f"WSP_PRESENCE={self.cfg['presence_penalty']}",
            "-v", f"{MODEL_DIR}:/model:ro", "-v", f"{PRACTICE}:/practice:ro", "-v", f"{self.dir}/work:/work",
-           "-v", f"{req}:/requests", "-v", f"{HARNESS}:/harness:ro", "-v", f"{CACHE}:/root/.cache",
+           "-v", f"{self.dir}/start:/start:ro", "-v", f"{req}:/requests", "-v", f"{HARNESS}:/harness:ro",
+           "-v", f"{CACHE}:/root/.cache",
            IMAGE, "python3", "-W", "ignore", "/harness/gpu_server.py")
         t0 = time.time()
         while time.time() - t0 < 900:
@@ -725,13 +753,19 @@ class Run:
     def validate(self, req):
         if not isinstance(req, dict):
             raise Refused("the block must hold one JSON object")
+        weights = ("original", "edited", "start") if self.has_start else ("original", "edited")
         if req.get("type") == "generate":
             unknown = set(req) - {"type", "model", "problems", "problems_file", "prompts", "prompts_file", "n",
-                                  "max_tokens", "activations"}
+                                  "max_tokens", "activations", "baseline"}
             if unknown:
                 raise Refused(f"unknown keys {sorted(unknown)}")
-            if req.get("model") not in ("original", "edited", "both"):
-                raise Refused('"model" must be "original", "edited" or "both"')
+            if req.get("model") not in weights + ("both",):
+                raise Refused('"model" must be ' + ", ".join(f'"{w}"' for w in weights) + ' or "both"')
+            baseline, bases = req.get("baseline", "original"), [w for w in weights if w != "edited"]
+            if "baseline" in req and req["model"] != "both":
+                raise Refused('"baseline" goes with "model": "both"')
+            if baseline not in bases:
+                raise Refused('"baseline" must be ' + " or ".join(f'"{w}"' for w in bases))
             problems, prompts = self.list_arg(req, "problems", str), self.list_arg(req, "prompts", str)
             bad = [p for p in problems if p not in self.problems]
             if bad:
@@ -752,6 +786,8 @@ class Run:
                 raise Refused(f"{items} items x n={n} = {items * n} generations per model (at most {cap})")
             out = {"type": "generate", "model": req["model"], "problems": problems, "prompts": prompts, "n": n,
                    "max_tokens": max_tokens}
+            if req["model"] == "both":
+                out["baseline"] = baseline
             acts = req.get("activations")
             if acts is not None:
                 if not isinstance(acts, dict) or set(acts) - {"layers", "mlp"}:
@@ -768,8 +804,8 @@ class Run:
                                   "return"}
             if unknown:
                 raise Refused(f"unknown keys {sorted(unknown)}")
-            if req.get("model") not in ("original", "edited"):
-                raise Refused('"model" must be "original" or "edited"')
+            if req.get("model") not in weights:
+                raise Refused('"model" must be ' + " or ".join(f'"{w}"' for w in weights))
             texts, chats = self.list_arg(req, "texts", str), self.list_arg(req, "chats", list)
             if bool(texts) == bool(chats):
                 raise Refused("give a non-empty texts (or texts_file) or chats (or chats_file), not both")
@@ -911,7 +947,7 @@ class Run:
         return out
 
     @staticmethod
-    def paired(o_rows, e_rows):
+    def paired(o_rows, e_rows, base="original"):
         O = {(r["id"], r["sample"]): r for r in o_rows if r["status"] != "ungraded"}
         E = {(r["id"], r["sample"]): r for r in e_rows if r["status"] != "ungraded"}
         keys = sorted(set(O) & set(E))
@@ -932,7 +968,7 @@ class Run:
         cut_d = 100 * np.mean([float(E[k]["finish_reason"] == "length") - float(O[k]["finish_reason"] == "length")
                                for k in keys])
         len_d = np.mean([E[k]["n_tokens"] - O[k]["n_tokens"] for k in keys])
-        out = [f"paired, edited - original, over {n_items} problems ({len(keys)} answer pairs): pass {m:+.1f} points "
+        out = [f"paired, edited - {base}, over {n_items} problems ({len(keys)} answer pairs): pass {m:+.1f} points "
                f"(SE {se:.1f}); fail->pass {up}, pass->fail {down}; cut at max_tokens {cut_d:+.1f} points; mean "
                f"length {len_d:+,.0f} tokens"]
         sources = sorted({O[k]["source"] for k in keys})
@@ -960,7 +996,8 @@ class Run:
                 json.dump(idx, open(idx_path, "w"))
                 files.append(folder + "/")
         if len(rows) == 2:
-            lines += self.paired(rows["original"], rows["edited"])
+            base = req.get("baseline", "original")
+            lines += self.paired(rows[base], rows["edited"], base)
         secs = ", ".join(f"{v} {t:.0f} s" for v, t in res.get("seconds", {}).items())
         lines.append(f"Files: {', '.join(files)}. Time: {secs}.")
         return "\n".join(lines)
@@ -1003,6 +1040,9 @@ def main():
     ap.add_argument("--max-context", type=int)
     ap.add_argument("--gpu-idle-minutes", type=float)
     ap.add_argument("--claude-bin", help="the claude executable (tests use a stand-in)")
+    ap.add_argument("--presence-penalty", type=float)
+    ap.add_argument("--start-from", help="a submission/ folder whose edit a new run starts from")
+    ap.add_argument("--brief", help="a text file added to the prompt under THIS RUN")
     args = ap.parse_args()
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*", args.run):
         raise SystemExit("run names use letters, digits, '.', '_' and '-'")

@@ -5,8 +5,10 @@ runs it and writes /requests/fwd_<k>.result.json ({"ok": true, ...} or {"ok": fa
 Grading of generations is done afterwards by the driver, in the no-GPU sandbox.
 
 Generation uses vLLM. Edited weights are swapped into the running engine in place (wsp_ext.py),
-so "original", "edited" and "both" share one engine. Teacher-forced reads and generation
-activations use a Hugging Face copy of the model kept in the same weight state.
+so "original", "edited", "start" (a run's starting edit, /start) and "both" (a baseline, original
+or start, then edited) share one engine. Teacher-forced reads and generation activations use a
+Hugging Face copy of the model kept in the same weight state. The presence penalty is
+$WSP_PRESENCE (0 by default).
 
 Hidden-state index h: 0 = embeddings, h = l + 1 = output of decoder layer l (tensor names
 model.language_model.layers.l.*), so h runs 0..24. MLP activations are the inputs of
@@ -30,7 +32,8 @@ torch.set_grad_enabled(False)
 MODEL, WORK, REQ = "/model", "/work", "/requests"
 MAX_NEW, ACT_TOKENS, CHUNK = 32768, 8192, 1024
 PREFIX = "model.language_model."
-SAMPLING = dict(temperature=0.6, top_p=0.95, top_k=20, min_p=0.0, presence_penalty=0.0)
+SAMPLING = dict(temperature=0.6, top_p=0.95, top_k=20, min_p=0.0,
+                presence_penalty=float(os.environ.get("WSP_PRESENCE", "0")))
 
 tok = AutoTokenizer.from_pretrained(MODEL)
 INDEX = json.load(open(f"{MODEL}/model.safetensors.index.json"))["weight_map"]
@@ -45,13 +48,18 @@ def original(name):
     return _files[fn].get_tensor(name)
 
 
-def current_edits():
-    """{name: (path, fingerprint)} for the edit files in /work/edited right now."""
+def current_edits(folder=f"{WORK}/edited"):
+    """{name: (path, fingerprint)} for the edit files in /work/edited right now (or in another folder)."""
     out = {}
-    for path in glob.glob(f"{WORK}/edited/*.npy"):
-        st = os.stat(path)
-        out[os.path.basename(path)[:-4]] = (path, (st.st_mtime_ns, st.st_size))
+    for path in glob.glob(f"{folder}/*.npy"):
+        st = os.stat(path)  # the path is part of the fingerprint, so start and edited never look alike
+        out[os.path.basename(path)[:-4]] = (path, (path, st.st_mtime_ns, st.st_size))
     return out
+
+
+def edits_for(variant):
+    """original: none; edited: the agent's current edits; start: the run's starting edit (read-only /start)."""
+    return {"original": {}, "edited": current_edits(), "start": current_edits("/start")}[variant]
 
 
 class WeightState:
@@ -61,7 +69,7 @@ class WeightState:
         self.apply, self.loaded = apply, {}  # name -> fingerprint of the edit currently in place
 
     def set(self, variant):
-        target = current_edits() if variant == "edited" else {}
+        target = edits_for(variant)
         pairs = []
         for name in set(self.loaded) | set(target):
             if name in target and self.loaded.get(name) == target[name][1]:
@@ -196,7 +204,7 @@ def generation(k, req):
     items = [(pid, PROBLEMS[pid]["problem"]) for pid in req.get("problems", [])]
     items += [(f"prompt/{i}", msg) for i, msg in enumerate(req.get("prompts", []))]
     n, max_tokens = int(req.get("n", 1)), int(req.get("max_tokens", MAX_NEW))
-    variants = ["original", "edited"] if req["model"] == "both" else [req["model"]]
+    variants = [req.get("baseline", "original"), "edited"] if req["model"] == "both" else [req["model"]]
     result = {"outputs": {}, "seconds": {}}
     for v in variants:
         t0 = time.time()
@@ -348,7 +356,7 @@ HANDLERS = {"generate": generation, "teacher_forced": teacher_forced, "debug_vll
 def main():
     init()
     open(f"{REQ}/server.ready", "w").write(str(time.time()))
-    print("gpu server ready", flush=True)
+    print(f"gpu server ready; sampling {SAMPLING}", flush=True)
     while True:
         for path in sorted(glob.glob(f"{REQ}/fwd_*.json")):
             if path.endswith(".result.json"):
