@@ -1,8 +1,8 @@
 """Progress of agent runs: python3 progress.py <run> [<run> ...] [--watch SECONDS]
 
 Passes used, turns, code runs and tokens from runs/<run>/state.json; the forward pass running now and the
-answers it has written so far; the agent's latest explanation; the last lines of driver.log; the 5090 and
-llama-swap. --watch redraws every SECONDS until Ctrl-C (the run goes on).
+answers it has written so far; the agent's latest explanation; the last lines of driver.log; the run's GPU
+(use, memory, temperature, power) and, for the 5090, llama-swap. --watch redraws every SECONDS until Ctrl-C (the run goes on).
 """
 import calendar
 import json
@@ -150,8 +150,13 @@ def show(name, compact=False):
     lines += ["  " + l[:width - 2] for l in log[-(3 if compact else 6):]]
     lines.append("")
     g = cfg.get("gpu", "5090")
-    gpu = sh("nvidia-smi", "-i", str(GPUS[g]["index"]), "--query-gpu=name,utilization.gpu,memory.used,memory.total",
-             "--format=csv,noheader")
+    q = sh("nvidia-smi", "-i", str(GPUS[g]["index"]),
+           "--query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu,power.draw",
+           "--format=csv,noheader,nounits").split(", ")
+    try:
+        gpu = f"{q[0]}, {q[1]} %, {q[2]} / {q[3]} MiB, {q[4]} C, {float(q[5]):.0f} W"
+    except (IndexError, ValueError):
+        gpu = ", ".join(q)
     if GPUS[g]["llama_swap"]:
         swap = sh("docker", "inspect", "-f", "{{.State.Status}}", "llama-swap")
         lines.append(f"GPU: {gpu}   llama-swap: {swap} (stopped while the run uses the 5090)")
