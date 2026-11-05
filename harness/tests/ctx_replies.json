@@ -1,0 +1,12 @@
+[
+ "I define a counter x in the kernel so later turns can check that it survives.\n```python\n# test: define the counter\nx = 1\nprint('x =', x)\n```",
+ "Turn 2 of the context test: I add one to the counter and print it to check the kernel.\n```python\nx += 1\nprint('x =', x)\n```",
+ "Turn 3 of the context test: I add one to the counter and print it to check the kernel.\n```python\nx += 1\nprint('x =', x)\n```",
+ "Turn 4 of the context test: I add one to the counter and print it to check the kernel.\n```python\nx += 1\nprint('x =', x)\n```",
+ "Turn 5 of the context test: I add one to the counter and print it to check the kernel.\n```python\nx += 1\nprint('x =', x)\n```",
+ "Turn 6 of the context test: I add one to the counter and print it to check the kernel.\n```python\nx += 1\nprint('x =', x)\n```",
+ "This is the reply after the size warning; I add one to the counter again as before.\n```python\nx += 1\nprint('x =', x)\n```",
+ "This is the first turn after the handoff; the kernel should still hold the counter x.\n```python\nx += 1\nprint('x =', x)\n```",
+ "Turn 9 of the context test: I add one to the counter and print it to check the kernel.\n```python\nx += 1\nprint('x =', x)\n```",
+ "Turn 10 of the context test: I add one to the counter and print it to check the kernel.\n```python\nx += 1\nprint('x =', x)\n```"
+]

@@ -65,8 +65,8 @@ CATEGORIES = ["cut_at_max_tokens", "no_code", "syntax_error", "wrong_interface",
 # $ per million tokens: input, output, cache read, cache write (1-hour TTL)
 PRICES = {"claude-opus-5-5": (4.0, 20.0, 0.20, 8.0)}
 DEFAULTS = dict(passes=50, backend="claude-code", replay=None, model="claude-opus-5-5", effort="max", max_usd=None,
-                handoff_every=40, max_turns=1000, max_code_runs=300, kernel_seconds=900, kernel_memory_gb=20,
-                max_output_tokens=128000, max_context=600_000, gpu_idle_minutes=30,
+                handoff_every=0, max_turns=1000, max_code_runs=300, kernel_seconds=900, kernel_memory_gb=20,
+                max_output_tokens=128000, max_context=400_000, gpu_idle_minutes=30,
                 claude_bin="/home/wspagent/.local/bin/claude", presence_penalty=0.0, start_from=None, brief=None,
                 gpu="5090")
 AGENT_USER = "wspagent"
@@ -364,6 +364,12 @@ class Run:
             prompt += "\n\nTHIS RUN.\n" + open(f"{self.dir}/brief.md").read().strip()
         for key in ("passes", "max_code_runs", "kernel_seconds", "kernel_memory_gb", "handoff_every"):
             prompt = prompt.replace("{{%s}}" % {"passes": "N_PASSES"}.get(key, key.upper()), str(self.cfg[key]))
+        if self.cfg["handoff_every"]:
+            rule = f"Every {self.cfg['handoff_every']} turns, or sooner when the conversation grows long,"
+        else:
+            rule = (f"When the conversation grows past about {self.cfg['max_context']:,} tokens (you are warned a "
+                    f"little before),")
+        prompt = prompt.replace("{{HANDOFF_RULE}}", rule)
         pp = float(self.cfg["presence_penalty"])
         prompt = prompt.replace("{{PRESENCE}}", f"presence penalty {pp:g}" if pp else "no presence penalty")
         assert "{{" not in prompt, "unfilled placeholder in prompt.txt"
@@ -527,7 +533,7 @@ class Run:
             pending = self.messages[-1]["content"]
         if self.messages or self.state["turn"]:
             self.state["conv"] += 1
-        self.state["conv_turns"], self.state["context"] = 0, 0
+        self.state["conv_turns"], self.state["context"], self.state["context_warned"] = 0, 0, False
         self.messages = []
         if hasattr(self.backend, "new_session"):
             self.backend.new_session()
@@ -597,9 +603,9 @@ class Run:
                 return self.stop(f"estimated spend ${s['usd']:.2f} reached --max-usd {c['max_usd']}")
             if s["turn"] >= c["max_turns"]:
                 return self.stop(f"turn limit {c['max_turns']}")
-            if s["conv_turns"] >= c["handoff_every"] or s["context"] > c["max_context"]:
+            if (c["handoff_every"] and s["conv_turns"] >= c["handoff_every"]) or s["context"] > c["max_context"]:
                 self.log(f"handoff after {s['conv_turns']} turns ({s['context']:,} tokens of context)")
-                self.new_conversation(f"routine restart after {s['conv_turns']} turns")
+                self.new_conversation(f"routine restart after {s['conv_turns']} turns, at {s['context']:,} tokens")
             s["turn"] += 1
             s["conv_turns"] += 1
             tdir = f"{self.dir}/turns/t{s['turn']:04d}"
@@ -641,9 +647,15 @@ class Run:
                 return self.finish(reply["text"])
             if s["invalid_streak"] >= 8:
                 return self.stop("eight replies in a row without a runnable block")
-            if s["conv_turns"] == c["handoff_every"] - 3:
+            if c["handoff_every"] and s["conv_turns"] == c["handoff_every"] - 3:
                 feedback += ("\n\n[The conversation will be restarted in 3 turns: make sure /work/notes.md is "
                              "up to date.]")
+            elif s["context"] > 0.9 * c["max_context"] and not s.get("context_warned"):
+                # about 40,000 tokens before the restart at 400,000: a dozen turns at the usual growth
+                s["context_warned"] = True
+                self.log(f"turn {s['turn']}: warned that the conversation ({s['context']:,} tokens) restarts soon")
+                feedback += (f"\n\n[This conversation is at {s['context']:,} tokens and will be restarted when it "
+                             f"passes {c['max_context']:,}: make sure /work/notes.md is up to date.]")
             self.add_message("user", feedback)
             self.save_state()
 
@@ -1041,12 +1053,14 @@ def main():
     ap.add_argument("--model")
     ap.add_argument("--effort", choices=["low", "medium", "high", "xhigh", "max"])
     ap.add_argument("--max-usd", type=float)
-    ap.add_argument("--handoff-every", type=int)
+    ap.add_argument("--handoff-every", type=int,
+                    help="also restart the conversation every N turns (default 0: only at --max-context)")
     ap.add_argument("--max-turns", type=int)
     ap.add_argument("--max-code-runs", type=int)
     ap.add_argument("--kernel-seconds", type=int)
     ap.add_argument("--kernel-memory-gb", type=int, help="the kernel container's memory limit (default 20)")
-    ap.add_argument("--max-context", type=int)
+    ap.add_argument("--max-context", type=int,
+                    help="restart the conversation once its context passes this many tokens (default 400000)")
     ap.add_argument("--gpu-idle-minutes", type=float)
     ap.add_argument("--claude-bin", help="the claude executable (tests use a stand-in)")
     ap.add_argument("--presence-penalty", type=float)

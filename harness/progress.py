@@ -361,8 +361,13 @@ def run_block(name, now, width, expl_lines, detail, evs):
     else:
         out += [row("Passes", passes), row("Code runs", code)]
     tok = st["tokens"]
-    agent = (f"turn {st['turn']} · conversation {st['conv'] + 1} ({st['conv_turns']}/{cfg['handoff_every']} turns) · "
-             f"{k(tok['output_tokens'])} output tokens · context {k(st['context'])}")
+    if cfg.get("handoff_every"):  # runs before 2026-11-05 19:00 UTC restart every N turns
+        agent = (f"turn {st['turn']} · conversation {st['conv'] + 1} ({st['conv_turns']}/{cfg['handoff_every']} "
+                 f"turns) · {k(tok['output_tokens'])} output tokens · context {k(st['context'])}")
+    else:
+        agent = (f"turn {st['turn']} · conversation {st['conv'] + 1} ({st['conv_turns']} turns) · "
+                 f"{k(tok['output_tokens'])} output tokens · context {k(st['context'])}"
+                 f"/{k(cfg.get('max_context', 400_000))}")
     if st.get("limit_waits"):
         agent += yellow(f" · waited for the usage limit {st['limit_waits']}× ({minutes(st['limit_wait_seconds'])})")
     out.append(row("Agent", agent))
