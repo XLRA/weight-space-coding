@@ -16,7 +16,9 @@ loops. Each agent reply must hold one ```python block, run in the kernel, or one
 block, validated here, run by the GPU server, graded in a no-GPU sandbox and summarized. The run
 ends when the forward-pass budget is used and the agent replies without a block; /work/edited is
 then copied to submission/. Running the driver again on a run that did not finish resumes it in
-a fresh conversation (a handoff) with a fresh kernel.
+a fresh conversation (a handoff), with the last result the agent had not answered. The kernel is
+fresh, unless the old driver was stopped with SIGKILL (kill -KILL -<its process group>) and its
+kernel still answers: then the kernel and the GPU server are kept, so its variables survive.
 
 The GPU server starts when the agent first asks for a forward pass. On the 5090, llama-swap is
 stopped while the run holds the card; on the 5080, other services keep running beside it.
@@ -525,11 +527,31 @@ class Run:
 
     # --- conversation ---
 
-    def new_conversation(self, reason=None, kernel_kept=True, carry=True):
+    def unseen_result(self):
+        """On a resume: the last message of the last conversation, if it is a block's result that the agent never
+        answered (the driver was stopped while waiting for the reply)."""
+        try:
+            lines = open(f"{self.dir}/messages/conv_{self.state['conv']:03d}.jsonl").read().splitlines()
+        except OSError:
+            return None
+        if len(lines) < 2:  # only the conversation's first message
+            return None
+        last = json.loads(lines[-1])
+        return last["content"] if last["role"] == "user" and isinstance(last["content"], str) else None
+
+    def kernel_alive(self):
+        if not running(self.kernel_name) or not os.path.exists(self.sock):
+            return False
+        try:
+            kernel_client.execute(self.sock, "1", 30)
+            return True
+        except (ConnectionError, TimeoutError, OSError):
+            return False
+
+    def new_conversation(self, reason=None, kernel_kept=True, carry=True, pending=None):
         """Start a conversation: the prompt, or for a handoff the prompt, notes, edits and the result
         of the last block if the agent has not seen it yet."""
-        pending = None
-        if carry and len(self.messages) > 1 and self.messages[-1]["role"] == "user":
+        if pending is None and carry and len(self.messages) > 1 and self.messages[-1]["role"] == "user":
             pending = self.messages[-1]["content"]
         if self.messages or self.state["turn"]:
             self.state["conv"] += 1
@@ -571,12 +593,22 @@ class Run:
             shutil.copy(f"{WSP}/baseline/eval_prompt_format.txt", f"{self.dir}/work/eval_prompt_format.txt")
         signal.signal(signal.SIGTERM, lambda *a: sys.exit(143))
         try:
-            self.log(f"starting the kernel for run {self.name} ({'resumed' if resumed else 'new'}, "
-                     f"{self.cfg['backend']} backend, {self.cfg['model']}, effort {self.cfg['effort']}, "
-                     f"GPU {self.cfg['gpu']})")
-            self.start_kernel()
+            # A driver stopped with SIGKILL leaves its containers running: a resume keeps a kernel that still
+            # answers (its variables survive) and the GPU server, and gives llama-swap back when it ends.
+            kept = resumed and self.kernel_alive()
+            self.log(f"{'keeping the running' if kept else 'starting the'} kernel for run {self.name} "
+                     f"({'resumed' if resumed else 'new'}, {self.cfg['backend']} backend, {self.cfg['model']}, "
+                     f"effort {self.cfg['effort']}, GPU {self.cfg['gpu']}, restart past "
+                     f"{self.cfg['max_context']:,} tokens"
+                     + (f" or every {self.cfg['handoff_every']} turns)" if self.cfg["handoff_every"] else ")"))
+            if not kept:
+                self.start_kernel()
+            if resumed and running(self.gpu_name):
+                self.gpu_used_at = time.time()
+                self.stopped_llama = bool(GPUS[self.cfg["gpu"]]["llama_swap"]) and not running("llama-swap")
+                self.log("keeping the running GPU server")
             if resumed:
-                self.new_conversation("the driver was restarted", kernel_kept=False)
+                self.new_conversation("the driver was restarted", kernel_kept=kept, pending=self.unseen_result())
             else:
                 self.new_conversation()
             self.state["status"] = "running"

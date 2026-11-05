@@ -11,8 +11,9 @@ error that resets 30 s later, which makes the driver wait and give the GPU back.
 logged to calls.jsonl in the working directory.
 
 A fake_config.json in the working directory changes this: "replies" (another replies file), "no_limit"
-(no usage-limit error), and "context_base" / "context_per_turn" (the context each call reports:
-base + per_turn × the session's calls so far), as in the context-handoff test:
+(no usage-limit error), "context_base" / "context_per_turn" (the context each call reports:
+base + per_turn × the session's calls so far), and "sleep_on_call" (call n, counted from 0, first
+sleeps 300 s, so the driver can be killed mid-reply), as in the context-handoff test:
 
     driver.py e2e-ctx --backend claude-code --claude-bin /opt/wsp/harness/tests/fake_claude.py --passes 0
     with runs/e2e-ctx/agent/fake_config.json = {"replies": "/opt/wsp/harness/tests/ctx_replies.json",
@@ -42,6 +43,10 @@ context = fc.get("context_base", 1060) + fc.get("context_per_turn", 0) * calls_i
 with open("calls.jsonl", "a") as f:
     f.write(json.dumps({"n": st["n"], "argv": args, "prompt_head": prompt[:60], "context": context,
                         "prompt_tail": prompt[-400:]}) + "\n")
+if st["n"] == fc.get("sleep_on_call") and not st.get("slept"):  # time to kill the driver mid-reply
+    st["slept"] = True
+    json.dump(st, open(state_path, "w"))
+    time.sleep(300)
 if st["n"] == 8 and not st["limited"] and not fc.get("no_limit"):
     st["limited"] = True
     json.dump(st, open(state_path, "w"))
