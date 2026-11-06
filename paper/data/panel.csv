@@ -1,0 +1,1001 @@
+q,id,suite,source,difficulty,about
+choice/1,panel/choice/5302,choice,mmlupro,other,other
+choice/2,panel/choice/5889,choice,mmlupro,other,other
+choice/3,panel/choice/10678,choice,mmlupro,computer science,computer science
+choice/4,panel/choice/3247,choice,mmlupro,biology,biology
+choice/5,panel/choice/7389,choice,mmlupro,economics,economics
+choice/6,panel/choice/6964,choice,mmlupro,economics,economics
+choice/7,panel/choice/563,choice,mmlupro,business,business
+choice/8,panel/choice/3964,choice,mmlupro,chemistry,chemistry
+choice/9,panel/choice/6813,choice,mmlupro,health,health
+choice/10,panel/choice/485,choice,mmlupro,business,business
+choice/11,panel/choice/8562,choice,mmlupro,math,math
+choice/12,panel/choice/2576,choice,mmlupro,psychology,psychology
+choice/13,panel/choice/7279,choice,mmlupro,economics,economics
+choice/14,panel/choice/1257,choice,mmlupro,law,law
+choice/15,panel/choice/3616,choice,mmlupro,chemistry,chemistry
+choice/16,panel/choice/1265,choice,mmlupro,law,law
+choice/17,panel/choice/11563,choice,mmlupro,engineering,engineering
+choice/18,panel/choice/9120,choice,mmlupro,physics,physics
+choice/19,panel/choice/3103,choice,mmlupro,biology,biology
+choice/20,panel/choice/7744,choice,mmlupro,math,math
+choice/21,panel/choice/8859,choice,mmlupro,math,math
+choice/22,panel/choice/1384,choice,mmlupro,law,law
+choice/23,panel/choice/4075,choice,mmlupro,chemistry,chemistry
+choice/24,panel/choice/11624,choice,mmlupro,engineering,engineering
+choice/25,panel/choice/11217,choice,mmlupro,philosophy,philosophy
+choice/26,panel/choice/4403,choice,mmlupro,chemistry,chemistry
+choice/27,panel/choice/6741,choice,mmlupro,health,health
+choice/28,panel/choice/8181,choice,mmlupro,math,math
+choice/29,panel/choice/11653,choice,mmlupro,engineering,engineering
+choice/30,panel/choice/4781,choice,mmlupro,history,history
+choice/31,panel/choice/6116,choice,mmlupro,health,health
+choice/32,panel/choice/4171,choice,mmlupro,chemistry,chemistry
+choice/33,panel/choice/9001,choice,mmlupro,math,math
+choice/34,panel/choice/9469,choice,mmlupro,physics,physics
+choice/35,panel/choice/2344,choice,mmlupro,psychology,psychology
+choice/36,panel/choice/8062,choice,mmlupro,math,math
+choice/37,panel/choice/6820,choice,mmlupro,health,health
+choice/38,panel/choice/6259,choice,mmlupro,health,health
+choice/39,panel/choice/7564,choice,mmlupro,economics,economics
+choice/40,panel/choice/3273,choice,mmlupro,biology,biology
+choice/41,panel/choice/11033,choice,mmlupro,philosophy,philosophy
+choice/42,panel/choice/8001,choice,mmlupro,math,math
+choice/43,panel/choice/10236,choice,mmlupro,physics,physics
+choice/44,panel/choice/11539,choice,mmlupro,engineering,engineering
+choice/45,panel/choice/5525,choice,mmlupro,other,other
+choice/46,panel/choice/9912,choice,mmlupro,physics,physics
+choice/47,panel/choice/9231,choice,mmlupro,physics,physics
+choice/48,panel/choice/10017,choice,mmlupro,physics,physics
+choice/49,panel/choice/9018,choice,mmlupro,math,math
+choice/50,panel/choice/7097,choice,mmlupro,economics,economics
+choice/51,panel/choice/4452,choice,mmlupro,chemistry,chemistry
+choice/52,panel/choice/2998,choice,mmlupro,biology,biology
+choice/53,panel/choice/4318,choice,mmlupro,chemistry,chemistry
+choice/54,panel/choice/11044,choice,mmlupro,philosophy,philosophy
+choice/55,panel/choice/2123,choice,mmlupro,psychology,psychology
+choice/56,panel/choice/831,choice,mmlupro,business,business
+choice/57,panel/choice/2632,choice,mmlupro,psychology,psychology
+choice/58,panel/choice/2916,choice,mmlupro,biology,biology
+choice/59,panel/choice/131,choice,mmlupro,business,business
+choice/60,panel/choice/7909,choice,mmlupro,math,math
+choice/61,panel/choice/6342,choice,mmlupro,health,health
+choice/62,panel/choice/11506,choice,mmlupro,engineering,engineering
+choice/63,panel/choice/11327,choice,mmlupro,engineering,engineering
+choice/64,panel/choice/4233,choice,mmlupro,chemistry,chemistry
+choice/65,panel/choice/7335,choice,mmlupro,economics,economics
+choice/66,panel/choice/7024,choice,mmlupro,economics,economics
+choice/67,panel/choice/11802,choice,mmlupro,engineering,engineering
+choice/68,panel/choice/3932,choice,mmlupro,chemistry,chemistry
+choice/69,panel/choice/8043,choice,mmlupro,math,math
+choice/70,panel/choice/3772,choice,mmlupro,chemistry,chemistry
+choice/71,panel/choice/12052,choice,mmlupro,engineering,engineering
+choice/72,panel/choice/7980,choice,mmlupro,math,math
+choice/73,panel/choice/4445,choice,mmlupro,chemistry,chemistry
+choice/74,panel/choice/7865,choice,mmlupro,math,math
+choice/75,panel/choice/2324,choice,mmlupro,psychology,psychology
+choice/76,panel/choice/8880,choice,mmlupro,math,math
+choice/77,panel/choice/7977,choice,mmlupro,math,math
+choice/78,panel/choice/8626,choice,mmlupro,math,math
+choice/79,panel/choice/3714,choice,mmlupro,chemistry,chemistry
+choice/80,panel/choice/6294,choice,mmlupro,health,health
+choice/81,panel/choice/11513,choice,mmlupro,engineering,engineering
+choice/82,panel/choice/8766,choice,mmlupro,math,math
+choice/83,panel/choice/5297,choice,mmlupro,other,other
+choice/84,panel/choice/4184,choice,mmlupro,chemistry,chemistry
+choice/85,panel/choice/8440,choice,mmlupro,math,math
+choice/86,panel/choice/2969,choice,mmlupro,biology,biology
+choice/87,panel/choice/376,choice,mmlupro,business,business
+choice/88,panel/choice/2001,choice,mmlupro,psychology,psychology
+choice/89,panel/choice/2096,choice,mmlupro,psychology,psychology
+choice/90,panel/choice/2050,choice,mmlupro,psychology,psychology
+choice/91,panel/choice/10542,choice,mmlupro,computer science,computer science
+choice/92,panel/choice/9030,choice,mmlupro,math,math
+choice/93,panel/choice/9725,choice,mmlupro,physics,physics
+choice/94,panel/choice/3266,choice,mmlupro,biology,biology
+choice/95,panel/choice/6812,choice,mmlupro,health,health
+choice/96,panel/choice/11143,choice,mmlupro,philosophy,philosophy
+choice/97,panel/choice/11483,choice,mmlupro,engineering,engineering
+choice/98,panel/choice/12134,choice,mmlupro,engineering,engineering
+choice/99,panel/choice/1432,choice,mmlupro,law,law
+choice/100,panel/choice/10641,choice,mmlupro,computer science,computer science
+choice/101,panel/choice/11323,choice,mmlupro,engineering,engineering
+choice/102,panel/choice/787,choice,mmlupro,business,business
+choice/103,panel/choice/5402,choice,mmlupro,other,other
+choice/104,panel/choice/7615,choice,mmlupro,economics,economics
+choice/105,panel/choice/3518,choice,mmlupro,biology,biology
+choice/106,panel/choice/7572,choice,mmlupro,economics,economics
+choice/107,panel/choice/2866,choice,mmlupro,biology,biology
+choice/108,panel/choice/2522,choice,mmlupro,psychology,psychology
+choice/109,panel/choice/866,choice,mmlupro,law,law
+choice/110,panel/choice/5870,choice,mmlupro,other,other
+choice/111,panel/choice/8504,choice,mmlupro,math,math
+choice/112,panel/choice/3511,choice,mmlupro,biology,biology
+choice/113,panel/choice/6385,choice,mmlupro,health,health
+choice/114,panel/choice/7081,choice,mmlupro,economics,economics
+choice/115,panel/choice/9783,choice,mmlupro,physics,physics
+choice/116,panel/choice/9480,choice,mmlupro,physics,physics
+choice/117,panel/choice/4839,choice,mmlupro,history,history
+choice/118,panel/choice/11362,choice,mmlupro,engineering,engineering
+choice/119,panel/choice/4302,choice,mmlupro,chemistry,chemistry
+choice/120,panel/choice/11903,choice,mmlupro,engineering,engineering
+choice/121,panel/choice/6973,choice,mmlupro,economics,economics
+choice/122,panel/choice/8618,choice,mmlupro,math,math
+choice/123,panel/choice/9305,choice,mmlupro,physics,physics
+choice/124,panel/choice/4486,choice,mmlupro,chemistry,chemistry
+choice/125,panel/choice/2111,choice,mmlupro,psychology,psychology
+choice/126,panel/choice/2984,choice,mmlupro,biology,biology
+choice/127,panel/choice/10272,choice,mmlupro,physics,physics
+choice/128,panel/choice/3440,choice,mmlupro,biology,biology
+choice/129,panel/choice/11932,choice,mmlupro,engineering,engineering
+choice/130,panel/choice/2610,choice,mmlupro,psychology,psychology
+choice/131,panel/choice/5090,choice,mmlupro,other,other
+choice/132,panel/choice/1780,choice,mmlupro,law,law
+choice/133,panel/choice/4442,choice,mmlupro,chemistry,chemistry
+choice/134,panel/choice/5982,choice,mmlupro,other,other
+choice/135,panel/choice/11031,choice,mmlupro,philosophy,philosophy
+choice/136,panel/choice/11652,choice,mmlupro,engineering,engineering
+choice/137,panel/choice/1372,choice,mmlupro,law,law
+choice/138,panel/choice/2584,choice,mmlupro,psychology,psychology
+choice/139,panel/choice/10754,choice,mmlupro,computer science,computer science
+choice/140,panel/choice/8411,choice,mmlupro,math,math
+choice/141,panel/choice/9370,choice,mmlupro,physics,physics
+choice/142,panel/choice/7770,choice,mmlupro,math,math
+choice/143,panel/choice/8863,choice,mmlupro,math,math
+choice/144,panel/choice/11220,choice,mmlupro,philosophy,philosophy
+choice/145,panel/choice/10440,choice,mmlupro,computer science,computer science
+choice/146,panel/choice/12047,choice,mmlupro,engineering,engineering
+choice/147,panel/choice/9384,choice,mmlupro,physics,physics
+choice/148,panel/choice/208,choice,mmlupro,business,business
+choice/149,panel/choice/8933,choice,mmlupro,math,math
+choice/150,panel/choice/8445,choice,mmlupro,math,math
+choice/151,panel/choice/11972,choice,mmlupro,engineering,engineering
+choice/152,panel/choice/5401,choice,mmlupro,other,other
+choice/153,panel/choice/11511,choice,mmlupro,engineering,engineering
+choice/154,panel/choice/5056,choice,mmlupro,history,history
+choice/155,panel/choice/11914,choice,mmlupro,engineering,engineering
+choice/156,panel/choice/10604,choice,mmlupro,computer science,computer science
+choice/157,panel/choice/8917,choice,mmlupro,math,math
+choice/158,panel/choice/10357,choice,mmlupro,computer science,computer science
+choice/159,panel/choice/2181,choice,mmlupro,psychology,psychology
+choice/160,panel/choice/2020,choice,mmlupro,psychology,psychology
+choice/161,panel/choice/12039,choice,mmlupro,engineering,engineering
+choice/162,panel/choice/6855,choice,mmlupro,economics,economics
+choice/163,panel/choice/245,choice,mmlupro,business,business
+choice/164,panel/choice/11014,choice,mmlupro,philosophy,philosophy
+choice/165,panel/choice/10379,choice,mmlupro,computer science,computer science
+choice/166,panel/choice/793,choice,mmlupro,business,business
+choice/167,panel/choice/5974,choice,mmlupro,other,other
+choice/168,panel/choice/9156,choice,mmlupro,physics,physics
+choice/169,panel/choice/11667,choice,mmlupro,engineering,engineering
+choice/170,panel/choice/3263,choice,mmlupro,biology,biology
+choice/171,panel/choice/11157,choice,mmlupro,philosophy,philosophy
+choice/172,panel/choice/2616,choice,mmlupro,psychology,psychology
+choice/173,panel/choice/11190,choice,mmlupro,philosophy,philosophy
+choice/174,panel/choice/9573,choice,mmlupro,physics,physics
+choice/175,panel/choice/3926,choice,mmlupro,chemistry,chemistry
+choice/176,panel/choice/4721,choice,mmlupro,history,history
+choice/177,panel/choice/6145,choice,mmlupro,health,health
+choice/178,panel/choice/1938,choice,mmlupro,law,law
+choice/179,panel/choice/7263,choice,mmlupro,economics,economics
+choice/180,panel/choice/666,choice,mmlupro,business,business
+choice/181,panel/choice/10657,choice,mmlupro,computer science,computer science
+choice/182,panel/choice/877,choice,mmlupro,law,law
+choice/183,panel/choice/11659,choice,mmlupro,engineering,engineering
+choice/184,panel/choice/226,choice,mmlupro,business,business
+choice/185,panel/choice/3268,choice,mmlupro,biology,biology
+choice/186,panel/choice/486,choice,mmlupro,business,business
+choice/187,panel/choice/6711,choice,mmlupro,health,health
+choice/188,panel/choice/8349,choice,mmlupro,math,math
+choice/189,panel/choice/1762,choice,mmlupro,law,law
+choice/190,panel/choice/9988,choice,mmlupro,physics,physics
+choice/191,panel/choice/2327,choice,mmlupro,psychology,psychology
+choice/192,panel/choice/10961,choice,mmlupro,philosophy,philosophy
+choice/193,panel/choice/1573,choice,mmlupro,law,law
+choice/194,panel/choice/1638,choice,mmlupro,law,law
+choice/195,panel/choice/4595,choice,mmlupro,chemistry,chemistry
+choice/196,panel/choice/7694,choice,mmlupro,math,math
+choice/197,panel/choice/3108,choice,mmlupro,biology,biology
+choice/198,panel/choice/11933,choice,mmlupro,engineering,engineering
+choice/199,panel/choice/8774,choice,mmlupro,math,math
+choice/200,panel/choice/6248,choice,mmlupro,health,health
+choice/201,panel/choice/9871,choice,mmlupro,physics,physics
+choice/202,panel/choice/1849,choice,mmlupro,law,law
+choice/203,panel/choice/1022,choice,mmlupro,law,law
+choice/204,panel/choice/6733,choice,mmlupro,health,health
+choice/205,panel/choice/5715,choice,mmlupro,other,other
+choice/206,panel/choice/8335,choice,mmlupro,math,math
+choice/207,panel/choice/7345,choice,mmlupro,economics,economics
+choice/208,panel/choice/4098,choice,mmlupro,chemistry,chemistry
+choice/209,panel/choice/9606,choice,mmlupro,physics,physics
+choice/210,panel/choice/4835,choice,mmlupro,history,history
+choice/211,panel/choice/5359,choice,mmlupro,other,other
+choice/212,panel/choice/974,choice,mmlupro,law,law
+choice/213,panel/choice/3111,choice,mmlupro,biology,biology
+choice/214,panel/choice/1498,choice,mmlupro,law,law
+choice/215,panel/choice/8195,choice,mmlupro,math,math
+choice/216,panel/choice/10206,choice,mmlupro,physics,physics
+choice/217,panel/choice/6504,choice,mmlupro,health,health
+choice/218,panel/choice/11304,choice,mmlupro,engineering,engineering
+choice/219,panel/choice/4495,choice,mmlupro,chemistry,chemistry
+choice/220,panel/choice/10760,choice,mmlupro,computer science,computer science
+choice/221,panel/choice/7931,choice,mmlupro,math,math
+choice/222,panel/choice/3601,choice,mmlupro,chemistry,chemistry
+choice/223,panel/choice/12214,choice,mmlupro,engineering,engineering
+choice/224,panel/choice/2939,choice,mmlupro,biology,biology
+choice/225,panel/choice/6896,choice,mmlupro,economics,economics
+choice/226,panel/choice/4751,choice,mmlupro,history,history
+choice/227,panel/choice/8991,choice,mmlupro,math,math
+choice/228,panel/choice/3718,choice,mmlupro,chemistry,chemistry
+choice/229,panel/choice/487,choice,mmlupro,business,business
+choice/230,panel/choice/8667,choice,mmlupro,math,math
+choice/231,panel/choice/9364,choice,mmlupro,physics,physics
+choice/232,panel/choice/9164,choice,mmlupro,physics,physics
+choice/233,panel/choice/12170,choice,mmlupro,engineering,engineering
+choice/234,panel/choice/4077,choice,mmlupro,chemistry,chemistry
+choice/235,panel/choice/5349,choice,mmlupro,other,other
+choice/236,panel/choice/579,choice,mmlupro,business,business
+choice/237,panel/choice/9636,choice,mmlupro,physics,physics
+choice/238,panel/choice/11330,choice,mmlupro,engineering,engineering
+choice/239,panel/choice/10022,choice,mmlupro,physics,physics
+choice/240,panel/choice/8739,choice,mmlupro,math,math
+choice/241,panel/choice/2145,choice,mmlupro,psychology,psychology
+choice/242,panel/choice/4471,choice,mmlupro,chemistry,chemistry
+choice/243,panel/choice/1606,choice,mmlupro,law,law
+choice/244,panel/choice/2928,choice,mmlupro,biology,biology
+choice/245,panel/choice/2656,choice,mmlupro,psychology,psychology
+choice/246,panel/choice/9421,choice,mmlupro,physics,physics
+choice/247,panel/choice/6345,choice,mmlupro,health,health
+choice/248,panel/choice/5199,choice,mmlupro,other,other
+choice/249,panel/choice/8319,choice,mmlupro,math,math
+choice/250,panel/choice/10518,choice,mmlupro,computer science,computer science
+math/1,panel/math/prealgebra/173,math,math,level 4,"prealgebra, level 4"
+math/2,panel/math/prealgebra/302,math,math,level 2,"prealgebra, level 2"
+math/3,panel/math/algebra/315,math,math,level 1,"algebra, level 1"
+math/4,panel/math/counting_and_probability/385,math,math,level 3,"counting_and_probability, level 3"
+math/5,panel/math/prealgebra/520,math,math,level 5,"prealgebra, level 5"
+math/6,panel/math/algebra/456,math,math,level 5,"algebra, level 5"
+math/7,panel/math/intermediate_algebra/292,math,math,level 5,"intermediate_algebra, level 5"
+math/8,panel/math/counting_and_probability/32,math,math,level 5,"counting_and_probability, level 5"
+math/9,panel/math/prealgebra/53,math,math,level 2,"prealgebra, level 2"
+math/10,panel/math/precalculus/404,math,math,level 5,"precalculus, level 5"
+math/11,panel/math/prealgebra/864,math,math,level 4,"prealgebra, level 4"
+math/12,panel/math/algebra/0,math,math,level 3,"algebra, level 3"
+math/13,panel/math/algebra/254,math,math,level 1,"algebra, level 1"
+math/14,panel/math/precalculus/139,math,math,level 2,"precalculus, level 2"
+math/15,panel/math/intermediate_algebra/833,math,math,level 4,"intermediate_algebra, level 4"
+math/16,panel/math/intermediate_algebra/718,math,math,level 3,"intermediate_algebra, level 3"
+math/17,panel/math/prealgebra/70,math,math,level 1,"prealgebra, level 1"
+math/18,panel/math/algebra/339,math,math,level 5,"algebra, level 5"
+math/19,panel/math/prealgebra/278,math,math,level 3,"prealgebra, level 3"
+math/20,panel/math/geometry/141,math,math,level 4,"geometry, level 4"
+math/21,panel/math/precalculus/90,math,math,level 5,"precalculus, level 5"
+math/22,panel/math/algebra/62,math,math,level 4,"algebra, level 4"
+math/23,panel/math/counting_and_probability/106,math,math,level 3,"counting_and_probability, level 3"
+math/24,panel/math/algebra/1118,math,math,level 5,"algebra, level 5"
+math/25,panel/math/prealgebra/17,math,math,level 3,"prealgebra, level 3"
+math/26,panel/math/prealgebra/297,math,math,level 4,"prealgebra, level 4"
+math/27,panel/math/intermediate_algebra/754,math,math,level 5,"intermediate_algebra, level 5"
+math/28,panel/math/algebra/1023,math,math,level 4,"algebra, level 4"
+math/29,panel/math/geometry/348,math,math,level 5,"geometry, level 5"
+math/30,panel/math/algebra/1115,math,math,level 4,"algebra, level 4"
+math/31,panel/math/algebra/1016,math,math,level 2,"algebra, level 2"
+math/32,panel/math/precalculus/411,math,math,level 1,"precalculus, level 1"
+math/33,panel/math/algebra/739,math,math,level 4,"algebra, level 4"
+math/34,panel/math/geometry/161,math,math,level 2,"geometry, level 2"
+math/35,panel/math/algebra/911,math,math,level 3,"algebra, level 3"
+math/36,panel/math/geometry/223,math,math,level 4,"geometry, level 4"
+math/37,panel/math/intermediate_algebra/640,math,math,level 5,"intermediate_algebra, level 5"
+math/38,panel/math/intermediate_algebra/457,math,math,level 3,"intermediate_algebra, level 3"
+math/39,panel/math/counting_and_probability/91,math,math,level 3,"counting_and_probability, level 3"
+math/40,panel/math/algebra/758,math,math,level 2,"algebra, level 2"
+math/41,panel/math/prealgebra/771,math,math,level 5,"prealgebra, level 5"
+math/42,panel/math/prealgebra/124,math,math,level 3,"prealgebra, level 3"
+math/43,panel/math/algebra/60,math,math,level 3,"algebra, level 3"
+math/44,panel/math/algebra/1181,math,math,level 3,"algebra, level 3"
+math/45,panel/math/intermediate_algebra/415,math,math,level 5,"intermediate_algebra, level 5"
+math/46,panel/math/prealgebra/585,math,math,level 3,"prealgebra, level 3"
+math/47,panel/math/algebra/886,math,math,level 3,"algebra, level 3"
+math/48,panel/math/intermediate_algebra/270,math,math,level 2,"intermediate_algebra, level 2"
+math/49,panel/math/counting_and_probability/130,math,math,level 4,"counting_and_probability, level 4"
+math/50,panel/math/precalculus/351,math,math,level 5,"precalculus, level 5"
+math/51,panel/math/number_theory/2,math,math,level 2,"number_theory, level 2"
+math/52,panel/math/algebra/879,math,math,level 2,"algebra, level 2"
+math/53,panel/math/counting_and_probability/296,math,math,level 5,"counting_and_probability, level 5"
+math/54,panel/math/intermediate_algebra/445,math,math,level 4,"intermediate_algebra, level 4"
+math/55,panel/math/algebra/1155,math,math,level 3,"algebra, level 3"
+math/56,panel/math/algebra/282,math,math,level 5,"algebra, level 5"
+math/57,panel/math/algebra/27,math,math,level 5,"algebra, level 5"
+math/58,panel/math/geometry/284,math,math,level 1,"geometry, level 1"
+math/59,panel/math/intermediate_algebra/296,math,math,level 4,"intermediate_algebra, level 4"
+math/60,panel/math/intermediate_algebra/741,math,math,level 5,"intermediate_algebra, level 5"
+math/61,panel/math/number_theory/366,math,math,level 4,"number_theory, level 4"
+math/62,panel/math/algebra/280,math,math,level 4,"algebra, level 4"
+math/63,panel/math/precalculus/138,math,math,level 4,"precalculus, level 4"
+math/64,panel/math/prealgebra/632,math,math,level 3,"prealgebra, level 3"
+math/65,panel/math/prealgebra/439,math,math,level 2,"prealgebra, level 2"
+math/66,panel/math/number_theory/415,math,math,level 5,"number_theory, level 5"
+math/67,panel/math/precalculus/492,math,math,level 4,"precalculus, level 4"
+math/68,panel/math/counting_and_probability/55,math,math,level 3,"counting_and_probability, level 3"
+math/69,panel/math/geometry/30,math,math,level 4,"geometry, level 4"
+math/70,panel/math/number_theory/441,math,math,level 5,"number_theory, level 5"
+math/71,panel/math/intermediate_algebra/55,math,math,level 5,"intermediate_algebra, level 5"
+math/72,panel/math/algebra/1070,math,math,level 5,"algebra, level 5"
+math/73,panel/math/counting_and_probability/170,math,math,level 3,"counting_and_probability, level 3"
+math/74,panel/math/counting_and_probability/27,math,math,level 2,"counting_and_probability, level 2"
+math/75,panel/math/intermediate_algebra/389,math,math,level 4,"intermediate_algebra, level 4"
+math/76,panel/math/intermediate_algebra/898,math,math,level 2,"intermediate_algebra, level 2"
+math/77,panel/math/number_theory/117,math,math,level 4,"number_theory, level 4"
+math/78,panel/math/number_theory/370,math,math,level 5,"number_theory, level 5"
+math/79,panel/math/algebra/704,math,math,level 5,"algebra, level 5"
+math/80,panel/math/number_theory/123,math,math,level 5,"number_theory, level 5"
+math/81,panel/math/algebra/229,math,math,level 4,"algebra, level 4"
+math/82,panel/math/algebra/274,math,math,level 4,"algebra, level 4"
+math/83,panel/math/intermediate_algebra/373,math,math,level 4,"intermediate_algebra, level 4"
+math/84,panel/math/counting_and_probability/371,math,math,level 4,"counting_and_probability, level 4"
+math/85,panel/math/counting_and_probability/257,math,math,level 5,"counting_and_probability, level 5"
+math/86,panel/math/intermediate_algebra/536,math,math,level 2,"intermediate_algebra, level 2"
+math/87,panel/math/number_theory/315,math,math,level 1,"number_theory, level 1"
+math/88,panel/math/prealgebra/11,math,math,level 1,"prealgebra, level 1"
+math/89,panel/math/algebra/999,math,math,level 3,"algebra, level 3"
+math/90,panel/math/intermediate_algebra/57,math,math,level 5,"intermediate_algebra, level 5"
+math/91,panel/math/algebra/878,math,math,level 5,"algebra, level 5"
+math/92,panel/math/prealgebra/790,math,math,level 3,"prealgebra, level 3"
+math/93,panel/math/intermediate_algebra/127,math,math,level 2,"intermediate_algebra, level 2"
+math/94,panel/math/algebra/327,math,math,level 3,"algebra, level 3"
+math/95,panel/math/intermediate_algebra/685,math,math,level 5,"intermediate_algebra, level 5"
+math/96,panel/math/counting_and_probability/68,math,math,level 2,"counting_and_probability, level 2"
+math/97,panel/math/precalculus/369,math,math,level 4,"precalculus, level 4"
+math/98,panel/math/algebra/512,math,math,level 5,"algebra, level 5"
+math/99,panel/math/intermediate_algebra/642,math,math,level 2,"intermediate_algebra, level 2"
+math/100,panel/math/prealgebra/18,math,math,level 4,"prealgebra, level 4"
+math/101,panel/math/intermediate_algebra/855,math,math,level 5,"intermediate_algebra, level 5"
+math/102,panel/math/intermediate_algebra/615,math,math,level 2,"intermediate_algebra, level 2"
+math/103,panel/math/prealgebra/275,math,math,level 3,"prealgebra, level 3"
+math/104,panel/math/algebra/825,math,math,level 3,"algebra, level 3"
+math/105,panel/math/algebra/751,math,math,level 2,"algebra, level 2"
+math/106,panel/math/prealgebra/813,math,math,level 2,"prealgebra, level 2"
+math/107,panel/math/prealgebra/759,math,math,level 2,"prealgebra, level 2"
+math/108,panel/math/number_theory/114,math,math,level 3,"number_theory, level 3"
+math/109,panel/math/number_theory/170,math,math,level 5,"number_theory, level 5"
+math/110,panel/math/algebra/954,math,math,level 1,"algebra, level 1"
+math/111,panel/math/prealgebra/798,math,math,level 4,"prealgebra, level 4"
+math/112,panel/math/algebra/889,math,math,level 3,"algebra, level 3"
+math/113,panel/math/precalculus/166,math,math,level 4,"precalculus, level 4"
+math/114,panel/math/prealgebra/369,math,math,level 4,"prealgebra, level 4"
+math/115,panel/math/algebra/245,math,math,level 4,"algebra, level 4"
+math/116,panel/math/intermediate_algebra/637,math,math,level 3,"intermediate_algebra, level 3"
+math/117,panel/math/number_theory/1,math,math,level 4,"number_theory, level 4"
+math/118,panel/math/counting_and_probability/305,math,math,level 2,"counting_and_probability, level 2"
+math/119,panel/math/counting_and_probability/392,math,math,level 2,"counting_and_probability, level 2"
+math/120,panel/math/algebra/648,math,math,level 2,"algebra, level 2"
+math/121,panel/math/algebra/471,math,math,level 1,"algebra, level 1"
+math/122,panel/math/algebra/63,math,math,level 4,"algebra, level 4"
+math/123,panel/math/geometry/22,math,math,level 4,"geometry, level 4"
+math/124,panel/math/geometry/409,math,math,level 4,"geometry, level 4"
+math/125,panel/math/algebra/431,math,math,level 1,"algebra, level 1"
+math/126,panel/math/number_theory/518,math,math,level 1,"number_theory, level 1"
+math/127,panel/math/algebra/1062,math,math,level 5,"algebra, level 5"
+math/128,panel/math/algebra/740,math,math,level 5,"algebra, level 5"
+math/129,panel/math/prealgebra/102,math,math,level 2,"prealgebra, level 2"
+math/130,panel/math/precalculus/337,math,math,level 4,"precalculus, level 4"
+math/131,panel/math/intermediate_algebra/539,math,math,level 5,"intermediate_algebra, level 5"
+math/132,panel/math/prealgebra/547,math,math,level 5,"prealgebra, level 5"
+math/133,panel/math/prealgebra/92,math,math,level 2,"prealgebra, level 2"
+math/134,panel/math/geometry/376,math,math,level 4,"geometry, level 4"
+math/135,panel/math/prealgebra/339,math,math,level 4,"prealgebra, level 4"
+math/136,panel/math/algebra/621,math,math,level 4,"algebra, level 4"
+math/137,panel/math/number_theory/381,math,math,level 2,"number_theory, level 2"
+math/138,panel/math/geometry/400,math,math,level 4,"geometry, level 4"
+math/139,panel/math/intermediate_algebra/306,math,math,level 3,"intermediate_algebra, level 3"
+math/140,panel/math/prealgebra/403,math,math,level 4,"prealgebra, level 4"
+math/141,panel/math/geometry/172,math,math,level 4,"geometry, level 4"
+math/142,panel/math/number_theory/292,math,math,level 3,"number_theory, level 3"
+math/143,panel/math/algebra/165,math,math,level 4,"algebra, level 4"
+math/144,panel/math/precalculus/390,math,math,level 4,"precalculus, level 4"
+math/145,panel/math/prealgebra/571,math,math,level 2,"prealgebra, level 2"
+math/146,panel/math/geometry/251,math,math,level 3,"geometry, level 3"
+math/147,panel/math/precalculus/161,math,math,level 2,"precalculus, level 2"
+math/148,panel/math/prealgebra/135,math,math,level 2,"prealgebra, level 2"
+math/149,panel/math/geometry/296,math,math,level 4,"geometry, level 4"
+math/150,panel/math/geometry/366,math,math,level 2,"geometry, level 2"
+math/151,panel/math/counting_and_probability/231,math,math,level 1,"counting_and_probability, level 1"
+math/152,panel/math/algebra/794,math,math,level 5,"algebra, level 5"
+math/153,panel/math/geometry/218,math,math,level 1,"geometry, level 1"
+math/154,panel/math/prealgebra/630,math,math,level 1,"prealgebra, level 1"
+math/155,panel/math/number_theory/460,math,math,level 3,"number_theory, level 3"
+math/156,panel/math/number_theory/320,math,math,level 4,"number_theory, level 4"
+math/157,panel/math/precalculus/73,math,math,level 2,"precalculus, level 2"
+math/158,panel/math/counting_and_probability/271,math,math,level 2,"counting_and_probability, level 2"
+math/159,panel/math/algebra/795,math,math,level 2,"algebra, level 2"
+math/160,panel/math/prealgebra/870,math,math,level 4,"prealgebra, level 4"
+math/161,panel/math/counting_and_probability/247,math,math,level 4,"counting_and_probability, level 4"
+math/162,panel/math/prealgebra/203,math,math,level 2,"prealgebra, level 2"
+math/163,panel/math/prealgebra/341,math,math,level 4,"prealgebra, level 4"
+math/164,panel/math/precalculus/354,math,math,level 2,"precalculus, level 2"
+math/165,panel/math/precalculus/147,math,math,level 5,"precalculus, level 5"
+math/166,panel/math/intermediate_algebra/805,math,math,level 2,"intermediate_algebra, level 2"
+math/167,panel/math/precalculus/171,math,math,level 1,"precalculus, level 1"
+math/168,panel/math/precalculus/173,math,math,level 1,"precalculus, level 1"
+math/169,panel/math/geometry/253,math,math,level 4,"geometry, level 4"
+math/170,panel/math/precalculus/532,math,math,level 3,"precalculus, level 3"
+math/171,panel/math/geometry/39,math,math,level 4,"geometry, level 4"
+math/172,panel/math/algebra/1078,math,math,level 3,"algebra, level 3"
+math/173,panel/math/number_theory/14,math,math,level 4,"number_theory, level 4"
+math/174,panel/math/intermediate_algebra/772,math,math,level 3,"intermediate_algebra, level 3"
+math/175,panel/math/intermediate_algebra/800,math,math,level 3,"intermediate_algebra, level 3"
+math/176,panel/math/algebra/227,math,math,level 2,"algebra, level 2"
+math/177,panel/math/precalculus/385,math,math,level 5,"precalculus, level 5"
+math/178,panel/math/intermediate_algebra/274,math,math,level 3,"intermediate_algebra, level 3"
+math/179,panel/math/counting_and_probability/307,math,math,level 2,"counting_and_probability, level 2"
+math/180,panel/math/number_theory/47,math,math,level 5,"number_theory, level 5"
+math/181,panel/math/intermediate_algebra/577,math,math,level 4,"intermediate_algebra, level 4"
+math/182,panel/math/prealgebra/728,math,math,level 2,"prealgebra, level 2"
+math/183,panel/math/algebra/475,math,math,level 5,"algebra, level 5"
+math/184,panel/math/precalculus/317,math,math,level 3,"precalculus, level 3"
+math/185,panel/math/algebra/259,math,math,level 3,"algebra, level 3"
+math/186,panel/math/geometry/44,math,math,level 5,"geometry, level 5"
+math/187,panel/math/algebra/269,math,math,level 2,"algebra, level 2"
+math/188,panel/math/intermediate_algebra/625,math,math,level 5,"intermediate_algebra, level 5"
+math/189,panel/math/algebra/1124,math,math,level 3,"algebra, level 3"
+math/190,panel/math/intermediate_algebra/870,math,math,level 4,"intermediate_algebra, level 4"
+math/191,panel/math/counting_and_probability/343,math,math,level 2,"counting_and_probability, level 2"
+math/192,panel/math/counting_and_probability/250,math,math,level 3,"counting_and_probability, level 3"
+math/193,panel/math/prealgebra/65,math,math,level 3,"prealgebra, level 3"
+math/194,panel/math/number_theory/406,math,math,level 4,"number_theory, level 4"
+math/195,panel/math/precalculus/221,math,math,level 1,"precalculus, level 1"
+math/196,panel/math/number_theory/497,math,math,level 4,"number_theory, level 4"
+math/197,panel/math/precalculus/425,math,math,level 2,"precalculus, level 2"
+math/198,panel/math/precalculus/200,math,math,level 1,"precalculus, level 1"
+math/199,panel/math/algebra/212,math,math,level 1,"algebra, level 1"
+math/200,panel/math/algebra/678,math,math,level 1,"algebra, level 1"
+math/201,panel/math/precalculus/329,math,math,level 1,"precalculus, level 1"
+math/202,panel/math/algebra/556,math,math,level 5,"algebra, level 5"
+math/203,panel/math/prealgebra/366,math,math,level 2,"prealgebra, level 2"
+math/204,panel/math/geometry/287,math,math,level 2,"geometry, level 2"
+math/205,panel/math/intermediate_algebra/537,math,math,level 5,"intermediate_algebra, level 5"
+math/206,panel/math/precalculus/474,math,math,level 5,"precalculus, level 5"
+math/207,panel/math/prealgebra/299,math,math,level 2,"prealgebra, level 2"
+math/208,panel/math/prealgebra/822,math,math,level 5,"prealgebra, level 5"
+math/209,panel/math/number_theory/61,math,math,level 5,"number_theory, level 5"
+math/210,panel/math/geometry/78,math,math,level 3,"geometry, level 3"
+math/211,panel/math/algebra/1169,math,math,level 3,"algebra, level 3"
+math/212,panel/math/algebra/1,math,math,level 1,"algebra, level 1"
+math/213,panel/math/counting_and_probability/89,math,math,level 2,"counting_and_probability, level 2"
+math/214,panel/math/precalculus/237,math,math,level 4,"precalculus, level 4"
+math/215,panel/math/intermediate_algebra/252,math,math,level 3,"intermediate_algebra, level 3"
+math/216,panel/math/intermediate_algebra/890,math,math,level 5,"intermediate_algebra, level 5"
+math/217,panel/math/algebra/47,math,math,level 3,"algebra, level 3"
+math/218,panel/math/precalculus/128,math,math,level 3,"precalculus, level 3"
+math/219,panel/math/intermediate_algebra/314,math,math,level 4,"intermediate_algebra, level 4"
+math/220,panel/math/intermediate_algebra/643,math,math,level 5,"intermediate_algebra, level 5"
+math/221,panel/math/prealgebra/220,math,math,level 5,"prealgebra, level 5"
+math/222,panel/math/number_theory/513,math,math,level 3,"number_theory, level 3"
+math/223,panel/math/number_theory/51,math,math,level 3,"number_theory, level 3"
+math/224,panel/math/algebra/440,math,math,level 1,"algebra, level 1"
+math/225,panel/math/counting_and_probability/370,math,math,level 3,"counting_and_probability, level 3"
+math/226,panel/math/algebra/979,math,math,level 2,"algebra, level 2"
+math/227,panel/math/intermediate_algebra/12,math,math,level 4,"intermediate_algebra, level 4"
+math/228,panel/math/intermediate_algebra/518,math,math,level 5,"intermediate_algebra, level 5"
+math/229,panel/math/intermediate_algebra/901,math,math,level 4,"intermediate_algebra, level 4"
+math/230,panel/math/algebra/386,math,math,level 3,"algebra, level 3"
+math/231,panel/math/algebra/230,math,math,level 4,"algebra, level 4"
+math/232,panel/math/prealgebra/815,math,math,level 2,"prealgebra, level 2"
+math/233,panel/math/prealgebra/30,math,math,level 4,"prealgebra, level 4"
+math/234,panel/math/counting_and_probability/190,math,math,level 5,"counting_and_probability, level 5"
+math/235,panel/math/precalculus/116,math,math,level 5,"precalculus, level 5"
+math/236,panel/math/algebra/602,math,math,level 2,"algebra, level 2"
+math/237,panel/math/counting_and_probability/272,math,math,level 2,"counting_and_probability, level 2"
+math/238,panel/math/number_theory/242,math,math,level 5,"number_theory, level 5"
+math/239,panel/math/prealgebra/247,math,math,level 4,"prealgebra, level 4"
+math/240,panel/math/algebra/225,math,math,level 4,"algebra, level 4"
+math/241,panel/math/prealgebra/695,math,math,level 3,"prealgebra, level 3"
+math/242,panel/math/number_theory/532,math,math,level 3,"number_theory, level 3"
+math/243,panel/math/prealgebra/634,math,math,level 4,"prealgebra, level 4"
+math/244,panel/math/algebra/317,math,math,level 1,"algebra, level 1"
+math/245,panel/math/algebra/77,math,math,level 4,"algebra, level 4"
+math/246,panel/math/prealgebra/731,math,math,level 4,"prealgebra, level 4"
+math/247,panel/math/algebra/1167,math,math,level 4,"algebra, level 4"
+math/248,panel/math/algebra/203,math,math,level 5,"algebra, level 5"
+math/249,panel/math/counting_and_probability/126,math,math,level 5,"counting_and_probability, level 5"
+math/250,panel/math/intermediate_algebra/817,math,math,level 1,"intermediate_algebra, level 1"
+instructions/1,panel/instructions/22848,instructions,ifeval-like,2 constraints,length_constraints:number_words;punctuation:no_comma
+instructions/2,panel/instructions/50083,instructions,ifeval-like,1 constraint,combination:two_responses
+instructions/3,panel/instructions/50765,instructions,ifeval-like,1 constraint,detectable_format:constrained_response
+instructions/4,panel/instructions/30706,instructions,ifeval-like,1 constraint,combination:two_responses
+instructions/5,panel/instructions/82626,instructions,ifeval-like,2 constraints,length_constraints:number_words;length_constraints:number_paragraphs
+instructions/6,panel/instructions/86374,instructions,ifeval-like,1 constraint,detectable_format:multiple_sections
+instructions/7,panel/instructions/31620,instructions,ifeval-like,3 constraints,detectable_format:number_bullet_lists;length_constraints:number_words;punctuation:no_comma
+instructions/8,panel/instructions/12728,instructions,ifeval-like,3 constraints,length_constraints:number_sentences;detectable_format:number_highlighted_sections;change_case:english_lowercase
+instructions/9,panel/instructions/46201,instructions,ifeval-like,2 constraints,length_constraints:number_words;punctuation:no_comma
+instructions/10,panel/instructions/67082,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;change_case:capital_word_frequency
+instructions/11,panel/instructions/26656,instructions,ifeval-like,2 constraints,length_constraints:number_sentences;detectable_format:number_highlighted_sections
+instructions/12,panel/instructions/58154,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;length_constraints:number_words
+instructions/13,panel/instructions/13195,instructions,ifeval-like,2 constraints,detectable_format:multiple_sections;length_constraints:nth_paragraph_first_word
+instructions/14,panel/instructions/14389,instructions,ifeval-like,3 constraints,detectable_format:number_bullet_lists;detectable_content:number_placeholders;length_constraints:number_words
+instructions/15,panel/instructions/73021,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;detectable_content:number_placeholders
+instructions/16,panel/instructions/61908,instructions,ifeval-like,2 constraints,keywords:frequency;length_constraints:number_sentences
+instructions/17,panel/instructions/83015,instructions,ifeval-like,3 constraints,detectable_format:number_bullet_lists;change_case:english_lowercase;detectable_content:postscript
+instructions/18,panel/instructions/80911,instructions,ifeval-like,1 constraint,combination:two_responses
+instructions/19,panel/instructions/50590,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/20,panel/instructions/77837,instructions,ifeval-like,1 constraint,detectable_format:json_format
+instructions/21,panel/instructions/18376,instructions,ifeval-like,2 constraints,length_constraints:number_words;keywords:existence
+instructions/22,panel/instructions/6576,instructions,ifeval-like,3 constraints,change_case:english_lowercase;startend:end_checker;length_constraints:nth_paragraph_first_word
+instructions/23,panel/instructions/22243,instructions,ifeval-like,1 constraint,detectable_format:json_format
+instructions/24,panel/instructions/14367,instructions,ifeval-like,3 constraints,length_constraints:number_words;keywords:existence;keywords:forbidden_words
+instructions/25,panel/instructions/14332,instructions,ifeval-like,1 constraint,combination:two_responses
+instructions/26,panel/instructions/19709,instructions,ifeval-like,3 constraints,length_constraints:number_sentences;keywords:existence;startend:end_checker
+instructions/27,panel/instructions/63791,instructions,ifeval-like,1 constraint,detectable_format:json_format
+instructions/28,panel/instructions/67998,instructions,ifeval-like,2 constraints,length_constraints:number_words;keywords:forbidden_words
+instructions/29,panel/instructions/84510,instructions,ifeval-like,2 constraints,length_constraints:number_sentences;keywords:letter_frequency
+instructions/30,panel/instructions/87187,instructions,ifeval-like,2 constraints,length_constraints:number_sentences;detectable_format:number_highlighted_sections
+instructions/31,panel/instructions/82449,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/32,panel/instructions/6756,instructions,ifeval-like,3 constraints,length_constraints:number_sentences;detectable_format:number_highlighted_sections;keywords:frequency
+instructions/33,panel/instructions/55597,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/34,panel/instructions/61971,instructions,ifeval-like,2 constraints,length_constraints:number_words;keywords:frequency
+instructions/35,panel/instructions/43145,instructions,ifeval-like,3 constraints,detectable_format:number_bullet_lists;change_case:english_capital;length_constraints:number_words
+instructions/36,panel/instructions/34403,instructions,ifeval-like,1 constraint,detectable_format:json_format
+instructions/37,panel/instructions/78952,instructions,ifeval-like,1 constraint,combination:two_responses
+instructions/38,panel/instructions/62349,instructions,ifeval-like,2 constraints,change_case:english_capital;length_constraints:number_words
+instructions/39,panel/instructions/43972,instructions,ifeval-like,2 constraints,length_constraints:number_sentences;detectable_format:title
+instructions/40,panel/instructions/57044,instructions,ifeval-like,2 constraints,length_constraints:number_sentences;startend:end_checker
+instructions/41,panel/instructions/86486,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;detectable_content:postscript
+instructions/42,panel/instructions/45000,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;detectable_format:title
+instructions/43,panel/instructions/3621,instructions,ifeval-like,1 constraint,detectable_format:constrained_response
+instructions/44,panel/instructions/11866,instructions,ifeval-like,1 constraint,detectable_format:constrained_response
+instructions/45,panel/instructions/55064,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/46,panel/instructions/69984,instructions,ifeval-like,2 constraints,length_constraints:number_sentences;keywords:letter_frequency
+instructions/47,panel/instructions/72722,instructions,ifeval-like,1 constraint,detectable_format:constrained_response
+instructions/48,panel/instructions/32792,instructions,ifeval-like,3 constraints,detectable_format:title;change_case:english_capital;startend:end_checker
+instructions/49,panel/instructions/56944,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;length_constraints:number_words
+instructions/50,panel/instructions/54108,instructions,ifeval-like,1 constraint,detectable_format:json_format
+instructions/51,panel/instructions/51393,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/52,panel/instructions/44830,instructions,ifeval-like,1 constraint,combination:two_responses
+instructions/53,panel/instructions/74233,instructions,ifeval-like,1 constraint,detectable_format:json_format
+instructions/54,panel/instructions/4636,instructions,ifeval-like,2 constraints,length_constraints:number_words;length_constraints:number_paragraphs
+instructions/55,panel/instructions/70538,instructions,ifeval-like,3 constraints,length_constraints:number_words;keywords:forbidden_words;keywords:frequency
+instructions/56,panel/instructions/69389,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;startend:end_checker
+instructions/57,panel/instructions/30671,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;length_constraints:number_words
+instructions/58,panel/instructions/19524,instructions,ifeval-like,1 constraint,detectable_format:constrained_response
+instructions/59,panel/instructions/58375,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/60,panel/instructions/74450,instructions,ifeval-like,1 constraint,detectable_format:multiple_sections
+instructions/61,panel/instructions/43661,instructions,ifeval-like,1 constraint,detectable_format:json_format
+instructions/62,panel/instructions/41035,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/63,panel/instructions/2792,instructions,ifeval-like,3 constraints,change_case:english_capital;length_constraints:number_words;startend:end_checker
+instructions/64,panel/instructions/81191,instructions,ifeval-like,3 constraints,change_case:english_lowercase;keywords:letter_frequency;length_constraints:number_words
+instructions/65,panel/instructions/15758,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/66,panel/instructions/81395,instructions,ifeval-like,1 constraint,combination:two_responses
+instructions/67,panel/instructions/8180,instructions,ifeval-like,2 constraints,change_case:english_capital;punctuation:no_comma
+instructions/68,panel/instructions/82087,instructions,ifeval-like,1 constraint,combination:two_responses
+instructions/69,panel/instructions/69332,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;detectable_content:number_placeholders
+instructions/70,panel/instructions/61092,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/71,panel/instructions/31276,instructions,ifeval-like,3 constraints,length_constraints:number_paragraphs;detectable_format:title;keywords:letter_frequency
+instructions/72,panel/instructions/62774,instructions,ifeval-like,1 constraint,length_constraints:number_words
+instructions/73,panel/instructions/82845,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/74,panel/instructions/5037,instructions,ifeval-like,1 constraint,combination:two_responses
+instructions/75,panel/instructions/31772,instructions,ifeval-like,2 constraints,length_constraints:number_sentences;detectable_format:number_highlighted_sections
+instructions/76,panel/instructions/32578,instructions,ifeval-like,1 constraint,detectable_format:constrained_response
+instructions/77,panel/instructions/66168,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;length_constraints:number_words
+instructions/78,panel/instructions/10749,instructions,ifeval-like,3 constraints,length_constraints:number_sentences;detectable_format:number_highlighted_sections;detectable_content:postscript
+instructions/79,panel/instructions/49591,instructions,ifeval-like,3 constraints,length_constraints:number_sentences;detectable_format:number_highlighted_sections;keywords:frequency
+instructions/80,panel/instructions/14140,instructions,ifeval-like,2 constraints,detectable_content:number_placeholders;detectable_format:multiple_sections
+instructions/81,panel/instructions/14518,instructions,ifeval-like,3 constraints,keywords:existence;startend:quotation;detectable_content:number_placeholders
+instructions/82,panel/instructions/54959,instructions,ifeval-like,1 constraint,detectable_format:json_format
+instructions/83,panel/instructions/13082,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;punctuation:no_comma
+instructions/84,panel/instructions/28700,instructions,ifeval-like,3 constraints,change_case:english_lowercase;length_constraints:number_sentences;keywords:existence
+instructions/85,panel/instructions/6541,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;detectable_content:number_placeholders
+instructions/86,panel/instructions/59467,instructions,ifeval-like,1 constraint,detectable_format:constrained_response
+instructions/87,panel/instructions/23116,instructions,ifeval-like,1 constraint,detectable_format:json_format
+instructions/88,panel/instructions/66628,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/89,panel/instructions/3195,instructions,ifeval-like,3 constraints,keywords:frequency;punctuation:no_comma;startend:quotation
+instructions/90,panel/instructions/48522,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/91,panel/instructions/59306,instructions,ifeval-like,2 constraints,length_constraints:number_words;detectable_format:number_bullet_lists
+instructions/92,panel/instructions/31398,instructions,ifeval-like,3 constraints,length_constraints:number_words;keywords:forbidden_words;startend:end_checker
+instructions/93,panel/instructions/56320,instructions,ifeval-like,3 constraints,change_case:english_lowercase;length_constraints:number_words;length_constraints:number_paragraphs
+instructions/94,panel/instructions/34886,instructions,ifeval-like,2 constraints,length_constraints:number_sentences;detectable_format:number_highlighted_sections
+instructions/95,panel/instructions/61521,instructions,ifeval-like,2 constraints,detectable_content:number_placeholders;startend:quotation
+instructions/96,panel/instructions/25026,instructions,ifeval-like,1 constraint,length_constraints:number_sentences
+instructions/97,panel/instructions/11615,instructions,ifeval-like,1 constraint,detectable_format:json_format
+instructions/98,panel/instructions/45859,instructions,ifeval-like,2 constraints,keywords:letter_frequency;length_constraints:number_sentences
+instructions/99,panel/instructions/12812,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/100,panel/instructions/21953,instructions,ifeval-like,2 constraints,change_case:english_lowercase;keywords:letter_frequency
+instructions/101,panel/instructions/4737,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;change_case:english_lowercase
+instructions/102,panel/instructions/43560,instructions,ifeval-like,2 constraints,length_constraints:number_sentences;detectable_content:number_placeholders
+instructions/103,panel/instructions/5961,instructions,ifeval-like,1 constraint,detectable_content:number_placeholders
+instructions/104,panel/instructions/35070,instructions,ifeval-like,3 constraints,length_constraints:number_sentences;detectable_format:number_highlighted_sections;startend:end_checker
+instructions/105,panel/instructions/50909,instructions,ifeval-like,1 constraint,detectable_format:constrained_response
+instructions/106,panel/instructions/19078,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/107,panel/instructions/78458,instructions,ifeval-like,3 constraints,detectable_format:title;length_constraints:number_sentences;change_case:english_lowercase
+instructions/108,panel/instructions/68388,instructions,ifeval-like,3 constraints,length_constraints:number_paragraphs;detectable_format:number_highlighted_sections;keywords:forbidden_words
+instructions/109,panel/instructions/58331,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/110,panel/instructions/24181,instructions,ifeval-like,1 constraint,detectable_format:json_format
+instructions/111,panel/instructions/40520,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;detectable_content:postscript
+instructions/112,panel/instructions/15728,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;detectable_format:number_highlighted_sections
+instructions/113,panel/instructions/39929,instructions,ifeval-like,2 constraints,detectable_format:title;startend:end_checker
+instructions/114,panel/instructions/70000,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;startend:end_checker
+instructions/115,panel/instructions/54393,instructions,ifeval-like,3 constraints,length_constraints:number_sentences;keywords:frequency;detectable_format:title
+instructions/116,panel/instructions/56162,instructions,ifeval-like,3 constraints,change_case:english_lowercase;length_constraints:number_words;length_constraints:number_paragraphs
+instructions/117,panel/instructions/53898,instructions,ifeval-like,1 constraint,detectable_format:json_format
+instructions/118,panel/instructions/19953,instructions,ifeval-like,3 constraints,detectable_content:number_placeholders;detectable_format:multiple_sections;detectable_content:postscript
+instructions/119,panel/instructions/76896,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/120,panel/instructions/69604,instructions,ifeval-like,2 constraints,length_constraints:number_words;detectable_format:number_bullet_lists
+instructions/121,panel/instructions/44155,instructions,ifeval-like,3 constraints,detectable_format:title;change_case:english_lowercase;length_constraints:number_sentences
+instructions/122,panel/instructions/34362,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;startend:end_checker
+instructions/123,panel/instructions/57421,instructions,ifeval-like,3 constraints,length_constraints:number_sentences;keywords:existence;startend:end_checker
+instructions/124,panel/instructions/39476,instructions,ifeval-like,3 constraints,detectable_content:number_placeholders;length_constraints:nth_paragraph_first_word;detectable_format:number_highlighted_sections
+instructions/125,panel/instructions/16497,instructions,ifeval-like,1 constraint,detectable_format:json_format
+instructions/126,panel/instructions/59890,instructions,ifeval-like,2 constraints,length_constraints:number_words;punctuation:no_comma
+instructions/127,panel/instructions/31956,instructions,ifeval-like,2 constraints,detectable_format:json_format;keywords:existence
+instructions/128,panel/instructions/53759,instructions,ifeval-like,3 constraints,length_constraints:number_sentences;detectable_format:number_highlighted_sections;keywords:forbidden_words
+instructions/129,panel/instructions/42676,instructions,ifeval-like,1 constraint,detectable_format:json_format
+instructions/130,panel/instructions/1789,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;length_constraints:number_words
+instructions/131,panel/instructions/35834,instructions,ifeval-like,3 constraints,length_constraints:number_sentences;change_case:english_lowercase;startend:quotation
+instructions/132,panel/instructions/4238,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/133,panel/instructions/69517,instructions,ifeval-like,2 constraints,detectable_content:number_placeholders;startend:quotation
+instructions/134,panel/instructions/72825,instructions,ifeval-like,2 constraints,length_constraints:number_sentences;detectable_format:number_highlighted_sections
+instructions/135,panel/instructions/66212,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/136,panel/instructions/19263,instructions,ifeval-like,1 constraint,detectable_format:json_format
+instructions/137,panel/instructions/62544,instructions,ifeval-like,2 constraints,detectable_content:number_placeholders;length_constraints:number_paragraphs
+instructions/138,panel/instructions/75662,instructions,ifeval-like,1 constraint,length_constraints:number_sentences
+instructions/139,panel/instructions/46282,instructions,ifeval-like,1 constraint,length_constraints:number_sentences
+instructions/140,panel/instructions/33581,instructions,ifeval-like,2 constraints,keywords:frequency;length_constraints:number_sentences
+instructions/141,panel/instructions/66507,instructions,ifeval-like,2 constraints,length_constraints:number_sentences;startend:end_checker
+instructions/142,panel/instructions/59575,instructions,ifeval-like,3 constraints,length_constraints:number_words;detectable_format:number_highlighted_sections;keywords:letter_frequency
+instructions/143,panel/instructions/58872,instructions,ifeval-like,1 constraint,combination:two_responses
+instructions/144,panel/instructions/62470,instructions,ifeval-like,2 constraints,length_constraints:number_words;change_case:english_lowercase
+instructions/145,panel/instructions/56615,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/146,panel/instructions/5659,instructions,ifeval-like,2 constraints,length_constraints:number_words;punctuation:no_comma
+instructions/147,panel/instructions/27061,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/148,panel/instructions/73270,instructions,ifeval-like,2 constraints,keywords:frequency;length_constraints:number_sentences
+instructions/149,panel/instructions/43751,instructions,ifeval-like,3 constraints,detectable_content:number_placeholders;keywords:existence;detectable_format:multiple_sections
+instructions/150,panel/instructions/71821,instructions,ifeval-like,3 constraints,length_constraints:number_sentences;detectable_format:title;change_case:english_lowercase
+instructions/151,panel/instructions/36562,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;detectable_format:title
+instructions/152,panel/instructions/22142,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/153,panel/instructions/71923,instructions,ifeval-like,3 constraints,detectable_format:number_bullet_lists;detectable_content:number_placeholders;detectable_format:title
+instructions/154,panel/instructions/66616,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;length_constraints:number_words
+instructions/155,panel/instructions/18740,instructions,ifeval-like,2 constraints,keywords:existence;length_constraints:number_sentences
+instructions/156,panel/instructions/35627,instructions,ifeval-like,2 constraints,length_constraints:number_sentences;startend:end_checker
+instructions/157,panel/instructions/3998,instructions,ifeval-like,2 constraints,length_constraints:number_words;punctuation:no_comma
+instructions/158,panel/instructions/13089,instructions,ifeval-like,2 constraints,change_case:english_lowercase;length_constraints:number_words
+instructions/159,panel/instructions/46152,instructions,ifeval-like,3 constraints,detectable_content:number_placeholders;detectable_format:number_highlighted_sections;detectable_content:postscript
+instructions/160,panel/instructions/44837,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;detectable_format:multiple_sections
+instructions/161,panel/instructions/1235,instructions,ifeval-like,3 constraints,length_constraints:number_sentences;keywords:existence;startend:end_checker
+instructions/162,panel/instructions/86464,instructions,ifeval-like,1 constraint,detectable_format:constrained_response
+instructions/163,panel/instructions/59267,instructions,ifeval-like,1 constraint,detectable_content:number_placeholders
+instructions/164,panel/instructions/19721,instructions,ifeval-like,3 constraints,detectable_format:number_bullet_lists;detectable_content:postscript;change_case:capital_word_frequency
+instructions/165,panel/instructions/3659,instructions,ifeval-like,3 constraints,length_constraints:number_sentences;detectable_format:multiple_sections;keywords:frequency
+instructions/166,panel/instructions/21895,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/167,panel/instructions/725,instructions,ifeval-like,2 constraints,length_constraints:number_words;detectable_content:postscript
+instructions/168,panel/instructions/85681,instructions,ifeval-like,1 constraint,detectable_format:constrained_response
+instructions/169,panel/instructions/26356,instructions,ifeval-like,3 constraints,length_constraints:number_words;punctuation:no_comma;change_case:english_lowercase
+instructions/170,panel/instructions/47111,instructions,ifeval-like,1 constraint,detectable_format:constrained_response
+instructions/171,panel/instructions/15435,instructions,ifeval-like,1 constraint,detectable_format:constrained_response
+instructions/172,panel/instructions/4213,instructions,ifeval-like,3 constraints,keywords:existence;keywords:forbidden_words;length_constraints:number_words
+instructions/173,panel/instructions/80621,instructions,ifeval-like,1 constraint,detectable_format:constrained_response
+instructions/174,panel/instructions/16787,instructions,ifeval-like,2 constraints,length_constraints:number_sentences;keywords:frequency
+instructions/175,panel/instructions/50462,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/176,panel/instructions/15064,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;length_constraints:number_paragraphs
+instructions/177,panel/instructions/6467,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/178,panel/instructions/57776,instructions,ifeval-like,1 constraint,detectable_format:constrained_response
+instructions/179,panel/instructions/61459,instructions,ifeval-like,3 constraints,detectable_content:number_placeholders;detectable_format:number_highlighted_sections;length_constraints:number_sentences
+instructions/180,panel/instructions/83560,instructions,ifeval-like,2 constraints,change_case:english_lowercase;keywords:letter_frequency
+instructions/181,panel/instructions/21209,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;detectable_content:postscript
+instructions/182,panel/instructions/78340,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;punctuation:no_comma
+instructions/183,panel/instructions/87459,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;detectable_content:number_placeholders
+instructions/184,panel/instructions/5,instructions,ifeval-like,2 constraints,detectable_format:title;combination:two_responses
+instructions/185,panel/instructions/15998,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/186,panel/instructions/59428,instructions,ifeval-like,2 constraints,length_constraints:number_sentences;keywords:frequency
+instructions/187,panel/instructions/11221,instructions,ifeval-like,3 constraints,length_constraints:number_words;detectable_format:number_highlighted_sections;change_case:capital_word_frequency
+instructions/188,panel/instructions/29311,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/189,panel/instructions/85,instructions,ifeval-like,1 constraint,length_constraints:number_words
+instructions/190,panel/instructions/27091,instructions,ifeval-like,3 constraints,length_constraints:number_words;keywords:existence;keywords:letter_frequency
+instructions/191,panel/instructions/64907,instructions,ifeval-like,2 constraints,length_constraints:number_sentences;detectable_content:postscript
+instructions/192,panel/instructions/35739,instructions,ifeval-like,1 constraint,detectable_format:json_format
+instructions/193,panel/instructions/1447,instructions,ifeval-like,1 constraint,length_constraints:number_words
+instructions/194,panel/instructions/42379,instructions,ifeval-like,3 constraints,length_constraints:number_words;change_case:english_lowercase;punctuation:no_comma
+instructions/195,panel/instructions/3519,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/196,panel/instructions/61583,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/197,panel/instructions/48075,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/198,panel/instructions/49966,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;length_constraints:number_paragraphs
+instructions/199,panel/instructions/43562,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;keywords:existence
+instructions/200,panel/instructions/14321,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/201,panel/instructions/8356,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;length_constraints:number_words
+instructions/202,panel/instructions/78376,instructions,ifeval-like,1 constraint,detectable_format:json_format
+instructions/203,panel/instructions/41882,instructions,ifeval-like,3 constraints,detectable_format:number_bullet_lists;detectable_format:number_highlighted_sections;punctuation:no_comma
+instructions/204,panel/instructions/45847,instructions,ifeval-like,1 constraint,length_constraints:number_words
+instructions/205,panel/instructions/29683,instructions,ifeval-like,1 constraint,detectable_format:json_format
+instructions/206,panel/instructions/56927,instructions,ifeval-like,1 constraint,detectable_format:constrained_response
+instructions/207,panel/instructions/82038,instructions,ifeval-like,2 constraints,detectable_content:number_placeholders;startend:end_checker
+instructions/208,panel/instructions/86388,instructions,ifeval-like,2 constraints,length_constraints:number_sentences;keywords:forbidden_words
+instructions/209,panel/instructions/61705,instructions,ifeval-like,3 constraints,detectable_content:number_placeholders;detectable_format:number_bullet_lists;length_constraints:number_paragraphs
+instructions/210,panel/instructions/78624,instructions,ifeval-like,2 constraints,change_case:english_lowercase;keywords:letter_frequency
+instructions/211,panel/instructions/57628,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;detectable_format:title
+instructions/212,panel/instructions/41960,instructions,ifeval-like,3 constraints,keywords:frequency;length_constraints:number_sentences;detectable_format:number_highlighted_sections
+instructions/213,panel/instructions/52502,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/214,panel/instructions/13966,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;keywords:forbidden_words
+instructions/215,panel/instructions/42640,instructions,ifeval-like,1 constraint,keywords:frequency
+instructions/216,panel/instructions/25254,instructions,ifeval-like,2 constraints,length_constraints:number_words;detectable_content:postscript
+instructions/217,panel/instructions/87597,instructions,ifeval-like,3 constraints,keywords:frequency;length_constraints:number_sentences;detectable_format:number_highlighted_sections
+instructions/218,panel/instructions/53580,instructions,ifeval-like,3 constraints,detectable_format:title;detectable_format:multiple_sections;keywords:letter_frequency
+instructions/219,panel/instructions/36006,instructions,ifeval-like,2 constraints,detectable_content:number_placeholders;detectable_format:number_highlighted_sections
+instructions/220,panel/instructions/86514,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;length_constraints:number_words
+instructions/221,panel/instructions/84743,instructions,ifeval-like,3 constraints,detectable_content:number_placeholders;detectable_format:multiple_sections;detectable_content:postscript
+instructions/222,panel/instructions/63591,instructions,ifeval-like,1 constraint,detectable_format:constrained_response
+instructions/223,panel/instructions/48419,instructions,ifeval-like,3 constraints,detectable_format:number_bullet_lists;detectable_format:number_highlighted_sections;detectable_content:number_placeholders
+instructions/224,panel/instructions/31274,instructions,ifeval-like,1 constraint,detectable_format:json_format
+instructions/225,panel/instructions/58535,instructions,ifeval-like,3 constraints,length_constraints:number_words;change_case:english_lowercase;keywords:letter_frequency
+instructions/226,panel/instructions/31830,instructions,ifeval-like,3 constraints,detectable_format:title;length_constraints:number_sentences;startend:end_checker
+instructions/227,panel/instructions/79693,instructions,ifeval-like,3 constraints,length_constraints:number_sentences;detectable_format:number_highlighted_sections;change_case:english_lowercase
+instructions/228,panel/instructions/83283,instructions,ifeval-like,2 constraints,keywords:existence;length_constraints:number_words
+instructions/229,panel/instructions/68651,instructions,ifeval-like,2 constraints,length_constraints:number_words;length_constraints:number_paragraphs
+instructions/230,panel/instructions/58138,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;length_constraints:number_paragraphs
+instructions/231,panel/instructions/35636,instructions,ifeval-like,1 constraint,detectable_content:number_placeholders
+instructions/232,panel/instructions/7755,instructions,ifeval-like,2 constraints,length_constraints:number_sentences;detectable_content:postscript
+instructions/233,panel/instructions/26612,instructions,ifeval-like,2 constraints,keywords:forbidden_words;length_constraints:number_sentences
+instructions/234,panel/instructions/47157,instructions,ifeval-like,1 constraint,length_constraints:number_words
+instructions/235,panel/instructions/87463,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/236,panel/instructions/52321,instructions,ifeval-like,3 constraints,length_constraints:number_sentences;detectable_format:multiple_sections;keywords:frequency
+instructions/237,panel/instructions/52874,instructions,ifeval-like,1 constraint,detectable_format:number_bullet_lists
+instructions/238,panel/instructions/6715,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;length_constraints:number_words
+instructions/239,panel/instructions/73979,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;startend:end_checker
+instructions/240,panel/instructions/48280,instructions,ifeval-like,3 constraints,length_constraints:number_sentences;detectable_format:number_highlighted_sections;change_case:english_lowercase
+instructions/241,panel/instructions/77233,instructions,ifeval-like,2 constraints,length_constraints:number_words;length_constraints:number_paragraphs
+instructions/242,panel/instructions/4953,instructions,ifeval-like,3 constraints,detectable_format:title;detectable_format:number_highlighted_sections;length_constraints:number_sentences
+instructions/243,panel/instructions/46766,instructions,ifeval-like,2 constraints,detectable_format:number_bullet_lists;detectable_format:title
+instructions/244,panel/instructions/2387,instructions,ifeval-like,1 constraint,length_constraints:number_sentences
+instructions/245,panel/instructions/77694,instructions,ifeval-like,2 constraints,length_constraints:number_words;length_constraints:number_paragraphs
+instructions/246,panel/instructions/71393,instructions,ifeval-like,3 constraints,detectable_format:number_bullet_lists;detectable_format:number_highlighted_sections;keywords:existence
+instructions/247,panel/instructions/58348,instructions,ifeval-like,2 constraints,keywords:existence;length_constraints:number_words
+instructions/248,panel/instructions/74192,instructions,ifeval-like,2 constraints,detectable_format:multiple_sections;keywords:existence
+instructions/249,panel/instructions/8134,instructions,ifeval-like,3 constraints,detectable_format:number_bullet_lists;change_case:english_capital;detectable_content:number_placeholders
+instructions/250,panel/instructions/11886,instructions,ifeval-like,2 constraints,keywords:frequency;detectable_format:number_bullet_lists
+code/1,panel/code/mbpp-144,code,mbpp-test,basic,basic
+code/2,panel/code/mbpp-352,code,mbpp-test,basic,basic
+code/3,panel/code/mbpp-509,code,mbpp-test,basic,basic
+code/4,panel/code/mbpp-291,code,mbpp-test,basic,basic
+code/5,panel/code/mbpp-381,code,mbpp-test,basic,basic
+code/6,panel/code/mbpp-54,code,mbpp-test,basic,basic
+code/7,panel/code/mbpp-159,code,mbpp-test,basic,basic
+code/8,panel/code/mbpp-393,code,mbpp-test,basic,basic
+code/9,panel/code/mbpp-174,code,mbpp-test,basic,basic
+code/10,panel/code/mbpp-396,code,mbpp-test,basic,basic
+code/11,panel/code/mbpp-207,code,mbpp-test,basic,basic
+code/12,panel/code/mbpp-48,code,mbpp-test,basic,basic
+code/13,panel/code/mbpp-22,code,mbpp-test,basic,basic
+code/14,panel/code/mbpp-216,code,mbpp-test,basic,basic
+code/15,panel/code/mbpp-321,code,mbpp-test,basic,basic
+code/16,panel/code/mbpp-211,code,mbpp-test,basic,basic
+code/17,panel/code/mbpp-203,code,mbpp-test,basic,basic
+code/18,panel/code/mbpp-320,code,mbpp-test,basic,basic
+code/19,panel/code/mbpp-302,code,mbpp-test,basic,basic
+code/20,panel/code/mbpp-354,code,mbpp-test,basic,basic
+code/21,panel/code/mbpp-151,code,mbpp-test,basic,basic
+code/22,panel/code/mbpp-340,code,mbpp-test,basic,basic
+code/23,panel/code/mbpp-382,code,mbpp-test,basic,basic
+code/24,panel/code/mbpp-43,code,mbpp-test,basic,basic
+code/25,panel/code/mbpp-155,code,mbpp-test,basic,basic
+code/26,panel/code/mbpp-122,code,mbpp-test,basic,basic
+code/27,panel/code/mbpp-32,code,mbpp-test,basic,basic
+code/28,panel/code/mbpp-452,code,mbpp-test,basic,basic
+code/29,panel/code/mbpp-480,code,mbpp-test,basic,basic
+code/30,panel/code/mbpp-208,code,mbpp-test,basic,basic
+code/31,panel/code/mbpp-362,code,mbpp-test,basic,basic
+code/32,panel/code/mbpp-173,code,mbpp-test,basic,basic
+code/33,panel/code/mbpp-482,code,mbpp-test,basic,basic
+code/34,panel/code/mbpp-347,code,mbpp-test,basic,basic
+code/35,panel/code/mbpp-187,code,mbpp-test,basic,basic
+code/36,panel/code/mbpp-134,code,mbpp-test,basic,basic
+code/37,panel/code/mbpp-313,code,mbpp-test,basic,basic
+code/38,panel/code/mbpp-254,code,mbpp-test,basic,basic
+code/39,panel/code/mbpp-146,code,mbpp-test,basic,basic
+code/40,panel/code/mbpp-149,code,mbpp-test,basic,basic
+code/41,panel/code/mbpp-385,code,mbpp-test,basic,basic
+code/42,panel/code/mbpp-402,code,mbpp-test,basic,basic
+code/43,panel/code/mbpp-26,code,mbpp-test,basic,basic
+code/44,panel/code/mbpp-358,code,mbpp-test,basic,basic
+code/45,panel/code/mbpp-189,code,mbpp-test,basic,basic
+code/46,panel/code/mbpp-195,code,mbpp-test,basic,basic
+code/47,panel/code/mbpp-46,code,mbpp-test,basic,basic
+code/48,panel/code/mbpp-339,code,mbpp-test,basic,basic
+code/49,panel/code/mbpp-326,code,mbpp-test,basic,basic
+code/50,panel/code/mbpp-507,code,mbpp-test,basic,basic
+code/51,panel/code/mbpp-357,code,mbpp-test,basic,basic
+code/52,panel/code/mbpp-467,code,mbpp-test,basic,basic
+code/53,panel/code/mbpp-464,code,mbpp-test,basic,basic
+code/54,panel/code/mbpp-221,code,mbpp-test,basic,basic
+code/55,panel/code/mbpp-442,code,mbpp-test,basic,basic
+code/56,panel/code/mbpp-298,code,mbpp-test,basic,basic
+code/57,panel/code/mbpp-157,code,mbpp-test,basic,basic
+code/58,panel/code/mbpp-76,code,mbpp-test,basic,basic
+code/59,panel/code/mbpp-28,code,mbpp-test,basic,basic
+code/60,panel/code/mbpp-368,code,mbpp-test,basic,basic
+code/61,panel/code/mbpp-384,code,mbpp-test,basic,basic
+code/62,panel/code/mbpp-341,code,mbpp-test,basic,basic
+code/63,panel/code/mbpp-83,code,mbpp-test,basic,basic
+code/64,panel/code/mbpp-225,code,mbpp-test,basic,basic
+code/65,panel/code/mbpp-52,code,mbpp-test,basic,basic
+code/66,panel/code/mbpp-490,code,mbpp-test,basic,basic
+code/67,panel/code/mbpp-423,code,mbpp-test,basic,basic
+code/68,panel/code/mbpp-45,code,mbpp-test,basic,basic
+code/69,panel/code/mbpp-335,code,mbpp-test,basic,basic
+code/70,panel/code/mbpp-449,code,mbpp-test,basic,basic
+code/71,panel/code/mbpp-186,code,mbpp-test,basic,basic
+code/72,panel/code/mbpp-344,code,mbpp-test,basic,basic
+code/73,panel/code/mbpp-213,code,mbpp-test,basic,basic
+code/74,panel/code/mbpp-218,code,mbpp-test,basic,basic
+code/75,panel/code/mbpp-112,code,mbpp-test,basic,basic
+code/76,panel/code/mbpp-81,code,mbpp-test,basic,basic
+code/77,panel/code/mbpp-323,code,mbpp-test,basic,basic
+code/78,panel/code/mbpp-37,code,mbpp-test,basic,basic
+code/79,panel/code/mbpp-219,code,mbpp-test,basic,basic
+code/80,panel/code/mbpp-416,code,mbpp-test,basic,basic
+code/81,panel/code/mbpp-184,code,mbpp-test,basic,basic
+code/82,panel/code/mbpp-231,code,mbpp-test,basic,basic
+code/83,panel/code/mbpp-115,code,mbpp-test,basic,basic
+code/84,panel/code/mbpp-489,code,mbpp-test,basic,basic
+code/85,panel/code/mbpp-148,code,mbpp-test,basic,basic
+code/86,panel/code/mbpp-117,code,mbpp-test,basic,basic
+code/87,panel/code/mbpp-13,code,mbpp-test,basic,basic
+code/88,panel/code/mbpp-29,code,mbpp-test,basic,basic
+code/89,panel/code/mbpp-177,code,mbpp-test,basic,basic
+code/90,panel/code/mbpp-499,code,mbpp-test,basic,basic
+code/91,panel/code/mbpp-487,code,mbpp-test,basic,basic
+code/92,panel/code/mbpp-483,code,mbpp-test,basic,basic
+code/93,panel/code/mbpp-315,code,mbpp-test,basic,basic
+code/94,panel/code/mbpp-485,code,mbpp-test,basic,basic
+code/95,panel/code/mbpp-176,code,mbpp-test,basic,basic
+code/96,panel/code/mbpp-408,code,mbpp-test,basic,basic
+code/97,panel/code/mbpp-202,code,mbpp-test,basic,basic
+code/98,panel/code/mbpp-374,code,mbpp-test,basic,basic
+code/99,panel/code/mbpp-330,code,mbpp-test,basic,basic
+code/100,panel/code/mbpp-258,code,mbpp-test,basic,basic
+code/101,panel/code/mbpp-304,code,mbpp-test,basic,basic
+code/102,panel/code/mbpp-411,code,mbpp-test,basic,basic
+code/103,panel/code/mbpp-318,code,mbpp-test,basic,basic
+code/104,panel/code/mbpp-324,code,mbpp-test,basic,basic
+code/105,panel/code/mbpp-407,code,mbpp-test,basic,basic
+code/106,panel/code/mbpp-210,code,mbpp-test,basic,basic
+code/107,panel/code/mbpp-375,code,mbpp-test,basic,basic
+code/108,panel/code/mbpp-370,code,mbpp-test,basic,basic
+code/109,panel/code/mbpp-332,code,mbpp-test,basic,basic
+code/110,panel/code/mbpp-15,code,mbpp-test,basic,basic
+code/111,panel/code/mbpp-190,code,mbpp-test,basic,basic
+code/112,panel/code/mbpp-275,code,mbpp-test,basic,basic
+code/113,panel/code/mbpp-365,code,mbpp-test,basic,basic
+code/114,panel/code/mbpp-204,code,mbpp-test,basic,basic
+code/115,panel/code/mbpp-192,code,mbpp-test,basic,basic
+code/116,panel/code/mbpp-371,code,mbpp-test,basic,basic
+code/117,panel/code/mbpp-229,code,mbpp-test,basic,basic
+code/118,panel/code/mbpp-386,code,mbpp-test,basic,basic
+code/119,panel/code/mbpp-295,code,mbpp-test,basic,basic
+code/120,panel/code/mbpp-40,code,mbpp-test,basic,basic
+code/121,panel/code/mbpp-263,code,mbpp-test,basic,basic
+code/122,panel/code/mbpp-355,code,mbpp-test,basic,basic
+code/123,panel/code/mbpp-373,code,mbpp-test,basic,basic
+code/124,panel/code/mbpp-377,code,mbpp-test,basic,basic
+code/125,panel/code/mbpp-35,code,mbpp-test,basic,basic
+code/126,panel/code/mbpp-53,code,mbpp-test,basic,basic
+code/127,panel/code/mbpp-180,code,mbpp-test,basic,basic
+code/128,panel/code/mbpp-169,code,mbpp-test,basic,basic
+code/129,panel/code/mbpp-205,code,mbpp-test,basic,basic
+code/130,panel/code/mbpp-469,code,mbpp-test,basic,basic
+code/131,panel/code/mbpp-163,code,mbpp-test,basic,basic
+code/132,panel/code/mbpp-206,code,mbpp-test,basic,basic
+code/133,panel/code/mbpp-199,code,mbpp-test,basic,basic
+code/134,panel/code/mbpp-136,code,mbpp-test,basic,basic
+code/135,panel/code/mbpp-178,code,mbpp-test,basic,basic
+code/136,panel/code/mbpp-444,code,mbpp-test,basic,basic
+code/137,panel/code/mbpp-154,code,mbpp-test,basic,basic
+code/138,panel/code/mbpp-503,code,mbpp-test,basic,basic
+code/139,panel/code/mbpp-443,code,mbpp-test,basic,basic
+code/140,panel/code/mbpp-236,code,mbpp-test,basic,basic
+code/141,panel/code/mbpp-350,code,mbpp-test,basic,basic
+code/142,panel/code/mbpp-243,code,mbpp-test,basic,basic
+code/143,panel/code/mbpp-364,code,mbpp-test,basic,basic
+code/144,panel/code/mbpp-403,code,mbpp-test,basic,basic
+code/145,panel/code/mbpp-328,code,mbpp-test,basic,basic
+code/146,panel/code/mbpp-486,code,mbpp-test,basic,basic
+code/147,panel/code/mbpp-500,code,mbpp-test,basic,basic
+code/148,panel/code/mbpp-21,code,mbpp-test,basic,basic
+code/149,panel/code/mbpp-181,code,mbpp-test,basic,basic
+code/150,panel/code/mbpp-348,code,mbpp-test,basic,basic
+code/151,panel/code/mbpp-78,code,mbpp-test,basic,basic
+code/152,panel/code/mbpp-34,code,mbpp-test,basic,basic
+code/153,panel/code/mbpp-200,code,mbpp-test,basic,basic
+code/154,panel/code/mbpp-322,code,mbpp-test,basic,basic
+code/155,panel/code/mbpp-215,code,mbpp-test,basic,basic
+code/156,panel/code/mbpp-107,code,mbpp-test,basic,basic
+code/157,panel/code/mbpp-434,code,mbpp-test,basic,basic
+code/158,panel/code/mbpp-196,code,mbpp-test,basic,basic
+code/159,panel/code/mbpp-193,code,mbpp-test,basic,basic
+code/160,panel/code/mbpp-494,code,mbpp-test,basic,basic
+code/161,panel/code/mbpp-24,code,mbpp-test,basic,basic
+code/162,panel/code/mbpp-431,code,mbpp-test,basic,basic
+code/163,panel/code/mbpp-314,code,mbpp-test,basic,basic
+code/164,panel/code/mbpp-400,code,mbpp-test,basic,basic
+code/165,panel/code/mbpp-50,code,mbpp-test,basic,basic
+code/166,panel/code/mbpp-23,code,mbpp-test,basic,basic
+code/167,panel/code/mbpp-378,code,mbpp-test,basic,basic
+code/168,panel/code/mbpp-505,code,mbpp-test,basic,basic
+code/169,panel/code/mbpp-360,code,mbpp-test,basic,basic
+code/170,panel/code/mbpp-249,code,mbpp-test,basic,basic
+code/171,panel/code/mbpp-191,code,mbpp-test,basic,basic
+code/172,panel/code/mbpp-345,code,mbpp-test,basic,basic
+code/173,panel/code/mbpp-417,code,mbpp-test,basic,basic
+code/174,panel/code/mbpp-491,code,mbpp-test,basic,basic
+code/175,panel/code/mbpp-497,code,mbpp-test,basic,basic
+code/176,panel/code/mbpp-510,code,mbpp-test,basic,basic
+code/177,panel/code/mbpp-153,code,mbpp-test,basic,basic
+code/178,panel/code/mbpp-492,code,mbpp-test,basic,basic
+code/179,panel/code/mbpp-194,code,mbpp-test,basic,basic
+code/180,panel/code/mbpp-334,code,mbpp-test,basic,basic
+code/181,panel/code/mbpp-143,code,mbpp-test,basic,basic
+code/182,panel/code/mbpp-228,code,mbpp-test,basic,basic
+code/183,panel/code/mbpp-327,code,mbpp-test,basic,basic
+code/184,panel/code/mbpp-182,code,mbpp-test,basic,basic
+code/185,panel/code/mbpp-317,code,mbpp-test,basic,basic
+code/186,panel/code/mbpp-246,code,mbpp-test,basic,basic
+code/187,panel/code/mbpp-376,code,mbpp-test,basic,basic
+code/188,panel/code/mbpp-504,code,mbpp-test,basic,basic
+code/189,panel/code/mbpp-325,code,mbpp-test,basic,basic
+code/190,panel/code/mbpp-248,code,mbpp-test,basic,basic
+code/191,panel/code/mbpp-401,code,mbpp-test,basic,basic
+code/192,panel/code/mbpp-329,code,mbpp-test,basic,basic
+code/193,panel/code/mbpp-502,code,mbpp-test,basic,basic
+code/194,panel/code/mbpp-461,code,mbpp-test,basic,basic
+code/195,panel/code/mbpp-493,code,mbpp-test,basic,basic
+code/196,panel/code/mbpp-363,code,mbpp-test,basic,basic
+code/197,panel/code/mbpp-241,code,mbpp-test,basic,basic
+code/198,panel/code/mbpp-73,code,mbpp-test,basic,basic
+code/199,panel/code/mbpp-438,code,mbpp-test,basic,basic
+code/200,panel/code/mbpp-49,code,mbpp-test,basic,basic
+code/201,panel/code/mbpp-156,code,mbpp-test,basic,basic
+code/202,panel/code/mbpp-30,code,mbpp-test,basic,basic
+code/203,panel/code/mbpp-316,code,mbpp-test,basic,basic
+code/204,panel/code/mbpp-508,code,mbpp-test,basic,basic
+code/205,panel/code/mbpp-342,code,mbpp-test,basic,basic
+code/206,panel/code/mbpp-367,code,mbpp-test,basic,basic
+code/207,panel/code/mbpp-498,code,mbpp-test,basic,basic
+code/208,panel/code/mbpp-383,code,mbpp-test,basic,basic
+code/209,panel/code/mbpp-369,code,mbpp-test,basic,basic
+code/210,panel/code/mbpp-351,code,mbpp-test,basic,basic
+code/211,panel/code/mbpp-25,code,mbpp-test,basic,basic
+code/212,panel/code/mbpp-51,code,mbpp-test,basic,basic
+code/213,panel/code/mbpp-121,code,mbpp-test,basic,basic
+code/214,panel/code/mbpp-501,code,mbpp-test,basic,basic
+code/215,panel/code/mbpp-372,code,mbpp-test,basic,basic
+code/216,panel/code/mbpp-359,code,mbpp-test,basic,basic
+code/217,panel/code/mbpp-319,code,mbpp-test,basic,basic
+code/218,panel/code/mbpp-41,code,mbpp-test,basic,basic
+code/219,panel/code/mbpp-36,code,mbpp-test,basic,basic
+code/220,panel/code/mbpp-366,code,mbpp-test,basic,basic
+code/221,panel/code/mbpp-343,code,mbpp-test,basic,basic
+code/222,panel/code/mbpp-47,code,mbpp-test,basic,basic
+code/223,panel/code/mbpp-349,code,mbpp-test,basic,basic
+code/224,panel/code/mbpp-506,code,mbpp-test,basic,basic
+code/225,panel/code/mbpp-307,code,mbpp-test,basic,basic
+code/226,panel/code/mbpp-220,code,mbpp-test,basic,basic
+code/227,panel/code/mbpp-214,code,mbpp-test,basic,basic
+code/228,panel/code/mbpp-303,code,mbpp-test,basic,basic
+code/229,panel/code/mbpp-158,code,mbpp-test,basic,basic
+code/230,panel/code/mbpp-331,code,mbpp-test,basic,basic
+code/231,panel/code/mbpp-496,code,mbpp-test,basic,basic
+code/232,panel/code/mbpp-380,code,mbpp-test,basic,basic
+code/233,panel/code/mbpp-336,code,mbpp-test,basic,basic
+code/234,panel/code/mbpp-110,code,mbpp-test,basic,basic
+code/235,panel/code/mbpp-197,code,mbpp-test,basic,basic
+code/236,panel/code/mbpp-353,code,mbpp-test,basic,basic
+code/237,panel/code/mbpp-495,code,mbpp-test,basic,basic
+code/238,panel/code/mbpp-188,code,mbpp-test,basic,basic
+code/239,panel/code/mbpp-212,code,mbpp-test,basic,basic
+code/240,panel/code/mbpp-38,code,mbpp-test,basic,basic
+code/241,panel/code/mbpp-387,code,mbpp-test,basic,basic
+code/242,panel/code/mbpp-33,code,mbpp-test,basic,basic
+code/243,panel/code/mbpp-361,code,mbpp-test,basic,basic
+code/244,panel/code/mbpp-152,code,mbpp-test,basic,basic
+code/245,panel/code/mbpp-185,code,mbpp-test,basic,basic
+code/246,panel/code/mbpp-150,code,mbpp-test,basic,basic
+code/247,panel/code/mbpp-201,code,mbpp-test,basic,basic
+code/248,panel/code/mbpp-31,code,mbpp-test,basic,basic
+code/249,panel/code/mbpp-55,code,mbpp-test,basic,basic
+code/250,panel/code/mbpp-289,code,mbpp-test,basic,basic

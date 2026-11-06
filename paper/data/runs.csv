@@ -1,10 +1,11 @@
-run,label,status,start_from,brief,gpu,model,effort,presence_penalty,passes_used,passes_budget,requests,turns,conversations,code_runs,output_tokens,cache_read_tokens,limit_waits,limit_wait_hours,started,last_event,hours
-pilot-10,,done,original,,5090,claude-opus-5-5,max,0,10,10,10,133,3,122,367489,9470640,0,0.0,2026-11-03 04:11:34,2026-11-03 07:19:16,3.13
-pilot-11,,done,pilot-10,pilot-11.md,5090,claude-opus-5-5,max,1.5,10,10,10,146,3,133,399688,10262827,0,0.0,2026-11-04 17:12:52,2026-11-04 20:09:48,2.95
-pilot-12,prose answers that end too early,done,pilot-10,pilot-12.md,5090,claude-opus-5-5,max,1.5,20,20,20,300,7,279,873120,24618205,0,0.0,2026-11-04 20:11:11,2026-11-04 23:28:51,3.29
-pilot-13,wrong function names in code answers,done,pilot-10,pilot-13.md,5080,claude-opus-5-5,max,1.5,20,20,20,227,5,204,486960,14431177,0,0.0,2026-11-04 20:19:52,2026-11-04 23:38:15,3.31
-pilot-14,answers that restart after the thinking closes,done,combo-12-13,pilot-14.md,5090,claude-opus-5-5,max,1.5,20,20,20,307,7,283,955912,27119962,1,0.25,2026-11-05 13:59:38,2026-11-05 21:01:23,7.03
-pilot-15,instructions that constrain the whole answer,done,combo-12-13,pilot-15.md,5080,claude-opus-5-5,max,1.5,20,20,20,307,7,285,788813,22330877,0,0.0,2026-11-05 13:59:40,2026-11-05 18:22:56,4.39
-pilot-16,turns that end with no answer (MLP only),done,start-r4,pilot-16.md,5090,claude-opus-5-5,max,1.5,20,20,21,154,0,132,321420,33808780,0,0.0,2026-11-06 15:29:54,2026-11-06 20:05:48,4.6
-pilot-17,copying text from the prompt (attention only),done,start-r4,pilot-17.md,5080,claude-opus-5-5,max,1.5,20,20,20,154,0,132,315027,34345058,0,0.0,2026-11-06 15:29:57,2026-11-06 18:14:51,2.75
-pilot-18,the code answer's interface and identifiers (Colab),running,start-r4,pilot-18.md,colab,claude-opus-5-5,max,1.5,7,12,8,123,0,114,256006,21145910,0,0.0,2026-11-06 17:56:59,2026-11-06 21:05:12,3.14
+run,label,status,backend,start_from,brief,gpu,model,effort,presence_penalty,passes_used,passes_budget,requests,turns,conversations,code_runs,output_tokens,cache_read_tokens,limit_waits,limit_wait_hours,started,last_event,hours
+panel-null,panel null check: the start against itself (replay),running,replay,start-r4,,5090,claude-opus-5-5,max,1.5,0,2,1,1,0,0,,,0,0.0,2026-11-06 22:40:45,2026-11-06 22:42:14,0.02
+pilot-10,,done,claude-code,original,,5090,claude-opus-5-5,max,0,10,10,10,133,3,122,367489,9470640,0,0.0,2026-11-03 04:11:34,2026-11-03 07:19:16,3.13
+pilot-11,,done,claude-code,pilot-10,pilot-11.md,5090,claude-opus-5-5,max,1.5,10,10,10,146,3,133,399688,10262827,0,0.0,2026-11-04 17:12:52,2026-11-04 20:09:48,2.95
+pilot-12,prose answers that end too early,done,claude-code,pilot-10,pilot-12.md,5090,claude-opus-5-5,max,1.5,20,20,20,300,7,279,873120,24618205,0,0.0,2026-11-04 20:11:11,2026-11-04 23:28:51,3.29
+pilot-13,wrong function names in code answers,done,claude-code,pilot-10,pilot-13.md,5080,claude-opus-5-5,max,1.5,20,20,20,227,5,204,486960,14431177,0,0.0,2026-11-04 20:19:52,2026-11-04 23:38:15,3.31
+pilot-14,answers that restart after the thinking closes,done,claude-code,combo-12-13,pilot-14.md,5090,claude-opus-5-5,max,1.5,20,20,20,307,7,283,955912,27119962,1,0.25,2026-11-05 13:59:38,2026-11-05 21:01:23,7.03
+pilot-15,instructions that constrain the whole answer,done,claude-code,combo-12-13,pilot-15.md,5080,claude-opus-5-5,max,1.5,20,20,20,307,7,285,788813,22330877,0,0.0,2026-11-05 13:59:40,2026-11-05 18:22:56,4.39
+pilot-16,turns that end with no answer (MLP only),done,claude-code,start-r4,pilot-16.md,5090,claude-opus-5-5,max,1.5,20,20,21,154,0,132,321420,33808780,0,0.0,2026-11-06 15:29:54,2026-11-06 20:05:48,4.6
+pilot-17,copying text from the prompt (attention only),done,claude-code,start-r4,pilot-17.md,5080,claude-opus-5-5,max,1.5,20,20,20,154,0,132,315027,34345058,0,0.0,2026-11-06 15:29:57,2026-11-06 18:14:51,2.75
+pilot-18,the code answer's interface and identifiers (Colab),running,claude-code,start-r4,pilot-18.md,colab,claude-opus-5-5,max,1.5,9,12,10,139,0,128,280683,26760568,0,0.0,2026-11-06 17:56:59,2026-11-06 21:48:35,3.86

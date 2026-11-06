@@ -1,4 +1,5 @@
 run,k,pass,turn,requested,type,model,size,gpu_seconds,gpu,ran,edit_snapshot
+panel-null,1,,,2026-11-06 22:42:14,generate,both,1000,,local,False,True
 pilot-10,1,1,6,2026-11-03 04:14:58,generate,original,128,2249.4,local,True,False
 pilot-10,2,2,22,2026-11-03 04:59:19,teacher_forced,original,78,8.6,local,True,False
 pilot-10,3,3,32,2026-11-03 05:02:14,teacher_forced,original,2,5.5,local,True,False
@@ -147,4 +148,6 @@ pilot-18,4,4,60,2026-11-06 19:36:06,teacher_forced,start,2,2.9,NVIDIA L4,True,Fa
 pilot-18,5,5,89,2026-11-06 19:54:19,teacher_forced,edited,220,58.6,NVIDIA L4,True,False
 pilot-18,6,6,104,2026-11-06 20:12:42,generate,both,159,1239.2,NVIDIA L4,True,False
 pilot-18,7,7,114,2026-11-06 20:38:07,generate,both,160,1419.4,NVIDIA L4,True,False
-pilot-18,8,,,2026-11-06 21:05:12,generate,both,256,,local,False,False
+pilot-18,8,8,123,2026-11-06 21:05:12,generate,both,256,1446.3,NVIDIA L4,True,False
+pilot-18,9,9,131,2026-11-06 21:32:13,teacher_forced,edited,287,77.1,NVIDIA L4,True,False
+pilot-18,10,,,2026-11-06 21:48:35,generate,both,96,,local,False,False

@@ -15,6 +15,7 @@ All credit for the method goes to the original paper. This project only asks whe
 - Each forward pass is either a generation pass or a teacher-forced pass:
   - **Generation:** up to 512 sampled answers, graded automatically. The agent gets back pass rates, cut and loop shares, and failure counts. In paired mode ("both"), it also gets the difference against a baseline model with a standard error over problems.
   - **Teacher-forced:** log-probabilities and activations on given text.
+  - **Panel** (from round 5): a fixed cross-suite check, described under [The panel](#the-panel).
 - A **practice set**, the only problems with tests it may use:
   - 319 MBPP problems: the train, validation and prompt splits, minus every MBPP+ id.
   - 1,400 APPS train stdin/stdout problems, with at most 10 tests each.
@@ -69,13 +70,13 @@ On 728 practice-candidate problems, one answer each, presence penalty 0:
 
 Every edit is scored against the unedited model at presence penalty 1.5. Later edits are also paired against their starting edit.
 
-| Suite | Unedited | pilot-10 | pilot-12 | pilot-13 | combo-12-13 | pilot-14 |
-|---|---|---|---|---|---|---|
-| MBPP+ and HumanEval+ | 19.0% | 27.6% | 27.7% | 31.5% | **32.6%** | 32.3% |
-| MMLU-Pro | 40.5% | 42.9% | 43.8% | 43.2% | 42.9% | **45.2%** |
-| IFEval, prompt-level | 22.3% | 56.6% | 59.4% | 56.7% | **60.8%** | 58.2% |
-| LiveCodeBench | 1.6% | **7.6%** | **7.6%** | 6.6% | 7.4% | 7.0% |
-| MATH-500 | 6.8% | 51.0% | 55.4% | 51.0% | 54.1% | **56.9%** |
+| Suite | Unedited | pilot-10 | pilot-12 | pilot-13 | combo-12-13 | pilot-14 | pilot-16 | pilot-17 |
+|---|---|---|---|---|---|---|---|---|
+| MBPP+ and HumanEval+ | 19.0% | 27.6% | 27.7% | 31.5% | **32.6%** | 32.3% | 31.4% | 31.5% |
+| MMLU-Pro | 40.5% | 42.9% | 43.8% | 43.2% | 42.9% | **45.2%** | 40.6% | 44.2% |
+| IFEval, prompt-level | 22.3% | 56.6% | 59.4% | 56.7% | 60.8% | 58.2% | 60.3% | **61.0%** |
+| LiveCodeBench | 1.6% | **7.6%** | **7.6%** | 6.6% | 7.4% | 7.0% | 6.4% | 7.4% |
+| MATH-500 | 6.8% | 51.0% | 55.4% | 51.0% | 54.1% | **56.9%** | 56.0% | 56.0% |
 
 For comparison, the paper's 50-pass math edit gained +5.2 (MMLU-Pro), +41.3 (IFEval) and +40.2 (MATH-500).
 
@@ -150,11 +151,50 @@ For comparison, the paper's 50-pass math edit gained +5.2 (MMLU-Pro), +41.3 (IFE
 - **On the agent's own 936 held-out prompts:** no-comma instructions followed 44.5% → 97.3%.
 - **Held-out:** IFEval's `no_comma` rose from 67% to 80%, but losses on other instruction types offset it. No suite moved beyond noise, so the edit was not kept.
 
-### Round 4 (in progress, from `pilot-14`)
+### Round 4: three narrower edits, each from `pilot-14`
 
-- **`pilot-16`:** turns that end with no answer (MLP tensors only).
-- **`pilot-17`:** copying text from the prompt under the presence penalty (attention tensors only).
-- **`pilot-18`:** function interfaces and identifiers in code answers.
+Held out, paired against `pilot-14` (SE in brackets):
+
+| Suite | `pilot-16` | `pilot-17` |
+|---|---|---|
+| MBPP+ and HumanEval+ | −0.97 (0.77) | −0.78 (0.91) |
+| HumanEval+ only | −0.15 (1.38) | +0.46 (1.54) |
+| MMLU-Pro | **−4.60 (1.30)** | −1.00 (1.36) |
+| IFEval | +2.03 (1.43) | +2.77 (1.64) |
+| LiveCodeBench | −0.57 (0.78) | +0.43 (0.74) |
+| MATH-500 | −0.85 (0.91) | −0.90 (0.95) |
+
+- **`pilot-16`: turns that end with no answer** (MLP tensors only, 20 passes).
+  - **The edit:** one row of layer 23's `gate_proj` (1,024 weights). `pilot-14`'s cycle stopper now fires at a segment boundary instead of right after a `</think>`.
+  - **Its target improved:** IFEval turns with no answer fell from 44 to 17 of 1,082.
+  - **But MMLU-Pro lost 4.6 points.** The losses are wrong letters in long answers, spread over subjects (106 right → wrong, 59 wrong → right), not missing answers. The agent had checked multiple choice only on a variant it later dropped.
+- **`pilot-17`: copying text from the prompt under the presence penalty** (attention tensors only, 20 passes).
+  - **The edit:** three rank-1 terms in `q_proj`, layer 15 head 7 and layer 11 head 1.
+  - **Held out:** IFEval +2.8; every other suite within about a point.
+- **`pilot-18`: function interfaces and identifiers in code answers** (12 passes, on a cloud L4; in progress).
+- **Neither finished edit lifted its target by much beyond noise, and one broke a suite the agent never measured.** That led to the panel.
+
+### The panel
+
+From round 5 on, the agent can ask for a **panel pass**: 1,000 fixed questions that are in neither the practice set nor the held-out evaluation, answered once each with the evaluation's protocol.
+
+| Suite | Questions | From | Graded like |
+|---|---|---|---|
+| choice | 250 | MMLU-Pro test questions outside the evaluation's 1,000 | MMLU-Pro |
+| math | 250 | MATH test problems outside MATH-500 | MATH-500 |
+| instructions | 250 | `argilla/ifeval-like-data`, 1–3 verifiable constraints, drawn to match IFEval's mix of constraint types and counts | IFEval |
+| code | 250 | MBPP test tasks outside MBPP+ | the practice problems |
+
+- **What the agent sees:** per suite, the edited model's score, the paired difference against its starting edit with a standard error, the questions that flipped, and the shares cut or without an answer. It also gets one pass/fail line per question, with a stable label but never the question or the answer.
+- **What it is for:** catching a cost on another suite, like `pilot-16`'s on MMLU-Pro, before a run ends, and choosing between candidate edits. With 250 questions a suite it is too small to tune an edit on.
+- **Its noise** is measured by a null check: the starting edit against itself, in one pass and across two.
+- **Built by** `eval/prepare_panel.py`. The reference answers are checked with the same graders; `paper/data/panel.csv` lists the questions by id.
+
+### Round 5 (planned): `pilot-19` consolidates round 4
+
+- **Starts from** `pilot-14`, with 24 passes and the panel.
+- **Candidates in its working directory:** the changes of `pilot-16`, `pilot-17` and `pilot-18`, each on its own and summed.
+- **The goal:** one edit that keeps what helps across all four panel suites and drops what costs elsewhere.
 
 ## What we've learned so far
 
@@ -163,20 +203,21 @@ For comparison, the paper's 50-pass math edit gained +5.2 (MMLU-Pro), +41.3 (IFE
 - **Targeted edits are small and interpretable.** They are a few neurons or rank-1 gates, each with a mechanism the agent can state, and they compose when they touch disjoint tensors.
 - **The agent's own checks overstate held-out gains on suites they don't resemble.** IFEval, for example, rose +18 on its own prompts but +2.9 held out.
 - **Later rounds trade between suites rather than lifting all of them.**
+- **A narrow edit can pass every check the agent runs and still cost a suite it never looks at.** `pilot-16` fixed its target and lost 4.6 points on MMLU-Pro, which is why later runs get the panel.
 
 ## Repository
 
 | Path | What |
 |---|---|
 | `harness/` | The agent loop (`driver.py`), the editor prompt (`prompt.txt`), the kernel and forward-pass servers, the grader, run briefs (`briefs/`) and tests |
-| `eval/` | The held-out evaluation (`evaluate.py`, `eval_gen.py`, `grade_suites.py`, `suites.py`, vendored IFEval checkers) and `results/<name>/report.md` |
+| `eval/` | The held-out evaluation (`evaluate.py`, `eval_gen.py`, `grade_suites.py`, `suites.py`, vendored IFEval checkers), the panel's builder (`prepare_panel.py`) and `results/<name>/report.md` |
 | `scripts/` | Practice-set preparation and the baseline |
 | `baseline/` | Baseline results and the rendered evaluation prompt |
 | `runs/<run>/` | Each run's brief, config, final report, the agent's explanations, its log and its submitted-edit manifest |
-| `paper/` | `collect.py` and `data/`: per-run, per-pass, per-evaluation and per-tensor tables, plus the full agent transcripts, for a write-up |
+| `paper/` | `collect.py` and `data/`: per-run, per-pass, per-evaluation, per-panel-pass and per-tensor tables, the panel's question list, plus the full agent transcripts, for a write-up |
 | `scratch/` | One-off analysis scripts |
 
-Model weights, datasets and edit tensors are not included. The data sources are MBPP, APPS, EvalPlus (MBPP+ and HumanEval+), MMLU-Pro, IFEval, LiveCodeBench and MATH-500, all public.
+Model weights, datasets and edit tensors are not included. The data sources are MBPP, APPS, EvalPlus (MBPP+ and HumanEval+), MMLU-Pro, IFEval, LiveCodeBench, MATH and MATH-500, and `argilla/ifeval-like-data`, all public.
 
 **Software:** vLLM 0.32.0, transformers 5.19.0 and torch 2.13.0 (CUDA 13.0), Python 3.12. GPUs: RTX 5090, RTX 5080, and a cloud L4 for `pilot-18`.
 

@@ -1,4 +1,13 @@
 run,edit,tensor,shape,delta_norm,relative_norm,max_abs,entries_changed,rank,top1_share,top4_share
+panel-null,request 1,model.language_model.layers.10.mlp.down_proj.weight,1024x3584,2.484616,0.163009,0.377852,2048,1,1.0,1.0
+panel-null,request 1,model.language_model.layers.13.mlp.down_proj.weight,1024x3584,3.497751,0.227911,0.466836,3072,2,0.8584,1.0
+panel-null,request 1,model.language_model.layers.14.mlp.down_proj.weight,1024x3584,1.193546,0.078822,0.224929,1024,1,1.0,1.0
+panel-null,request 1,model.language_model.layers.15.self_attn.q_proj.weight,4096x1024,10.96198,0.341252,0.079493,262144,1,1.0,1.0
+panel-null,request 1,model.language_model.layers.19.self_attn.q_proj.weight,4096x1024,12.141128,0.380775,0.040429,1310720,1,1.0,1.0
+panel-null,request 1,model.language_model.layers.23.mlp.down_proj.weight,1024x3584,5.252832,0.319962,0.341421,4096,4,0.9225,1.0
+panel-null,request 1,model.language_model.layers.23.mlp.gate_proj.weight,3584x1024,25.735435,0.711363,5.117218,4096,4,0.9169,1.0
+panel-null,request 1,model.language_model.layers.23.mlp.up_proj.weight,3584x1024,0.565088,0.026596,0.043823,4096,4,0.3285,1.0
+panel-null,request 1,model.language_model.layers.23.self_attn.q_proj.weight,4096x1024,10.513654,0.312995,0.058787,524288,1,1.0,1.0
 pilot-10,final,model.language_model.layers.10.mlp.down_proj.weight,1024x3584,2.484616,0.163009,0.377852,2048,1,1.0,1.0
 pilot-10,final,model.language_model.layers.13.mlp.down_proj.weight,1024x3584,3.497751,0.227911,0.466836,3072,2,0.8584,1.0
 pilot-10,final,model.language_model.layers.14.mlp.down_proj.weight,1024x3584,1.193546,0.078822,0.224929,1024,1,1.0,1.0

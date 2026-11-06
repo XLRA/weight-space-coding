@@ -16,9 +16,16 @@ Writes:
                   numerical rank, and the share of it in the top 1 and top 4 singular directions;
 - environment.json  the model (repository, revision, weights sha256), the runtime's vLLM, transformers, torch,
                   numpy and Python versions, the local GPUs and driver, the Colab GPUs used;
+- panels.csv      one row per panel pass and suite (README, "Panel"): run, request k, pass, baseline, questions,
+                  edited and baseline pass rates, paired difference and its standard error, flips, cut and mean
+                  lengths; null-check runs (panel-*) give the panel's noise;
+- panel.csv       the panel's questions without their text: label q, id, suite, source, difficulty, about;
+- panel_stats.json  how the panel was drawn (eval/prepare_panel.py);
 - runs/<run>/     the small texts of each run (brief, report, explanations, label, config, state, manifest), its
                   evaluation reports (report.md, report.json), its full agent transcript (tool_calls.jsonl,
-                  messages/) and the harness copies driver.py made at each start (code/);
+                  messages/), the harness copies driver.py made at each start (code/) and its panel passes per
+                  question without the answers (panel/panel_<k>.jsonl, and the graded rows panel/gen_*.jsonl and
+                  panel/base_*.jsonl);
 - /opt/wsp/paper/code/<time>/  the harness, evaluation and paper code, copied whenever it changed.
 Edits kept by driver.py at each request (snapshot_edit) are in /opt/wsp/paper/edits/<md5>.npy, listed per run in
 runs/<run>/edits.jsonl. Runs before 2026-11-06 20:30 have only their final edit (runs/<run>/submission).
@@ -38,6 +45,7 @@ WSP = "/opt/wsp"
 OUT = f"{WSP}/paper/data"
 MODEL = f"{WSP}/models/qwen3.5-0.8b"
 CACHE = f"{OUT}/.cache.json"
+PANEL = f"{WSP}/panel/final/panel.jsonl"
 SKIP = re.compile(r"^(e2e|test|smoke)")
 STAMP = re.compile(r"^(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d) ")
 
@@ -90,7 +98,7 @@ def run_row(name, d):
     label = "\n".join(lines(f"{d}label.txt")).strip()
     tok = st.get("tokens") or {}
     return {
-        "run": name, "label": label, "status": st.get("status", ""),
+        "run": name, "label": label, "status": st.get("status", ""), "backend": cfg.get("backend", "claude-code"),
         "start_from": os.path.basename(os.path.dirname((cfg.get("start_from") or "").rstrip("/"))) or "original",
         "brief": os.path.basename(cfg.get("brief") or ""), "gpu": cfg.get("gpu", "5090"),
         "model": cfg.get("model", ""), "effort": cfg.get("effort", ""),
@@ -128,14 +136,55 @@ def pass_rows(name, d):
         res = load(f"{d}requests/fwd_{k}.result.json", {}) or {}
         turn, summary = results.get(k, ("", ""))
         m = re.search(r"\[forward pass (\d+) of", summary)
-        size = len(req.get("texts") or []) or len(req.get("problems") or req.get("prompts") or []) or ""
+        size = (len(req.get("texts") or []) or len(req.get("problems") or req.get("prompts") or [])
+                or len(req.get("items") or []) or "")
         out.append({
             "run": name, "k": k, "pass": int(m.group(1)) if m else "", "turn": turn, "requested": asked.get(k, ""),
             "type": req.get("type", ""), "model": req.get("model", ""), "size": size,
             "gpu_seconds": res.get("wall_seconds", ""), "gpu": (res.get("colab") or {}).get("gpu", "") or "local",
             "ran": bool(res.get("ok")) and bool(m), "edit_snapshot": k in edits,
-            "_request": {x: y for x, y in req.items() if x not in ("texts",)}, "_summary": summary,
+            "_request": {x: y for x, y in req.items() if x not in ("texts", "items")}, "_summary": summary,
         })
+    return out
+
+
+def panel_rows(name, d, prows):
+    """One row per panel pass (work/panel_<k>.jsonl, written by driver.py's summarize_panel) and suite."""
+    passno = {p["k"]: p["pass"] for p in prows if p["run"] == name}
+    out = []
+    for path in sorted(glob.glob(f"{d}work/panel_*.jsonl"), key=lambda p: int(re.findall(r"\d+", os.path.basename(p))[0])):
+        k = int(re.findall(r"\d+", os.path.basename(path))[0])
+        rows = jsonl(path)
+        for suite in sorted({r["suite"] for r in rows}):
+            rs = [r for r in rows if r["suite"] == suite]
+            n = len(rs)
+            e = [r["status"] == "pass" for r in rs]
+            b = [r["base_status"] == "pass" for r in rs]
+            diff = [100 * (x - y) for x, y in zip(e, b)]
+            mean = sum(diff) / n
+            se = (sum((x - mean) ** 2 for x in diff) / (n - 1)) ** 0.5 / n ** 0.5 if n > 1 else ""
+            out.append({"run": name, "k": k, "pass": passno.get(k, ""), "baseline": rs[0].get("baseline", ""),
+                        "suite": suite, "questions": n, "edited": round(100 * sum(e) / n, 2),
+                        "base": round(100 * sum(b) / n, 2), "diff": round(mean, 2),
+                        "se": round(se, 2) if se != "" else "",
+                        "fail_to_pass": sum(x and not y for x, y in zip(e, b)),
+                        "pass_to_fail": sum(y and not x for x, y in zip(e, b)),
+                        "cut": sum(bool(r["cut"]) for r in rs), "base_cut": sum(bool(r["base_cut"]) for r in rs),
+                        "mean_tokens": round(sum(r["tokens"] for r in rs) / n),
+                        "base_mean_tokens": round(sum(r["base_tokens"] for r in rs) / n)})
+    return out
+
+
+def panel_questions():
+    """The panel's questions without their text (the full file is rebuilt by eval/prepare_panel.py)."""
+    out, count = [], {}
+    for p in jsonl(PANEL):  # the same q and about as driver.py
+        count[p["suite"]] = count.get(p["suite"], 0) + 1
+        about = (p["instruction_id_list"] if p["suite"] == "instructions" else
+                 f"{p.get('subject', '')}, {p['difficulty']}" if p["suite"] == "math" else p["difficulty"])
+        out.append({"q": f"{p['suite']}/{count[p['suite']]}", "id": p["id"], "suite": p["suite"],
+                    "source": p.get("source", ""), "difficulty": p.get("difficulty", ""),
+                    "about": ";".join(about) if isinstance(about, list) else about})
     return out
 
 
@@ -187,6 +236,11 @@ def copy_texts(name, d):
     for sub in ("messages", "code"):
         if os.path.isdir(f"{d}{sub}"):
             shutil.copytree(f"{d}{sub}", f"{dest}/{sub}", dirs_exist_ok=True)
+    panel = sorted(glob.glob(f"{d}work/panel_*.jsonl")) + [p for p in sorted(glob.glob(f"{d}panel/*.jsonl"))
+                                                           if not p.endswith(".raw.jsonl")]
+    for p in panel:  # per question, without question or answer texts
+        os.makedirs(f"{dest}/panel", exist_ok=True)
+        shutil.copyfile(p, f"{dest}/panel/{os.path.basename(p)}")
     for rep in glob.glob(f"{WSP}/eval/results/*/report.json"):
         cfg = (load(rep, {}) or {}).get("config", {})
         if os.path.basename(os.path.dirname(cfg.get("submission", "").rstrip("/"))) == name:
@@ -335,11 +389,16 @@ def code_history():
 
 def main():
     os.makedirs(OUT, exist_ok=True)
-    rrows, prows = [], []
+    rrows, prows, panrows = [], [], []
     for name, d in runs():
         rrows.append(run_row(name, d))
         prows += pass_rows(name, d)
+        panrows += panel_rows(name, d, prows)
         copy_texts(name, d)
+    write_csv(f"{OUT}/panels.csv", panrows)
+    if os.path.exists(PANEL):
+        write_csv(f"{OUT}/panel.csv", panel_questions())
+        shutil.copyfile(os.path.join(os.path.dirname(PANEL), "stats.json"), f"{OUT}/panel_stats.json")
     erows = eval_rows()
     write_csv(f"{OUT}/runs.csv", rrows)
     write_csv(f"{OUT}/passes.csv", prows)
@@ -359,8 +418,8 @@ def main():
     with open(CACHE, "w") as f:
         json.dump(cache, f)
     code = code_history()
-    print(f"{len(rrows)} runs, {len(prows)} requests, {len(erows)} evaluation rows, {len(drows)} edited tensors; "
-          f"code copy {code} -> {OUT}")
+    print(f"{len(rrows)} runs, {len(prows)} requests, {len(panrows)} panel rows, {len(erows)} evaluation rows, "
+          f"{len(drows)} edited tensors; code copy {code} -> {OUT}")
 
 
 if __name__ == "__main__":

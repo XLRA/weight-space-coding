@@ -1,0 +1,1 @@
+panel null check: the start against itself (replay)

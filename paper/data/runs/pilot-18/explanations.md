@@ -520,3 +520,80 @@ What would change my plan:
 - A clear drop in any of the non-code checks would mean the edit acts outside code, and I'd investigate before submitting.
 - A reversal on the code mechanism counts would weaken the case for keeping v2.
 
+## Turn 124 (python)
+
+Pass 8 is back (own prompts are ungraded, so I'll grade everything myself). First the code items: the 160 set-B MBPP prompts and the 32 HE-style prompts, using the last ```python block after `</think>` and run_tests against the matching problem's tests, plus the mechanism counts.
+
+## Turn 125 (python)
+
+Confirmation 2 on set B (fresh seeds): MBPP 26.9% → 31.2% (+4.4, SE 3.5; 19 fail→pass vs 12 pass→fail). Extensions fell 3 → 1, short signatures 16 → 12, over-arity 2 → 0. The 32 HE-style items went 46.9% → 37.5% (−9.4, SE 9.4; only 3 vs 6 discordant). Pooling both confirmation passes, MBPP set B is +2.5 points (about 1 SE). Now the non-code checks.
+
+The graders read the answer after the last `</think>`:
+- **Math:** the last `\boxed{}`.
+- **Instruction following:** my per-prompt checkers.
+- **Multiple choice:** the last "The answer is (X)".
+
+## Turn 126 (python)
+
+No harm in the checks: math 22/24 for both (2 changes each way), instruction following 22 → 23 of 24, multiple choice 15/16 for both. Let me check whether these non-code pairs are identical or drift apart, since that tells me whether the edit is truly inert outside code (if they diverge early, the cause is the removed original neuron contributions, not the new mechanism).
+
+## Turn 127 (python)
+
+Every non-code pair diverges early (median 340–460 characters into the thinking), so the drift is global, consistent with the small, position-independent change from removing the four neurons' original contributions rather than with the new detectors (which never fired in prose). It randomizes trajectories without a systematic effect, and the checks show none. One count rose on set B, descriptive renames ("other") 16 → 22 over both passes. I'll inspect v2's renames for any sign that the end-of-name neuron cuts names (e.g. a variant that is a truncated form of the given name).
+
+## Turn 128 (python)
+
+These renames are all descriptive or spelling/case normalizations of odd given names (small_nnum → get_n_smallest, len_log → find_shortest_word_length, last_occurence_char → last_occurrence_char), many identical to the starting edit's own renames on the same problems; none is a truncation. So the 16 → 22 difference is sampling noise, not a side effect. One risk remains unmeasured: the competitive-programming suite, where programs define their own helpers and there is no example call. I'll use a teacher-forced pass with v2 on (1) APPS reference solutions with helper functions, to see whether either neuron fires at parameter-list closes or name middles there; (2) set-B answers written by the starting edit (held-out problems), to measure how much v2 favours ending the name and continuing the signature at their actual extension and premature-close points. Let me assemble the texts.
+
+## Turn 129 (python)
+
+The longest texts (up to 6,260 tokens) would blow the padding budget with MLP activations. Since only the decision points matter for the long set-B answers, I'll cut any text over 1,600 tokens right after its first def line whose name starts with the given name (or its first def), and drop anything still too long.
+
+## Turn 130 (python)
+
+287 texts, longest 1,590 tokens, about 3.3 GB of MLP activations: within limits. Pass 9 teacher-forces v2 on them. What would change my plan: if either neuron fires at parameter-list closes or name middles of APPS helper functions, it could break competitive-programming answers, and I would raise its threshold or add those positions as negatives. On the held-out set-B decision points I expect v2 to put substantial probability on ending the name and continuing the signature.
+
+## Turn 131 (forward)
+
+Pass 9 teacher-forces v2 on these 287 texts, returning token log-probabilities, top-20 and the layer-22 MLP activations.
+
+## Turn 132 (python)
+
+Pass 9 is back. Since each pair's down vectors are +v and −v, the effective push is act(2979) − act(2055) for end-of-name and act(2126) − act(1878) for arity. First the APPS safety check: those effective activations at the positions of every def line in the reference solutions (name middles, name ends, before each `,` and before the closing `)`), and the resulting continuation probabilities at closes.
+
+## Turn 133 (python)
+
+Safety problem found in standard-input code. The end-of-name ramp is nearly silent (fires at 7 of 218 helper-name ends, which is harmless, and 2 of 149 name middles). But the arity ramp fires above 0.5 at 16 of 155 helper parameter-list closes (max 3.3), where a pushed comma would add a spurious parameter. Let me see those 16 contexts and how much probability v2 actually puts on continuing there.
+
+## Turn 134 (python)
+
+This is a real risk. At APPS helper parameter lists where the arity ramp fires, v2 puts high probability on continuing past the true close in several cases (`def full_way(u` 0.98, `def circles(u` 1.00, `def mex(x` 0.91, `def calc(x` 0.62, `def GLR(x` 0.52). In model-written standard-input code that would add parameters the calls don't pass. Without an example call, "more arguments expected" is not well defined, and the detector evidently picks up something broader. Given that the arity repair converted almost no failures into passes (consistent with the oracle), its expected value is about zero on MBPP-style and negative on competitive programming. I'll drop it unless the end-of-name ramp has a similar problem. Let me check the end ramp's two firings at APPS helper-name middles.
+
+## Turn 135 (python)
+
+The end-of-name ramp is much safer. At helper-name ends in APPS code it only reinforces the `(` that follows (p 0.88–0.999). Its one risky case is a name that extends an earlier helper's complete name: at `def cell_advance` → `_hero` v2 puts 0.80 on ending the name. That is the APPS analogue of "helpers extending the given name", which was rare in MBPP (4 of 512 final blocks). My decision: drop the arity pair (restore neurons 2126 and 1878) and keep the end-of-name pair. Before rebuilding, let me measure the end ramp on the held-out set-B texts written by the starting edit: v2's probability of ending the name at each actual extension point, and at kept ends and mid-name positions of the given name.
+
+## Turn 136 (python)
+
+Held-out validation of the end-of-name ramp on set-B answers written by the starting edit: at the first extension point of each answer, v2 ends the name with probability about 0.8 on average (0.48–1.00 in 10 of 11 cases; mbpp/832 resisted at 0.01). The later extension points are copies of the already-written variant and correctly get no push. At kept ends it reinforces `(` (0.996), and at 562 mid-name positions it fires in only 0.7% with no truncation. Now I'll build v3 = starting edit + end-of-name pair only (neurons 2979 and 2055), restoring neurons 2126 and 1878 to their original weights, and verify the diff.
+
+## Turn 137 (python)
+
+The conversation will restart soon, so I'll first bring /work/notes.md fully up to date. It needs the current edit (v3) with its exact construction, all measured results so far, and the plan for the last three passes.
+
+## Turn 138 (python)
+
+Notes are complete. Pass 10 is the first confirmation of v3 (end-of-name ramp only) against the starting edit, and the first generation check on the competitive-programming form. It runs:
+- the 160 set-B MBPP problems as own prompts in a new shuffled order (fresh seeds), graded by me;
+- 96 APPS standard-input problems (all 34 introductory plus 62 interview), graded by the harness.
+
+What I expect: fewer name extensions on MBPP and no change on APPS.
+
+What would change my plan:
+- A clear drop on APPS, or new helper-name truncations, would point to the residual risk I found (names extending an earlier helper's name), and I'd raise the threshold.
+- Losing the MBPP extension gains would undercut the edit.
+
+## Turn 139 (forward)
+
+Files are ready. Pass 10 runs v3 against the starting edit on the 96 APPS problems (graded by the harness) and the 160 reshuffled set-B MBPP prompts (graded by me), one sample each.
+
