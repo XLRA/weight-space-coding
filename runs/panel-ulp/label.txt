@@ -1,0 +1,1 @@
+panel noise floor: the start with one weight moved by one bf16 step (replay)

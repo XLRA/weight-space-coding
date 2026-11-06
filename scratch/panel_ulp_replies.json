@@ -1,0 +1,4 @@
+[
+ "I am running this step to set up a noise-floor check of the panel: one weight of an untouched tensor moves by a single bf16 step, and nothing else changes.\n\n```python\nimport torch\nname = \"model.language_model.layers.5.mlp.down_proj.weight\"\nt = load(name)\nb = t.to(torch.bfloat16).contiguous()\nassert torch.equal(b.float(), t)\ni = int(t.abs().reshape(-1).argsort()[t.numel() // 2])\nbits = b.reshape(-1).view(torch.int16).clone()\nbits[i] += 1\nnew = bits.view(torch.bfloat16).reshape(t.shape).float()\nprint(\"entry\", i, \"of\", t.numel(), \"from\", t.reshape(-1)[i].item(), \"to\", new.reshape(-1)[i].item(),\n      \"| entries changed:\", int((new != t).sum()))\nprint(save_edit(name, new))\n```\n",
+ "I am running this step to measure how many panel answers flip when the weights differ from the start by one bf16 step in a single entry.\n\n```forward\n{\n \"type\": \"panel\"\n}\n```\n"
+]

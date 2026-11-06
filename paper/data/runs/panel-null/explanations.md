@@ -2,3 +2,7 @@
 
 I am running this step to check one part of the harness, and a failure here would mean a bug to fix. Null check: the edit is the start, so the panel should show no difference beyond noise.
 
+## Turn 2 (forward)
+
+I am running this step to check one part of the harness, and a failure here would mean a bug to fix. Null check across passes: the start answers are reused from the first pass.
+

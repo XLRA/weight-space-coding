@@ -187,7 +187,10 @@ From round 5 on, the agent can ask for a **panel pass**: 1,000 fixed questions t
 
 - **What the agent sees:** per suite, the edited model's score, the paired difference against its starting edit with a standard error, the questions that flipped, and the shares cut or without an answer. It also gets one pass/fail line per question, with a stable label but never the question or the answer.
 - **What it is for:** catching a cost on another suite, like `pilot-16`'s on MMLU-Pro, before a run ends, and choosing between candidate edits. With 250 questions a suite it is too small to tune an edit on.
-- **Its noise** is measured by a null check: the starting edit against itself, in one pass and across two.
+- **Its noise**, measured with two checks from `pilot-14`'s edit:
+  - **The same weights give the same answers.** Three generations of the starting edit, two of them in separate passes, were byte-identical on all 1,000 questions (vLLM on one GPU, same batch and seeds).
+  - **Any change gives new answers.** One weight was moved by a single bf16 rounding step: 1 of 3.7 million entries of a layer-5 MLP tensor that no edit touches. None of the 1,000 answers stayed the same; they parted from the originals after the first 2–4% of their text. That edit does nothing, yet the panel read choice +1.6 (SE 2.7), math +1.6 (2.0), instructions −4.8 (2.6), code −3.2 (2.3), mean over the suites −1.2 (1.2).
+  - **So only differences beyond about two standard errors count:** about 5 points on one suite, 2.5 on the mean.
 - **Built by** `eval/prepare_panel.py`. The reference answers are checked with the same graders; `paper/data/panel.csv` lists the questions by id.
 
 ### Round 5 (planned): `pilot-19` consolidates round 4
@@ -203,6 +206,7 @@ From round 5 on, the agent can ask for a **panel pass**: 1,000 fixed questions t
 - **Targeted edits are small and interpretable.** They are a few neurons or rank-1 gates, each with a mechanism the agent can state, and they compose when they touch disjoint tensors.
 - **The agent's own checks overstate held-out gains on suites they don't resemble.** IFEval, for example, rose +18 on its own prompts but +2.9 held out.
 - **Later rounds trade between suites rather than lifting all of them.**
+- **Fixed seeds don't make two models' answers comparable one by one.** With thinking on, changing a single weight by one rounding step re-samples nearly every answer, so a paired comparison removes the problems' difficulty but not the sampling noise. Its standard error is the honest yardstick, and single-suite differences of a few points are noise.
 - **A narrow edit can pass every check the agent runs and still cost a suite it never looks at.** `pilot-16` fixed its target and lost 4.6 points on MMLU-Pro, which is why later runs get the panel.
 
 ## Repository

@@ -1,0 +1,13 @@
+run,k,pass,baseline,suite,questions,edited,base,diff,se,fail_to_pass,pass_to_fail,cut,base_cut,mean_tokens,base_mean_tokens
+panel-null,1,1,start,choice,250,44.8,44.8,0.0,0.0,0,0,1,1,8653,8653
+panel-null,1,1,start,code,250,21.2,21.2,0.0,0.0,0,0,1,1,3179,3179
+panel-null,1,1,start,instructions,250,79.2,79.2,0.0,0.0,0,0,4,4,4553,4553
+panel-null,1,1,start,math,250,58.0,58.0,0.0,0.0,0,0,11,11,13585,13585
+panel-null,2,2,start,choice,250,44.8,44.8,0.0,0.0,0,0,1,1,8653,8653
+panel-null,2,2,start,code,250,21.2,21.2,0.0,0.0,0,0,1,1,3179,3179
+panel-null,2,2,start,instructions,250,79.2,79.2,0.0,0.0,0,0,4,4,4553,4553
+panel-null,2,2,start,math,250,58.0,58.0,0.0,0.0,0,0,11,11,13585,13585
+panel-ulp,1,1,start,choice,250,46.4,44.8,1.6,2.72,25,21,4,1,8854,8653
+panel-ulp,1,1,start,code,250,18.0,21.2,-3.2,2.33,13,21,4,1,3789,3179
+panel-ulp,1,1,start,instructions,250,74.4,79.2,-4.8,2.58,15,27,5,4,4399,4553
+panel-ulp,1,1,start,math,250,59.6,58.0,1.6,2.04,15,11,8,11,12955,13585

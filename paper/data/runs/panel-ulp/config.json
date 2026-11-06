@@ -1,0 +1,22 @@
+{
+ "passes": 1,
+ "backend": "replay",
+ "replay": "/opt/wsp/scratch/panel_ulp_replies.json",
+ "model": "claude-opus-5-5",
+ "effort": "max",
+ "max_usd": null,
+ "handoff_every": 0,
+ "max_turns": 1000,
+ "max_code_runs": 300,
+ "kernel_seconds": 120,
+ "kernel_memory_gb": 20,
+ "max_output_tokens": 128000,
+ "max_context": 400000,
+ "gpu_idle_minutes": 30,
+ "claude_bin": "/home/wspagent/.local/bin/claude",
+ "presence_penalty": 1.5,
+ "start_from": "/opt/wsp/runs/start-r4/submission",
+ "brief": null,
+ "gpu": "5090",
+ "panel": true
+}

@@ -1,5 +1,7 @@
 run,k,pass,turn,requested,type,model,size,gpu_seconds,gpu,ran,edit_snapshot
-panel-null,1,,,2026-11-06 22:42:14,generate,both,1000,,local,False,True
+panel-null,1,1,1,2026-11-06 22:42:14,generate,both,1000,1798.4,local,True,True
+panel-null,2,2,2,2026-11-06 23:12:20,generate,edited,1000,899.4,local,True,True
+panel-ulp,1,1,2,2026-11-06 23:33:52,generate,edited,1000,909.4,local,True,True
 pilot-10,1,1,6,2026-11-03 04:14:58,generate,original,128,2249.4,local,True,False
 pilot-10,2,2,22,2026-11-03 04:59:19,teacher_forced,original,78,8.6,local,True,False
 pilot-10,3,3,32,2026-11-03 05:02:14,teacher_forced,original,2,5.5,local,True,False
