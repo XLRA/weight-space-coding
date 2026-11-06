@@ -1,0 +1,187 @@
+# Weight-space programming for code
+
+A recreation of Experiment 8 of *Sparks of Weight-Space Programming* (Takehi et al., 2026), with coding in place of math.
+
+An AI agent (Claude Opus 5.5, at maximum effort) edits the weights of a small language model directly. It works through a Python kernel and a limited budget of forward passes on a GPU, with no gradient training. The target is **Qwen3.5-0.8B** with thinking on, at the revision the paper used (`2fc06364715b967f1860aea9cf38778875588b17`). Every edit is then scored on held-out benchmarks the agent never sees.
+
+All credit for the method goes to the original paper. This project only asks whether it carries over to code.
+
+## The setup
+
+**What the agent gets:**
+- The original weights, read-only, and a working directory where it saves edited tensors.
+- A persistent Python kernel with helpers to load tensors, save an edit, tokenize, and run tests. It has no network access.
+- A budget of **forward passes** (10–20 per run here; failed or refused requests are free) and 300 code runs of at most 15 minutes each.
+- Each forward pass is either a generation pass or a teacher-forced pass:
+  - **Generation:** up to 512 sampled answers, graded automatically. The agent gets back pass rates, cut and loop shares, and failure counts. In paired mode ("both"), it also gets the difference against a baseline model with a standard error over problems.
+  - **Teacher-forced:** log-probabilities and activations on given text.
+- A **practice set**, the only problems with tests it may use:
+  - 319 MBPP problems: the train, validation and prompt splits, minus every MBPP+ id.
+  - 1,400 APPS train stdin/stdout problems, with at most 10 tests each.
+  - Only problems whose reference solution passes the grader are kept.
+- The rendered evaluation prompt format, though not the evaluation problems.
+
+**Rules the harness enforces:**
+- Each reply holds one code block or one forward request, with at least ten words explaining it. A reply without that is sent back unrun.
+- Output is cut at 10,000 characters.
+- Edits to the final norm or the embedding/output layer, and whole-tensor scalings, are refused.
+- When the conversation passes 400k tokens, it restarts with the agent's own notes, the edit manifest and the last result. Kernel variables survive the restart.
+- Everything runs in network-isolated containers. Graded code runs in a locked-down sandbox: unprivileged user, a 2 GB memory cap, process limits, and time limits.
+
+**Sampling** (the model card's coding setting): temperature 0.6, top_p 0.95, top_k 20, at most 32,768 new tokens. From `pilot-11` on, presence penalty is 1.5, the paper's setting; `pilot-10` used 0.
+
+**Briefs:** after the first run, each run is started from an earlier edit and given a short brief. A brief names a failure pattern found in the previous evaluation, with rough shares only, never individual held-out problems. This makes the targeted suite a little less blind for that run, which is noted with each result.
+
+## Baseline: the unedited model
+
+On 728 practice-candidate problems, one answer each, presence penalty 0:
+
+| Set | n | Pass | Cut at token limit | Wrong interface | Runtime error | Wrong answer |
+|---|---|---|---|---|---|---|
+| All | 728 | 4.5% | 76.0% | 12.5% | 5.1% | 1.8% |
+| MBPP | 473 | 6.3% | 64.1% | 19.2% | 7.8% | 2.3% |
+| APPS | 255 | 1.2% | 98.0% | 0 | 0 | 0.8% |
+
+- **Loops:** 543 of the 553 cut answers are loops, almost all inside the thinking. Only 16 closed `</think>`. This is the same obstacle the paper fixed on math.
+- **Answers that weren't cut** (175) pass 19% of the time.
+- **Wrong interface:** the model renames the function (`bell_Number` → `bell_number`) or writes a script with no function.
+
+## Held-out evaluation
+
+| Suite | Problems | Samples | Score |
+|---|---|---|---|
+| MBPP+ and HumanEval+ | 542 (378 + 164) | 4 | pass@1 |
+| MMLU-Pro | 1,000, the paper's fixed sample | 1 | accuracy, official zero-shot prompt and extraction |
+| IFEval | 541 | 2 | strict prompt-level accuracy (official checkers, on the text after `</think>`) |
+| LiveCodeBench | 175, the release_v6 additions (2025-01 to 2025-04) | 4 | pass@1 |
+| MATH-500 | 500 | 4 | accuracy (last `\boxed{}`, compared with math-verify) |
+
+- **Protocol:** the agent's sampling settings, with original and edited models on the same seeds. Every difference is paired per problem, with its standard error.
+- **Grader check:**
+  - Reference solutions pass on all suites, and wrong controls fail.
+  - The paper's own published answers, graded here, agree with its grades on 799 of 800.
+  - A mock report from them reproduces the paper's reported gains to within noise.
+- **Differences from the paper:**
+  - GPQA Diamond is left out (gated dataset).
+  - The LiveCodeBench problems are from early 2025, so they may be in Qwen3.5's training data.
+
+## Results
+
+Every edit is scored against the unedited model at presence penalty 1.5. Later edits are also paired against their starting edit.
+
+| Suite | Unedited | pilot-10 | pilot-12 | pilot-13 | combo-12-13 | pilot-14 |
+|---|---|---|---|---|---|---|
+| MBPP+ and HumanEval+ | 19.0% | 27.6% | 27.7% | 31.5% | **32.6%** | 32.3% |
+| MMLU-Pro | 40.5% | 42.9% | 43.8% | 43.2% | 42.9% | **45.2%** |
+| IFEval, prompt-level | 22.3% | 56.6% | 59.4% | 56.7% | **60.8%** | 58.2% |
+| LiveCodeBench | 1.6% | **7.6%** | **7.6%** | 6.6% | 7.4% | 7.0% |
+| MATH-500 | 6.8% | 51.0% | 55.4% | 51.0% | 54.1% | **56.9%** |
+
+For comparison, the paper's 50-pass math edit gained +5.2 (MMLU-Pro), +41.3 (IFEval) and +40.2 (MATH-500).
+
+### `pilot-10`: the first edit (10 passes, from the original)
+
+- **The edit:** six `down_proj` columns in layers 10, 13 and 14.
+- **Agent's own estimate:** +12.3 points (SE 2.1) on 191 MBPP practice problems it held out, with far fewer looping answers.
+- **Held-out, paired against the unedited model:**
+
+| Suite | Presence penalty 0 | Presence penalty 1.5 |
+|---|---|---|
+| Code | +13.56 (1.17) | +8.58 (1.06) |
+| MMLU-Pro | +11.10 (1.57) | +2.40 (1.43) |
+| IFEval | +54.62 (1.83) | +34.29 (1.98) |
+| LiveCodeBench | +4.43 (1.26) | +6.00 (1.54) |
+| MATH-500 | +43.75 (1.84) | +44.25 (1.76) |
+
+- **Nearly all of the gain is answers that no longer loop to the limit.** At presence penalty 0, cut answers fell from 59–99% to 2–66% across suites.
+- **An edit chosen only on code transferred to math, instruction following and multiple choice.**
+- **On LiveCodeBench it gains only on easy problems.**
+- **The largest failure left:** after the thinking closes, the model keeps reasoning in its answer and stops without finishing.
+
+### `pilot-11`: improve on `pilot-10` (10 passes)
+
+- **Result:** the agent kept the starting edit unchanged.
+- **What it tried:** a layer-23 attention-gate edit that makes the model copy the function name. It raised the right name's probability from 0.14 to 0.35, but measured −3.9 points (SE 2.9) in generation, so the agent dropped it.
+- **Its ceiling estimates** put every remaining structural repair on code at about 1–2 points: wrong answers are algorithmic, and fixing names is worth at most about 5 points on MBPP-style problems.
+
+### `pilot-12`: prose answers that end too early (20 passes)
+
+- **The failure:** on IFEval, `pilot-10`'s edit ended prose answers early. For example, "at least N words" answers reached a median of 0.67 N.
+- **The edit:** one repurposed layer-23 MLP neuron (3,072 weights). It cancels the loop-exit detectors' push on `<|im_end|>` only where they fire strongly.
+- **Held-out, against `pilot-10`:** MATH-500 **+4.35 (0.98)**, IFEval +2.87 (1.63), code unchanged.
+- **Why math gained:** answers that used to stop without a boxed answer now often reach one.
+
+### `pilot-13`: wrong function names (20 passes)
+
+- **The edit:** three rank-1 gate edits in `q_proj` (layer 19 heads 0, 2, 5, 6, 7; layer 15 head 7; layer 23 heads 0, 1). They act only where a function name is written after `def`.
+- **Held-out, against `pilot-10`:**
+  - MBPP+ **+6.61 (1.40)**; HumanEval+ −2.44 (1.91), since its prompts give the signature.
+  - Other suites unchanged.
+  - Wrong-interface answers fell from 398 to 186 of 2,168.
+  - Many answers that now get the name right fail on ordinary bugs, as the ceiling predicted.
+
+### `combo-12-13`: the two edits combined
+
+- **How:** the two runs changed disjoint tensors, so the combination is their union.
+- **Held-out, against `pilot-10`:** code **+4.98 (1.04)**, IFEval **+4.25 (1.62)**, MATH-500 **+3.10 (1.00)**.
+- **The edits add up without interfering:** code keeps `pilot-13`'s gain, and math and IFEval keep `pilot-12`'s.
+
+### `pilot-14`: answers that restart after `</think>` (20 passes, from `combo-12-13`)
+
+- **The edit:** three more repurposed layer-23 MLP neurons (9,216 weights).
+  - One reads a degenerate re-close cycle and pushes the end of the turn.
+  - Two form a saturating step that reads "an answer statement after the thinking closed" and push toward a boxed answer.
+- **Held-out, against `combo-12-13`:**
+
+| Suite | Paired diff (SE) | Answers cut at the limit |
+|---|---|---|
+| MATH-500 | **+2.75 (0.93)** | 298 → 90 |
+| MMLU-Pro | +2.30 (1.33) | 13 → 3 |
+| IFEval | −2.59 (1.60) | 63 → 29 |
+| Code | −0.28 (0.96) | 67 → 39 |
+| LiveCodeBench | −0.43 (0.82) | 247 → 19 |
+
+- **MATH-500 is the best of any edit:** +50.1 points over the unedited model.
+- **It is a trade:** the cycle stopper also ends some IFEval turns before any answer (8 → 44 of 1,082).
+
+### `pilot-15`: whole-answer instruction constraints (20 passes, from `combo-12-13`)
+
+- **The edit:** two layer-22 MLP neurons. A linear probe reads "this answer must have no commas" and gates comma tokens down.
+- **On the agent's own 936 held-out prompts:** no-comma instructions followed 44.5% → 97.3%.
+- **Held-out:** IFEval's `no_comma` rose from 67% to 80%, but losses on other instruction types offset it. No suite moved beyond noise, so the edit was not kept.
+
+### Round 4 (in progress, from `pilot-14`)
+
+- **`pilot-16`:** turns that end with no answer (MLP tensors only).
+- **`pilot-17`:** copying text from the prompt under the presence penalty (attention tensors only).
+- **`pilot-18`:** function interfaces and identifiers in code answers.
+
+## What we've learned so far
+
+- **Weight-space programming carries over to code.** A 10-pass edit chosen only on code problems roughly doubled the held-out code pass rate at presence penalty 0, and transferred to math and instruction following.
+- **Most of the early gain is loop control,** as in the paper: the unedited 0.8B model loops in its thinking on most hard prompts.
+- **Targeted edits are small and interpretable.** They are a few neurons or rank-1 gates, each with a mechanism the agent can state, and they compose when they touch disjoint tensors.
+- **The agent's own checks overstate held-out gains on suites they don't resemble.** IFEval, for example, rose +18 on its own prompts but +2.9 held out.
+- **Later rounds trade between suites rather than lifting all of them.**
+
+## Repository
+
+| Path | What |
+|---|---|
+| `harness/` | The agent loop (`driver.py`), the editor prompt (`prompt.txt`), the kernel and forward-pass servers, the grader, run briefs (`briefs/`) and tests |
+| `eval/` | The held-out evaluation (`evaluate.py`, `eval_gen.py`, `grade_suites.py`, `suites.py`, vendored IFEval checkers) and `results/<name>/report.md` |
+| `scripts/` | Practice-set preparation and the baseline |
+| `baseline/` | Baseline results and the rendered evaluation prompt |
+| `runs/<run>/` | Each run's brief, config, final report, the agent's explanations, its log and its submitted-edit manifest |
+| `paper/` | `collect.py` and `data/`: per-run, per-pass, per-evaluation and per-tensor tables, plus the full agent transcripts, for a write-up |
+| `scratch/` | One-off analysis scripts |
+
+Model weights, datasets and edit tensors are not included. The data sources are MBPP, APPS, EvalPlus (MBPP+ and HumanEval+), MMLU-Pro, IFEval, LiveCodeBench and MATH-500, all public.
+
+**Software:** vLLM 0.32.0, transformers 5.19.0 and torch 2.13.0 (CUDA 13.0), Python 3.12. GPUs: RTX 5090, RTX 5080, and a cloud L4 for `pilot-18`.
+
+## Citation
+
+This project recreates Experiment 8 of:
+
+> Takehi et al. *Sparks of Weight-Space Programming.* 2026.
