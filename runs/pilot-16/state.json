@@ -1,0 +1,23 @@
+{
+ "status": "done",
+ "turn": 154,
+ "conv": 0,
+ "conv_turns": 154,
+ "passes_used": 20,
+ "code_runs": 132,
+ "requests": 21,
+ "usd": 0.0,
+ "tokens": {
+  "input_tokens": 614,
+  "output_tokens": 321420,
+  "cache_read_input_tokens": 33808780,
+  "cache_creation_input_tokens": 390093
+ },
+ "invalid_streak": 0,
+ "refusals": 0,
+ "turns_after_budget": 2,
+ "context": 390097,
+ "limit_waits": 0,
+ "limit_wait_seconds": 0,
+ "context_warned": true
+}
