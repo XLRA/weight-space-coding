@@ -3,13 +3,23 @@
 For each run:
 - what it works on (runs/<run>/label.txt, if there is one), its status and age, GPU, model and settings;
 - passes and code runs used; the agent's turn, tokens and context;
-- what is happening now (the forward pass running, with each model's answers, or the agent working in
-  its kernel) and the last driver.log event;
-- the start of the agent's latest explanation, and its evaluations (matched by submission directory), or
-  that its hand-off will start one when the agent finishes.
+- Now, what the driver is doing at this moment, with how long it has been at it:
+  - the agent thinking and writing its next reply (what it replies to, since when, from Claude Code's live
+    transcript), with how long its replies have taken so far;
+  - running a code run in the kernel, against the kernel's time limit;
+  - a forward pass: stopping llama-swap, starting the GPU server, then the request on the GPU (each model's
+    answers: generating, waiting, done and how long it took) and grading its answers, with how long earlier
+    passes of that kind took;
+  - waiting for the usage limit to reset, a Claude Code error and its retry, a kernel restart, a handoff,
+    or a driver that is not running;
+- Containers: the kernel's up time, memory (now and peak, against its limit) and CPU; the GPU server's
+  state (off, loading, busy, or idle and when it is given back);
+- the last driver.log event, the start of the agent's latest explanation, and its evaluations (matched by
+  submission directory, with their progress), or that its hand-off will start one when the agent finishes.
 Below the runs:
-- evaluations running now or finished in the last day (eval/results/<name>, not smoke or e2e tests): GPU, how long, which suite
-  and how many answers (from eval/<name>.out), or when done the edited model's overall score per suite;
+- evaluations running now or finished in the last day (eval/results/<name>, not smoke or e2e tests): GPU, how long,
+  which suite, how many answers, the speed and about how long the suite has left (from eval/<name>.out), or when
+  done the edited model's overall score per suite;
 - both GPUs (temperature, power, use, memory, the jobs running on each now, llama-swap);
 - the temperature logger's warnings (gpu_temps.py).
 
@@ -131,56 +141,390 @@ def start_name(path):
     return f"from {m.group(1)}'s edit" if m else f"from {path}"
 
 
-def forward_pass(run, now):
-    """(what, answers) for the forward pass running now, or None when the agent is in its kernel."""
-    req = f"{run}/requests"
+# ---------- what a running run is doing now ----------
+# A turn of the driver: it writes turns/tNNNN/prompt.txt and calls Claude Code (the agent thinks, then writes its
+# reply), writes answer.md, appends the reply's explanation to explanations.md and runs its block (code in the
+# kernel, or a forward request in requests/ for the GPU server), then writes run.json. Claude Code writes its
+# transcript as it goes: the user message, an api-request entry when the request is sent, and when the reply is
+# done one assistant entry per content block (the thinking and the text, written together).
+
+CLAUDE_PROJECTS = "/home/wspagent/.claude/projects"
+_seen = {}   # kept between redraws: finished turns' times, earlier passes' times, CPU samples, container ids
+_frame = {}  # kept for one redraw (frame() lays the screen out several times when it is short of rows)
+
+
+def secs(s):
+    """A duration that moves at a 10-second redraw: 45 s, 3 min 05 s, 12 min, 1 h 05 min."""
+    s = int(max(s, 0))
+    if s < 60:
+        return f"{s} s"
+    return f"{s // 60} min {s % 60:02d} s" if s < 600 else minutes(s)
+
+
+def iso(ts):
     try:
-        ns = sorted(int(m.group(1)) for f in os.listdir(req) if (m := re.fullmatch(r"fwd_(\d+)\.json", f)))
-    except FileNotFoundError:
+        return calendar.timegm(time.strptime(ts[:19], "%Y-%m-%dT%H:%M:%S"))
+    except (TypeError, ValueError):
         return None
-    if not ns or os.path.exists(f"{req}/fwd_{ns[-1]}.result.json"):
-        return None
-    n = ns[-1]
-    path = f"{req}/fwd_{n}.json"
-    r = json.load(open(path))
 
-    def items(key):
-        v = r.get(key)
-        if v is None and r.get(f"{key}_file"):
+
+def mtime(path):
+    try:
+        return os.path.getmtime(path)
+    except OSError:
+        return None
+
+
+def hms(t):
+    return time.strftime("%H:%M:%S UTC", time.gmtime(t))
+
+
+def tail_jsonl(path, nbytes=1 << 20):
+    """The JSON lines in the last nbytes of a file."""
+    try:
+        with open(path, "rb") as f:
+            f.seek(0, 2)
+            size = f.tell()
+            f.seek(max(size - nbytes, 0))
+            lines = f.read().decode("utf-8", "replace").splitlines()
+    except OSError:
+        return []
+    out = []
+    for l in lines[1:] if size > nbytes else lines:
+        try:
+            out.append(json.loads(l))
+        except ValueError:
+            pass
+    return out
+
+
+def reply_progress(name, since):
+    """The agent's reply in progress, from Claude Code's live transcript: when the request went out and how
+    often; None when the transcript has not got this turn's message. (The thinking and the text are written
+    together when the reply is done, so the transcript cannot tell the two apart while they happen.)"""
+    d = f"{CLAUDE_PROJECTS}/{re.sub(r'[^A-Za-z0-9]', '-', f'{RUNS}/{name}/agent')}"
+    try:
+        path = max((f"{d}/{f}" for f in os.listdir(d) if f.endswith(".jsonl")), key=os.path.getmtime, default=None)
+    except OSError:
+        return None
+    if not path or (mtime(path) or 0) < since - 5:
+        return None
+    key = ("transcript", path)
+    size = os.path.getsize(path)
+    if _seen.get(key, (None,))[0] == size:
+        return _seen[key][1]
+    entries = tail_jsonl(path)
+    users = [i for i, e in enumerate(entries) if e.get("type") == "user"]
+    out = None
+    if users and (iso(entries[users[-1]].get("timestamp")) or 0) >= since - 5:
+        after = entries[users[-1] + 1:]
+        sent = [iso(e.get("timestamp")) for e in after if e.get("type") == "api-request"]
+        out = {"sent": next((t for t in reversed(sent) if t), None) or iso(entries[users[-1]].get("timestamp")),
+               "requests": len(sent)}
+    _seen[key] = (size, out)
+    return out
+
+
+def replying_to(tdir):
+    """What the agent's current reply answers, from the turn's prompt."""
+    try:
+        text = open(f"{tdir}/prompt.txt", errors="replace").read()
+    except OSError:
+        return "its next message"
+    cut = text.startswith("[Your reply was cut at the")
+    if cut:
+        text = text.split("\n", 1)[-1]
+    if m := re.match(r"\[code run (\d+) of \d+", text):
+        what = f"code run {m.group(1)}'s output"
+        if "ran past the" in text[:400]:
+            what += " (it hit the time limit)"
+        elif "kernel died" in text[:400]:
+            what += " (the kernel died)"
+    elif m := re.match(r"\[forward pass (\d+) of \d+ used \(request (\d+)\)", text):
+        what = f"pass {m.group(1)}'s result"
+    elif m := re.match(r"\[request (\d+) failed", text):
+        what = f"request {m.group(1)}'s failure"
+    elif text.startswith("[forward request refused"):
+        what = "a refused forward request"
+    elif m := re.search(r"SESSION RESTART \(([^)]*)\)", text):
+        what = f"the restart message ({m.group(1)})"
+    elif text.startswith(("Your reply has", "Your block")):
+        what = "a note that its reply ran nothing"
+    elif len(text) > 5000:
+        what = "the opening prompt"
+    else:
+        what = "its last message"
+    return what + (", after a reply cut at the output limit" if cut else "")
+
+
+def turn_seconds(run):
+    """{turn: seconds the agent took to reply} for the finished turns."""
+    got = _seen.setdefault(("turns", run), {})
+    try:
+        names = os.listdir(f"{run}/turns")
+    except OSError:
+        return got
+    for n in names:
+        t = int(n[1:]) if re.fullmatch(r"t\d+", n) else None
+        if t is not None and t not in got:
             try:
-                v = json.load(open(r[f"{key}_file"].replace("/work", f"{run}/work", 1)))
-            except (OSError, ValueError):
-                return None
-        return v or []
+                got[t] = json.load(open(f"{run}/turns/{n}/run.json"))["seconds"]
+            except (OSError, ValueError, KeyError):
+                pass
+    return got
 
-    what = [f"pass {n}", r["type"].replace("_", "-")]
+
+def typical_reply(run, upto):
+    ts = sorted(v for t, v in turn_seconds(run).items() if t < upto)
+    if len(ts) < 3:
+        return None
+    longest = max((v, t) for t, v in turn_seconds(run).items() if t < upto)
+    return (f"replies so far: half within {secs(ts[len(ts) // 2])}, 9 in 10 within "
+            f"{secs(ts[min(len(ts) - 1, int(len(ts) * 0.9))])}, longest {secs(longest[0])} (turn {longest[1]})")
+
+
+def latest_kind(run, turn):
+    """The block kind of the given turn's reply (python or forward) if it had a runnable block."""
+    try:
+        text = open(f"{run}/explanations.md", errors="replace").read()
+    except OSError:
+        return None
+    heads = re.findall(r"^## Turn (\d+) \((\w+)\)\s*$", text, flags=re.M)
+    return heads[-1][1] if heads and int(heads[-1][0]) == turn else None
+
+
+def container(name):
+    """{"cg": cgroup folder, "started": epoch} of a running container, or None."""
+    c = _seen.get(("ctr", name))
+    if c and os.path.isdir(c["cg"]):
+        return c
+    parts = sh("docker", "inspect", "-f", "{{.Id}} {{.State.Running}} {{.State.StartedAt}}", name).split()
+    if len(parts) != 3 or parts[1] != "true":
+        _seen.pop(("ctr", name), None)
+        return None
+    c = {"cg": f"/sys/fs/cgroup/system.slice/docker-{parts[0]}.scope", "started": iso(parts[2])}
+    _seen[("ctr", name)] = c
+    return c
+
+
+def usage(name):
+    """A running container's memory (GB, now and peak) and CPU cores (averaged since a sample at least 5 s
+    earlier; None until there is one), or None when it is not running."""
+    c = container(name)
+    if not c:
+        return None
+
+    def read(f):
+        try:
+            return open(f"{c['cg']}/{f}").read()
+        except OSError:
+            return None
+    mem, peak, stat = read("memory.current"), read("memory.peak"), read("cpu.stat") or ""
+    out = {"started": c["started"], "mem": int(mem) / 1e9 if mem else None, "peak": int(peak) / 1e9 if peak else None,
+           "cores": None}
+    if m := re.search(r"usage_usec (\d+)", stat):
+        t, u = time.time(), int(m.group(1))
+        prev = _seen.get(("cpu", c["cg"]))
+        if prev is None or t - prev[0] >= 5:
+            cores = (u - prev[1]) / 1e6 / (t - prev[0]) if prev else None
+            _seen[("cpu", c["cg"])] = (t, u, cores)
+        else:
+            cores = prev[2]
+        out["cores"] = cores
+    return out
+
+
+def request(run, k):
+    """Request k as the driver wrote it, and its wall time once done (cached: neither changes)."""
+    key = ("req", run, k)
+    if key in _seen:
+        return _seen[key]
+    try:
+        r = json.load(open(f"{run}/requests/fwd_{k}.json"))
+    except (OSError, ValueError):
+        return None, None
+    try:
+        wall = json.load(open(f"{run}/requests/fwd_{k}.result.json")).get("wall_seconds")
+    except (OSError, ValueError):
+        return r, None
+    _seen[key] = (r, wall)
+    return r, wall
+
+
+def earlier_passes(run, k, kind):
+    walls = [w for j in range(1, k) for r, w in [request(run, j)] if r and w and r["type"] == kind]
+    if not walls:
+        return None
+    lo, hi = min(walls), max(walls)
+    span = secs(lo) if len(walls) == 1 else f"{secs(lo)} to {secs(hi)}"
+    return f"earlier {kind.replace('_', '-')} passes took {span}"
+
+
+def describe_request(r):
+    what = [r["type"].replace("_", "-")]
     what.append(f"{r.get('baseline', 'original')} vs edited" if r["model"] == "both" else f"model {r['model']}")
     if r["type"] == "generate":
-        probs, own = items("problems"), items("prompts")
-        if probs is not None and own is not None:
-            parts = ([f"{len(probs)} problems"] if probs else []) + ([f"{len(own)} prompts"] if own else [])
-            k_ = r.get("n", 1)
-            what.append(" + ".join(parts) + (f" × {k_}" if k_ != 1 else ""))
+        parts = [f"{len(r[key])} {key if len(r[key]) != 1 else key[:-1]}" for key in ("problems", "prompts")
+                 if r.get(key)]
+        n = r.get("n", 1)
+        what.append(" + ".join(parts) + (f" × {n}" if n != 1 else ""))
     else:
-        texts = items("texts")
-        if texts:
-            what.append(f"{len(texts)} texts")
-    what.append(f"running {minutes(now - os.path.getmtime(path))}")
-    answers = None
+        what.append(f"{len(r.get('texts') or r.get('chats') or [])} texts")
+    return " · ".join(what)
+
+
+def generation_states(run, k, r, since, now, graded=False):
+    """Each model's answers in a generation: generating (and for how long), waiting, done, graded."""
+    variants = [r.get("baseline", "original"), "edited"] if r["model"] == "both" else [r["model"]]
+    states, t0, first_open = [], since, True
+    for v in variants:
+        stem = f"{run}/work/gen_{k}_{v}" if len(variants) > 1 else f"{run}/work/gen_{k}"
+        done = mtime(f"{stem}.raw.jsonl")
+        if done is not None:
+            took = (f" {'generated ' if graded else ''}in {secs(done - t0)}") if done > t0 else ""
+            mark = (green("✓ graded") if os.path.exists(f"{stem}.jsonl") else yellow("▸ grading")) if graded else \
+                green("✓")
+            states.append(f"{v} {mark} {count(stem + '.raw.jsonl')} answers{took}")
+            t0 = done
+        elif first_open:
+            note = f" (the first model took {secs(t0 - since)})" if states and t0 > since else ""
+            states.append(f"{v} {yellow('▸ generating')} {secs(now - t0)}{note}")
+            first_open = False
+        else:
+            states.append(f"{v} {dim('waiting')}")
+    return "    ".join(states)
+
+
+def forward_rows(name, run, st, cfg, log, now, since, turn):
+    """The Now rows while a forward block is handled (since: when the reply arrived)."""
+    req, k, p, P = f"{run}/requests", st["requests"], st["passes_used"] + 1, cfg["passes"]
+    head = f"turn {turn}: "
+    path = f"{req}/fwd_{k}.json"
+    if (mtime(path) or 0) < since - 1:  # this turn's request is not written yet
+        last = log[-1] if log else ""
+        if "stopping llama-swap" in last and (stamp(last) or 0) >= since - 1:
+            return [row("Now", yellow(head + f"stopping llama-swap to free the RTX {cfg.get('gpu', '5090')} for pass {p}"))]
+        g = container(f"wsp-gpu-{name}")
+        if g and not os.path.exists(f"{req}/server.ready"):
+            return [row("Now", yellow(head + f"starting the GPU server for pass {p} · {secs(now - g['started'])}")),
+                    row("", dim("loading the model and compiling; earlier starts took 1 to 3 minutes"))]
+        return [row("Now", head + "checking the forward request")]
+    r, _ = request(run, k)
+    if r is None:
+        return [row("Now", head + f"request {k}")]
+    t_req = mtime(path)
+    res = mtime(f"{req}/fwd_{k}.result.json")
+    what = f"request {k}: {describe_request(r)}"
+    if res is None:
+        rows = [row("Now", yellow(head + f"pass {p} of {P} on the GPU, {secs(now - t_req)} so far · {what}"))]
+        if r["type"] == "generate":
+            rows.append(row("", generation_states(run, k, r, t_req, now)))
+        if hint := earlier_passes(run, k, r["type"]):
+            rows.append(row("", dim(hint)))
+        return rows
     if r["type"] == "generate":
-        variants = [r.get("baseline", "original"), "edited"] if r["model"] == "both" else [r["model"]]
-        states, first_open = [], True
-        for v in variants:
-            d = count(f"{run}/work/gen_{n}_{v}.raw.jsonl" if len(variants) > 1 else f"{run}/work/gen_{n}.raw.jsonl")
-            if d is not None:
-                states.append(f"{v} {green('✓')} {d} answers")
-            elif first_open:
-                states.append(f"{v} {yellow('▸ generating')}")
-                first_open = False
-            else:
-                states.append(f"{v} {dim('waiting')}")
-        answers = "    ".join(states)
-    return " · ".join(what), answers
+        return [row("Now", yellow(head + f"grading pass {p}'s answers in the sandbox, {secs(now - res)} so far · {what}")),
+                row("", generation_states(run, k, r, t_req, now, graded=True))]
+    return [row("Now", yellow(head + f"summarizing pass {p}'s result, {secs(now - res)} so far · {what}"))]
+
+
+def activity(name, run, st, cfg, log, now, alive):
+    """The Now rows of a running run: what its driver is doing at this moment."""
+    if not alive:
+        return [row("Now", red(f"the driver is not running · to resume: driver.py {name} in /opt/wsp/harness "
+                               "(it keeps a kernel that still answers)"))]
+    try:
+        turns = sorted(int(n[1:]) for n in os.listdir(f"{run}/turns") if re.fullmatch(r"t\d+", n))
+    except OSError:
+        turns = []
+    if not turns:
+        return [row("Now", "starting: the kernel, then the opening prompt")]
+    T = turns[-1]
+    tdir = f"{run}/turns/t{T:04d}"
+    last = log[-1] if log else ""
+    lt = stamp(last) or 0
+    if st.get("waiting_until"):
+        try:
+            until = time.mktime(time.strptime(st["waiting_until"], "%Y-%m-%d %H:%M:%S"))
+        except ValueError:
+            until = None
+        when = f" · until {clock(until, now)}, in {secs(until - now)}" if until else ""
+        rows = [row("Now", yellow(f"turn {T}: waiting for the Claude usage limit to reset{when}"))]
+        if m := re.search(r"usage limit \((.*)\); waiting", last):
+            rows.append(row("", dim(m.group(1))))
+        return rows
+    prompt_t = mtime(f"{tdir}/prompt.txt") or now
+    answer_t = mtime(f"{tdir}/answer.md")
+    if answer_t is None:  # the agent is replying
+        if (m := re.search(r"Claude Code error \((.*)\); retrying in (\d+) s", last)) and lt >= prompt_t - 1:
+            at = lt + int(m.group(2))
+            return [row("Now", red(f"turn {T}: Claude Code failed; " +
+                                   (f"retrying at {hms(at)}, in {secs(at - now)}" if at > now else "retrying now"))),
+                    row("", dim(m.group(1)))]
+        what = replying_to(tdir)
+        rp = reply_progress(name, prompt_t)
+        line = f"turn {T}: the agent is thinking and writing, {secs(now - (rp['sent'] if rp else prompt_t))} so far"
+        if rp and rp["requests"] > 1:
+            line += f" (request sent {rp['requests']} times)"
+        rows = [row("Now", f"{line} · its reply to {what}")]
+        if hint := typical_reply(run, T):
+            rows.append(row("", dim(hint)))
+        return rows
+    if mtime(f"{tdir}/run.json") is not None:
+        if "handoff after" in last:
+            return [row("Now", f"starting conversation {st['conv'] + 2}: {last[20:]}")]
+        return [row("Now", f"turn {T} done · starting turn {T + 1}")]
+    kind = latest_kind(run, T)
+    if kind == "python":
+        n, lim = st["code_runs"] + 1, cfg.get("kernel_seconds", 900)
+        if lt >= answer_t - 1 and ("kernel time limit" in last or "kernel died" in last):
+            why = "it ran past the time limit" if "time limit" in last else "it died"
+            return [row("Now", red(f"turn {T}: restarting the kernel after code run {n}: {why}"))]
+        ran = now - answer_t
+        line = f"turn {T}: running code run {n} of {cfg['max_code_runs']} in the kernel · {secs(ran)}"
+        line += f" of the {lim // 60}-minute limit"
+        return [row("Now", red(line) if ran > 0.8 * lim else line)]
+    if kind == "forward":
+        return forward_rows(name, run, st, cfg, log, now, answer_t, T)
+    return [row("Now", f"turn {T}: handling the reply (no runnable block)")]
+
+
+def containers_row(name, run, cfg, now):
+    """The run's kernel (up time, memory against its limit, CPU) and GPU server (loading, busy or idle)."""
+    parts = []
+    u = usage(f"wsp-kernel-{name}")
+    if u:
+        lim = cfg.get("kernel_memory_gb", 20)
+        s = f"kernel: up {minutes(now - u['started'])}" if u["started"] else "kernel: up"
+        if u["mem"] is not None:
+            mem = f"{u['mem']:.1f}/{lim} GB" + (f" (peak {u['peak']:.1f})" if u["peak"] else "")
+            s += ", " + (red(mem) if u["mem"] > 0.85 * lim else yellow(mem) if (u["peak"] or 0) > 0.85 * lim else mem)
+        if u["cores"] is not None:
+            s += f", CPU {u['cores']:.1f}/12 cores"
+        parts.append(s)
+    else:
+        parts.append(red("kernel not running"))
+    req = f"{run}/requests"
+    g = container(f"wsp-gpu-{name}")
+    if not g:
+        parts.append(dim("GPU server: off, the next pass starts it"))
+    elif not os.path.exists(f"{req}/server.ready"):
+        parts.append(yellow(f"GPU server: loading, {secs(now - (g['started'] or now))}"))
+    else:
+        try:
+            done = [f for f in os.listdir(req) if f.endswith(".result.json")]
+            busy = any(re.fullmatch(r"fwd_\d+\.json", f) and f"{f[:-5]}.result.json" not in done for f in os.listdir(req))
+        except OSError:
+            done, busy = [], False
+        if busy:
+            parts.append(yellow("GPU server: busy"))
+        else:
+            used = max([mtime(f"{req}/{f}") or 0 for f in done] + [mtime(f"{req}/server.ready") or 0])
+            idle, limit = now - used, cfg.get("gpu_idle_minutes", 30)
+            note = (yellow(f", over {limit}: freed at the next turn") if idle > limit * 60 else
+                    dim(f", freed at {limit}"))
+            parts.append(f"GPU server: idle {minutes(idle)}{note}")
+    return row("Containers", "    ".join(parts))
 
 
 def explanation(run):
@@ -226,24 +570,34 @@ def running_jobs():
 
 def eval_progress(name, suites, models):
     """Where a running evaluation is, from the progress lines in eval/<name>.out."""
+    path = f"{EVAL}/{name}.out"
     try:
-        text = open(f"{EVAL}/{name}.out", errors="replace").read().replace("\r", "\n")
+        text = open(path, errors="replace").read().replace("\r", "\n")
     except FileNotFoundError:
         return "starting"
-    last = None
-    for m in re.finditer(r"^(\w+) / (\w+): (\d+)/(\d+) in", text, flags=re.M):
-        last = m.group(1), m.group(2), int(m.group(3)), int(m.group(4))
+    since = time.time() - (mtime(path) or time.time())  # since the last progress line
+    last, before = None, {}
+    # one line per batch of answers: "<suite> / <model>: <done>/<total> in <the batch's seconds> s (<rate> tok/s)"
+    for m in re.finditer(r"^(\w+) / (\w+): (\d+)/(\d+) in (\d+) s(?: \(([\d,.]+) tok/s\))?", text, flags=re.M):
+        prev = before.get(m.group(1, 2), 0) if last and last[:2] == m.group(1, 2) else 0
+        last = m.group(1), m.group(2), int(m.group(3)), int(m.group(4)), int(m.group(5)), m.group(6), prev
+        before[m.group(1, 2)] = int(m.group(3))
     if not last:
         return "loading the model, then " + (SUITE_NAMES.get(suites[0], suites[0]) if suites else "the first suite")
-    suite, model, done, total = last
+    suite, model, done, total, took, rate, prev = last
     k = suites.index(suite) + 1 if suite in suites else 0
     if done < total:
-        return f"suite {k} of {len(suites)}, {SUITE_NAMES.get(suite, suite)}: {done:,}/{total:,} answers"
+        batch = done - prev
+        left = max(took * (total - done) / batch - since, 0) if batch > 0 else None
+        return (f"suite {k} of {len(suites)}, {SUITE_NAMES.get(suite, suite)}, {model}: {done:,}/{total:,} answers"
+                + (f" · {rate} tok/s" if rate else "")
+                + (f" · about {minutes(left + 59)} left in this suite" if left is not None else ""))
     if model == "original" and "edited" in models:
         return f"suite {k} of {len(suites)}, {SUITE_NAMES.get(suite, suite)}: edited answers starting"
     if k and k < len(suites):
-        return f"suite {k + 1} of {len(suites)}, {SUITE_NAMES.get(suites[k], suites[k])}: first batch generating"
-    return "grading the answers and writing the report"
+        return (f"suite {k + 1} of {len(suites)}, {SUITE_NAMES.get(suites[k], suites[k])}: first batch generating "
+                f"for {secs(since)}")
+    return f"grading the answers and writing the report · {secs(since)}"
 
 
 def eval_scores(report):
@@ -313,7 +667,7 @@ def run_evaluation(name, run, evs, now):
         parts = []
         for e in mine:
             if e["running"]:
-                parts.append(f"{e['name']} " + yellow(f"running on the RTX {e['gpu']}"))
+                parts.append(f"{e['name']} " + yellow(f"running on the RTX {e['gpu']}: {e['progress']}"))
             elif "done" in e:
                 parts.append(f"{e['name']} " + green(f"done {clock(e['done'], now)}"))
         return " · ".join(parts) + dim("  (see Evaluations below)")
@@ -361,24 +715,31 @@ def run_block(name, now, width, expl_lines, detail, evs):
     else:
         out += [row("Passes", passes), row("Code runs", code)]
     tok = st["tokens"]
+    turn = st["turn"]
+    if status == "running":  # state.json is saved at the end of a turn: the turn under way is the newest folder
+        try:
+            turn = max([turn] + [int(n[1:]) for n in os.listdir(f"{run}/turns") if re.fullmatch(r"t\d+", n)])
+        except OSError:
+            pass
+    conv_turns = st["conv_turns"] + turn - st["turn"]
     if cfg.get("handoff_every"):  # runs before 2026-11-05 19:00 UTC restart every N turns
-        agent = (f"turn {st['turn']} · conversation {st['conv'] + 1} ({st['conv_turns']}/{cfg['handoff_every']} "
+        agent = (f"turn {turn} · conversation {st['conv'] + 1} ({conv_turns}/{cfg['handoff_every']} "
                  f"turns) · {k(tok['output_tokens'])} output tokens · context {k(st['context'])}")
     else:
-        agent = (f"turn {st['turn']} · conversation {st['conv'] + 1} ({st['conv_turns']} turns) · "
+        agent = (f"turn {turn} · conversation {st['conv'] + 1} ({conv_turns} turns) · "
                  f"{k(tok['output_tokens'])} output tokens · context {k(st['context'])}"
                  f"/{k(cfg.get('max_context', 400_000))}")
+    if st.get("context_warned"):
+        agent += yellow(" · told the conversation restarts soon")
     if st.get("limit_waits"):
         agent += yellow(f" · waited for the usage limit {st['limit_waits']}× ({minutes(st['limit_wait_seconds'])})")
     out.append(row("Agent", agent))
 
-    fp = forward_pass(run, now) if status == "running" else None
-    if fp:
-        out.append(row("Now", yellow(fp[0])))
-        if fp[1]:
-            out.append(row("", fp[1]))
-    elif status == "running":
-        out.append(row("Now", "the agent is working in its kernel"))
+    if status == "running":
+        key = ("live", name)
+        if key not in _frame:
+            _frame[key] = activity(name, run, st, cfg, log, now, alive) + [containers_row(name, run, cfg, now)]
+        out += _frame[key]
     elif status == "done":
         files = len(os.listdir(f"{run}/submission")) if os.path.isdir(f"{run}/submission") else 0
         out.append(row("Result", f"{files} files in submission/ · report in final_answer.md"))
@@ -462,6 +823,7 @@ def frame(names, cols, rows, every):
     """The screen as lines, at most rows of them (None: no limit)."""
     width = max(min(cols - 1, 130), 60)
     now = time.time()
+    _frame.clear()
     single = len(names) == 1
     header = spread(f" {bold('Agent runs and evaluations')}  {dim('Qwen3.5-0.8B weight editing')}",
                     time.strftime("%H:%M:%S UTC", time.gmtime(now)), width)
