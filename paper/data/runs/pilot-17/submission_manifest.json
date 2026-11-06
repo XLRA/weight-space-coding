@@ -1,0 +1,72 @@
+{
+ "model.language_model.layers.10.mlp.down_proj.weight": {
+  "shape": [
+   1024,
+   3584
+  ],
+  "changed_entries": 2048
+ },
+ "model.language_model.layers.11.self_attn.q_proj.weight": {
+  "shape": [
+   4096,
+   1024
+  ],
+  "changed_entries": 196608
+ },
+ "model.language_model.layers.13.mlp.down_proj.weight": {
+  "shape": [
+   1024,
+   3584
+  ],
+  "changed_entries": 3072
+ },
+ "model.language_model.layers.14.mlp.down_proj.weight": {
+  "shape": [
+   1024,
+   3584
+  ],
+  "changed_entries": 1024
+ },
+ "model.language_model.layers.15.self_attn.q_proj.weight": {
+  "shape": [
+   4096,
+   1024
+  ],
+  "changed_entries": 458752
+ },
+ "model.language_model.layers.19.self_attn.q_proj.weight": {
+  "shape": [
+   4096,
+   1024
+  ],
+  "changed_entries": 1310720
+ },
+ "model.language_model.layers.23.mlp.down_proj.weight": {
+  "shape": [
+   1024,
+   3584
+  ],
+  "changed_entries": 4096
+ },
+ "model.language_model.layers.23.mlp.gate_proj.weight": {
+  "shape": [
+   3584,
+   1024
+  ],
+  "changed_entries": 4096
+ },
+ "model.language_model.layers.23.mlp.up_proj.weight": {
+  "shape": [
+   3584,
+   1024
+  ],
+  "changed_entries": 4096
+ },
+ "model.language_model.layers.23.self_attn.q_proj.weight": {
+  "shape": [
+   4096,
+   1024
+  ],
+  "changed_entries": 524288
+ }
+}

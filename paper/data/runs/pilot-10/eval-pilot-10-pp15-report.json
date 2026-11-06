@@ -1,0 +1,426 @@
+{
+ "name": "pilot-10-pp15",
+ "config": {
+  "submission": "/opt/wsp/runs/pilot-10/submission",
+  "tensors": [
+   "model.language_model.layers.10.mlp.down_proj.weight.npy",
+   "model.language_model.layers.13.mlp.down_proj.weight.npy",
+   "model.language_model.layers.14.mlp.down_proj.weight.npy"
+  ],
+  "suites": {
+   "code": 4,
+   "mmlupro": 1,
+   "ifeval": 2,
+   "lcb": 4,
+   "math500": 4
+  },
+  "models": [
+   "original",
+   "edited"
+  ],
+  "limit_per_set": 0,
+  "presence_penalty": 1.5
+ },
+ "models": {
+  "code": {
+   "original": {
+    "all": {
+     "answers": 2168,
+     "pass@1": 19.05,
+     "cut": 18.82,
+     "loop": 19.23,
+     "mean_tokens": 7304.7,
+     "failures": {
+      "wrong_interface": 622,
+      "wrong_answer": 475,
+      "pass": 413,
+      "cut_at_max_tokens": 408,
+      "runtime_error": 208,
+      "syntax_error": 35,
+      "timeout": 7
+     }
+    },
+    "mbpp+": {
+     "answers": 1512,
+     "pass@1": 16.14,
+     "cut": 19.78,
+     "loop": 18.98,
+     "mean_tokens": 7625.0,
+     "failures": {
+      "wrong_interface": 612,
+      "cut_at_max_tokens": 299,
+      "pass": 244,
+      "wrong_answer": 204,
+      "runtime_error": 131,
+      "syntax_error": 21,
+      "timeout": 1
+     }
+    },
+    "humaneval+": {
+     "answers": 656,
+     "pass@1": 25.76,
+     "cut": 16.62,
+     "loop": 19.82,
+     "mean_tokens": 6566.5,
+     "failures": {
+      "wrong_answer": 271,
+      "pass": 169,
+      "cut_at_max_tokens": 109,
+      "runtime_error": 77,
+      "syntax_error": 14,
+      "wrong_interface": 10,
+      "timeout": 6
+     }
+    }
+   },
+   "edited": {
+    "all": {
+     "answers": 2168,
+     "pass@1": 27.63,
+     "cut": 2.12,
+     "loop": 5.21,
+     "mean_tokens": 3357.9,
+     "failures": {
+      "wrong_answer": 632,
+      "pass": 599,
+      "wrong_interface": 398,
+      "runtime_error": 323,
+      "syntax_error": 111,
+      "no_code": 51,
+      "cut_at_max_tokens": 46,
+      "timeout": 8
+     }
+    },
+    "mbpp+": {
+     "answers": 1512,
+     "pass@1": 27.05,
+     "cut": 2.45,
+     "loop": 4.37,
+     "mean_tokens": 3470.0,
+     "failures": {
+      "pass": 409,
+      "wrong_interface": 392,
+      "wrong_answer": 353,
+      "runtime_error": 226,
+      "syntax_error": 57,
+      "cut_at_max_tokens": 37,
+      "no_code": 33,
+      "timeout": 5
+     }
+    },
+    "humaneval+": {
+     "answers": 656,
+     "pass@1": 28.96,
+     "cut": 1.37,
+     "loop": 7.16,
+     "mean_tokens": 3099.6,
+     "failures": {
+      "wrong_answer": 279,
+      "pass": 190,
+      "runtime_error": 97,
+      "syntax_error": 54,
+      "no_code": 18,
+      "cut_at_max_tokens": 9,
+      "wrong_interface": 6,
+      "timeout": 3
+     }
+    }
+   }
+  },
+  "mmlupro": {
+   "original": {
+    "all": {
+     "answers": 1000,
+     "pass@1": 40.5,
+     "cut": 33.1,
+     "loop": 32.9,
+     "mean_tokens": 14653.1,
+     "failures": {
+      "pass": 405,
+      "wrong_answer": 327,
+      "cut_at_max_tokens": 268
+     }
+    }
+   },
+   "edited": {
+    "all": {
+     "answers": 1000,
+     "pass@1": 42.9,
+     "cut": 0.3,
+     "loop": 0.6,
+     "mean_tokens": 8138.8,
+     "failures": {
+      "wrong_answer": 559,
+      "pass": 429,
+      "no_answer": 9,
+      "cut_at_max_tokens": 3
+     }
+    }
+   }
+  },
+  "ifeval": {
+   "original": {
+    "all": {
+     "answers": 1082,
+     "pass@1": 22.27,
+     "cut": 72.92,
+     "loop": 74.4,
+     "mean_tokens": 24836.9,
+     "failures": {
+      "cut_at_max_tokens": 785,
+      "pass": 241,
+      "not_followed": 56
+     },
+     "instruction_level": 19.84
+    }
+   },
+   "edited": {
+    "all": {
+     "answers": 1082,
+     "pass@1": 56.56,
+     "cut": 0.18,
+     "loop": 5.64,
+     "mean_tokens": 3666.3,
+     "failures": {
+      "pass": 612,
+      "not_followed": 426,
+      "no_answer": 42,
+      "cut_at_max_tokens": 2
+     },
+     "instruction_level": 64.33
+    }
+   }
+  },
+  "lcb": {
+   "original": {
+    "all": {
+     "answers": 700,
+     "pass@1": 1.57,
+     "cut": 98.14,
+     "loop": 97.14,
+     "mean_tokens": 32274.3,
+     "failures": {
+      "cut_at_max_tokens": 687,
+      "pass": 11,
+      "runtime_error": 1,
+      "wrong_answer": 1
+     }
+    },
+    "easy": {
+     "answers": 172,
+     "pass@1": 5.81,
+     "cut": 93.6,
+     "loop": 92.44,
+     "mean_tokens": 31042.7,
+     "failures": {
+      "cut_at_max_tokens": 161,
+      "pass": 10,
+      "runtime_error": 1
+     }
+    },
+    "medium": {
+     "answers": 208,
+     "pass@1": 0.48,
+     "cut": 99.04,
+     "loop": 99.04,
+     "mean_tokens": 32533.3,
+     "failures": {
+      "cut_at_max_tokens": 206,
+      "pass": 1,
+      "wrong_answer": 1
+     }
+    },
+    "hard": {
+     "answers": 320,
+     "pass@1": 0.0,
+     "cut": 100.0,
+     "loop": 98.44,
+     "mean_tokens": 32768.0,
+     "failures": {
+      "cut_at_max_tokens": 320
+     }
+    }
+   },
+   "edited": {
+    "all": {
+     "answers": 700,
+     "pass@1": 7.57,
+     "cut": 14.71,
+     "loop": 24.0,
+     "mean_tokens": 13674.1,
+     "failures": {
+      "syntax_error": 285,
+      "wrong_answer": 185,
+      "cut_at_max_tokens": 103,
+      "pass": 53,
+      "no_code": 41,
+      "wrong_interface": 29,
+      "runtime_error": 4
+     }
+    },
+    "easy": {
+     "answers": 172,
+     "pass@1": 29.07,
+     "cut": 7.56,
+     "loop": 19.19,
+     "mean_tokens": 10906.4,
+     "failures": {
+      "pass": 50,
+      "syntax_error": 47,
+      "wrong_answer": 42,
+      "no_code": 13,
+      "cut_at_max_tokens": 13,
+      "wrong_interface": 6,
+      "runtime_error": 1
+     }
+    },
+    "medium": {
+     "answers": 208,
+     "pass@1": 0.96,
+     "cut": 19.71,
+     "loop": 28.85,
+     "mean_tokens": 14609.8,
+     "failures": {
+      "syntax_error": 93,
+      "wrong_answer": 50,
+      "cut_at_max_tokens": 41,
+      "wrong_interface": 11,
+      "no_code": 9,
+      "runtime_error": 2,
+      "pass": 2
+     }
+    },
+    "hard": {
+     "answers": 320,
+     "pass@1": 0.31,
+     "cut": 15.31,
+     "loop": 23.44,
+     "mean_tokens": 14553.6,
+     "failures": {
+      "syntax_error": 145,
+      "wrong_answer": 93,
+      "cut_at_max_tokens": 49,
+      "no_code": 19,
+      "wrong_interface": 12,
+      "runtime_error": 1,
+      "pass": 1
+     }
+    }
+   }
+  },
+  "math500": {
+   "original": {
+    "all": {
+     "answers": 2000,
+     "pass@1": 6.8,
+     "cut": 93.75,
+     "loop": 90.6,
+     "mean_tokens": 31053.9,
+     "failures": {
+      "cut_at_max_tokens": 1861,
+      "pass": 136,
+      "no_answer": 2,
+      "wrong_answer": 1
+     }
+    }
+   },
+   "edited": {
+    "all": {
+     "answers": 2000,
+     "pass@1": 51.05,
+     "cut": 3.9,
+     "loop": 6.4,
+     "mean_tokens": 13542.5,
+     "failures": {
+      "pass": 1021,
+      "no_answer": 650,
+      "wrong_answer": 251,
+      "cut_at_max_tokens": 78
+     }
+    }
+   }
+  }
+ },
+ "paired": {
+  "code": {
+   "all": {
+    "problems": 542,
+    "diff": 8.58,
+    "se": 1.06,
+    "fail_to_pass": 325,
+    "pass_to_fail": 139
+   },
+   "mbpp+": {
+    "problems": 378,
+    "diff": 10.91,
+    "se": 1.3,
+    "fail_to_pass": 250,
+    "pass_to_fail": 85
+   },
+   "humaneval+": {
+    "problems": 164,
+    "diff": 3.2,
+    "se": 1.75,
+    "fail_to_pass": 75,
+    "pass_to_fail": 54
+   }
+  },
+  "mmlupro": {
+   "all": {
+    "problems": 1000,
+    "diff": 2.4,
+    "se": 1.43,
+    "fail_to_pass": 114,
+    "pass_to_fail": 90
+   }
+  },
+  "ifeval": {
+   "all": {
+    "problems": 541,
+    "diff": 34.29,
+    "se": 1.98,
+    "fail_to_pass": 433,
+    "pass_to_fail": 62
+   }
+  },
+  "lcb": {
+   "all": {
+    "problems": 175,
+    "diff": 6.0,
+    "se": 1.54,
+    "fail_to_pass": 43,
+    "pass_to_fail": 1
+   },
+   "easy": {
+    "problems": 43,
+    "diff": 23.26,
+    "se": 5.35,
+    "fail_to_pass": 40,
+    "pass_to_fail": 0
+   },
+   "medium": {
+    "problems": 52,
+    "diff": 0.48,
+    "se": 1.08,
+    "fail_to_pass": 2,
+    "pass_to_fail": 1
+   },
+   "hard": {
+    "problems": 80,
+    "diff": 0.31,
+    "se": 0.31,
+    "fail_to_pass": 1,
+    "pass_to_fail": 0
+   }
+  },
+  "math500": {
+   "all": {
+    "problems": 500,
+    "diff": 44.25,
+    "se": 1.76,
+    "fail_to_pass": 891,
+    "pass_to_fail": 6
+   }
+  }
+ }
+}

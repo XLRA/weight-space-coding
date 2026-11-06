@@ -1,0 +1,27 @@
+{
+ "model": {
+  "repo": "Qwen/Qwen3.5-0.8B",
+  "revision": [
+   "2fc06364715b967f1860aea9cf38778875588b17"
+  ],
+  "weights_sha256": {
+   "model.safetensors-00001-of-00001.safetensors": "04b1c301231dd422b8860db31311ab2721511346a32cb1e079c4c4e5f1fe4696"
+  }
+ },
+ "runtime": {
+  "vllm": "0.32.0",
+  "transformers": "5.19.0",
+  "torch": "2.13.0+cu130",
+  "numpy": "2.2.6",
+  "python": "3.12.3",
+  "image": "wsp-runtime:1"
+ },
+ "local_gpus": [
+  "NVIDIA GeForce RTX 5080, 16303 MiB, 595.58.03",
+  "NVIDIA GeForce RTX 5090, 32607 MiB, 595.58.03"
+ ],
+ "agent": "Claude Code headless; model and effort per run in runs.csv",
+ "colab_gpus": [
+  "NVIDIA L4"
+ ]
+}

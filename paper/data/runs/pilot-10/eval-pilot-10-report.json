@@ -1,0 +1,418 @@
+{
+ "name": "pilot-10",
+ "config": {
+  "submission": "/opt/wsp/runs/pilot-10/submission",
+  "tensors": [
+   "model.language_model.layers.10.mlp.down_proj.weight.npy",
+   "model.language_model.layers.13.mlp.down_proj.weight.npy",
+   "model.language_model.layers.14.mlp.down_proj.weight.npy"
+  ],
+  "suites": {
+   "code": 4,
+   "mmlupro": 1,
+   "ifeval": 2,
+   "lcb": 4,
+   "math500": 4
+  },
+  "models": [
+   "original",
+   "edited"
+  ],
+  "limit_per_set": 0,
+  "presence_penalty": 0.0
+ },
+ "models": {
+  "code": {
+   "original": {
+    "all": {
+     "answers": 2168,
+     "pass@1": 12.27,
+     "cut": 58.95,
+     "loop": 58.99,
+     "mean_tokens": 19782.0,
+     "failures": {
+      "cut_at_max_tokens": 1278,
+      "wrong_interface": 342,
+      "pass": 266,
+      "wrong_answer": 186,
+      "runtime_error": 85,
+      "syntax_error": 10,
+      "timeout": 1
+     }
+    },
+    "mbpp+": {
+     "answers": 1512,
+     "pass@1": 9.99,
+     "cut": 58.8,
+     "loop": 57.61,
+     "mean_tokens": 19730.6,
+     "failures": {
+      "cut_at_max_tokens": 889,
+      "wrong_interface": 335,
+      "pass": 151,
+      "wrong_answer": 81,
+      "runtime_error": 48,
+      "syntax_error": 8
+     }
+    },
+    "humaneval+": {
+     "answers": 656,
+     "pass@1": 17.53,
+     "cut": 59.3,
+     "loop": 62.2,
+     "mean_tokens": 19900.5,
+     "failures": {
+      "cut_at_max_tokens": 389,
+      "pass": 115,
+      "wrong_answer": 105,
+      "runtime_error": 37,
+      "wrong_interface": 7,
+      "syntax_error": 2,
+      "timeout": 1
+     }
+    }
+   },
+   "edited": {
+    "all": {
+     "answers": 2168,
+     "pass@1": 25.83,
+     "cut": 7.38,
+     "loop": 13.01,
+     "mean_tokens": 4791.5,
+     "failures": {
+      "wrong_answer": 679,
+      "pass": 560,
+      "wrong_interface": 365,
+      "runtime_error": 219,
+      "cut_at_max_tokens": 160,
+      "syntax_error": 141,
+      "no_code": 40,
+      "timeout": 4
+     }
+    },
+    "mbpp+": {
+     "answers": 1512,
+     "pass@1": 25.93,
+     "cut": 7.61,
+     "loop": 11.51,
+     "mean_tokens": 4817.6,
+     "failures": {
+      "pass": 392,
+      "wrong_answer": 382,
+      "wrong_interface": 358,
+      "runtime_error": 146,
+      "cut_at_max_tokens": 115,
+      "syntax_error": 91,
+      "no_code": 26,
+      "timeout": 2
+     }
+    },
+    "humaneval+": {
+     "answers": 656,
+     "pass@1": 25.61,
+     "cut": 6.86,
+     "loop": 16.46,
+     "mean_tokens": 4731.2,
+     "failures": {
+      "wrong_answer": 297,
+      "pass": 168,
+      "runtime_error": 73,
+      "syntax_error": 50,
+      "cut_at_max_tokens": 45,
+      "no_code": 14,
+      "wrong_interface": 7,
+      "timeout": 2
+     }
+    }
+   }
+  },
+  "mmlupro": {
+   "original": {
+    "all": {
+     "answers": 1000,
+     "pass@1": 28.8,
+     "cut": 84.4,
+     "loop": 83.9,
+     "mean_tokens": 28188.7,
+     "failures": {
+      "cut_at_max_tokens": 668,
+      "pass": 288,
+      "wrong_answer": 44
+     }
+    }
+   },
+   "edited": {
+    "all": {
+     "answers": 1000,
+     "pass@1": 39.9,
+     "cut": 4.6,
+     "loop": 7.0,
+     "mean_tokens": 6904.1,
+     "failures": {
+      "wrong_answer": 479,
+      "pass": 399,
+      "no_answer": 77,
+      "cut_at_max_tokens": 45
+     }
+    }
+   }
+  },
+  "ifeval": {
+   "original": {
+    "all": {
+     "answers": 1082,
+     "pass@1": 1.57,
+     "cut": 98.15,
+     "loop": 95.84,
+     "mean_tokens": 32208.8,
+     "failures": {
+      "cut_at_max_tokens": 1061,
+      "pass": 17,
+      "not_followed": 4
+     },
+     "instruction_level": 1.08
+    }
+   },
+   "edited": {
+    "all": {
+     "answers": 1082,
+     "pass@1": 56.19,
+     "cut": 1.85,
+     "loop": 10.63,
+     "mean_tokens": 3202.5,
+     "failures": {
+      "pass": 608,
+      "not_followed": 444,
+      "cut_at_max_tokens": 17,
+      "no_answer": 13
+     },
+     "instruction_level": 64.69
+    }
+   }
+  },
+  "lcb": {
+   "original": {
+    "all": {
+     "answers": 700,
+     "pass@1": 0.86,
+     "cut": 99.14,
+     "loop": 98.86,
+     "mean_tokens": 32522.7,
+     "failures": {
+      "cut_at_max_tokens": 694,
+      "pass": 6
+     }
+    },
+    "easy": {
+     "answers": 172,
+     "pass@1": 3.49,
+     "cut": 96.51,
+     "loop": 96.51,
+     "mean_tokens": 31769.8,
+     "failures": {
+      "cut_at_max_tokens": 166,
+      "pass": 6
+     }
+    },
+    "medium": {
+     "answers": 208,
+     "pass@1": 0.0,
+     "cut": 100.0,
+     "loop": 100.0,
+     "mean_tokens": 32768.0,
+     "failures": {
+      "cut_at_max_tokens": 208
+     }
+    },
+    "hard": {
+     "answers": 320,
+     "pass@1": 0.0,
+     "cut": 100.0,
+     "loop": 99.38,
+     "mean_tokens": 32768.0,
+     "failures": {
+      "cut_at_max_tokens": 320
+     }
+    }
+   },
+   "edited": {
+    "all": {
+     "answers": 700,
+     "pass@1": 5.29,
+     "cut": 66.14,
+     "loop": 69.43,
+     "mean_tokens": 24615.3,
+     "failures": {
+      "cut_at_max_tokens": 463,
+      "wrong_answer": 81,
+      "syntax_error": 80,
+      "pass": 37,
+      "no_code": 22,
+      "runtime_error": 9,
+      "wrong_interface": 6,
+      "timeout": 2
+     }
+    },
+    "easy": {
+     "answers": 172,
+     "pass@1": 21.51,
+     "cut": 48.26,
+     "loop": 57.56,
+     "mean_tokens": 19312.8,
+     "failures": {
+      "cut_at_max_tokens": 83,
+      "pass": 37,
+      "wrong_answer": 25,
+      "syntax_error": 18,
+      "wrong_interface": 3,
+      "runtime_error": 3,
+      "no_code": 3
+     }
+    },
+    "medium": {
+     "answers": 208,
+     "pass@1": 0.0,
+     "cut": 73.56,
+     "loop": 75.0,
+     "mean_tokens": 26368.0,
+     "failures": {
+      "cut_at_max_tokens": 153,
+      "syntax_error": 25,
+      "wrong_answer": 20,
+      "runtime_error": 5,
+      "no_code": 4,
+      "wrong_interface": 1
+     }
+    },
+    "hard": {
+     "answers": 320,
+     "pass@1": 0.0,
+     "cut": 70.94,
+     "loop": 72.19,
+     "mean_tokens": 26326.1,
+     "failures": {
+      "cut_at_max_tokens": 227,
+      "syntax_error": 37,
+      "wrong_answer": 36,
+      "no_code": 15,
+      "wrong_interface": 2,
+      "timeout": 2,
+      "runtime_error": 1
+     }
+    }
+   }
+  },
+  "math500": {
+   "original": {
+    "all": {
+     "answers": 2000,
+     "pass@1": 2.55,
+     "cut": 99.35,
+     "loop": 97.55,
+     "mean_tokens": 32570.7,
+     "failures": {
+      "cut_at_max_tokens": 1949,
+      "pass": 51
+     }
+    }
+   },
+   "edited": {
+    "all": {
+     "answers": 2000,
+     "pass@1": 46.3,
+     "cut": 25.4,
+     "loop": 29.05,
+     "mean_tokens": 15417.0,
+     "failures": {
+      "pass": 926,
+      "cut_at_max_tokens": 508,
+      "no_answer": 383,
+      "wrong_answer": 183
+     }
+    }
+   }
+  }
+ },
+ "paired": {
+  "code": {
+   "all": {
+    "problems": 542,
+    "diff": 13.56,
+    "se": 1.17,
+    "fail_to_pass": 390,
+    "pass_to_fail": 96
+   },
+   "mbpp+": {
+    "problems": 378,
+    "diff": 15.94,
+    "se": 1.47,
+    "fail_to_pass": 303,
+    "pass_to_fail": 62
+   },
+   "humaneval+": {
+    "problems": 164,
+    "diff": 8.08,
+    "se": 1.82,
+    "fail_to_pass": 87,
+    "pass_to_fail": 34
+   }
+  },
+  "mmlupro": {
+   "all": {
+    "problems": 1000,
+    "diff": 11.1,
+    "se": 1.57,
+    "fail_to_pass": 184,
+    "pass_to_fail": 73
+   }
+  },
+  "ifeval": {
+   "all": {
+    "problems": 541,
+    "diff": 54.62,
+    "se": 1.83,
+    "fail_to_pass": 591,
+    "pass_to_fail": 0
+   }
+  },
+  "lcb": {
+   "all": {
+    "problems": 175,
+    "diff": 4.43,
+    "se": 1.26,
+    "fail_to_pass": 33,
+    "pass_to_fail": 2
+   },
+   "easy": {
+    "problems": 43,
+    "diff": 18.02,
+    "se": 4.58,
+    "fail_to_pass": 33,
+    "pass_to_fail": 2
+   },
+   "medium": {
+    "problems": 52,
+    "diff": 0.0,
+    "se": 0.0,
+    "fail_to_pass": 0,
+    "pass_to_fail": 0
+   },
+   "hard": {
+    "problems": 80,
+    "diff": 0.0,
+    "se": 0.0,
+    "fail_to_pass": 0,
+    "pass_to_fail": 0
+   }
+  },
+  "math500": {
+   "all": {
+    "problems": 500,
+    "diff": 43.75,
+    "se": 1.84,
+    "fail_to_pass": 877,
+    "pass_to_fail": 2
+   }
+  }
+ }
+}

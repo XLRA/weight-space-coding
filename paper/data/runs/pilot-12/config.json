@@ -1,0 +1,20 @@
+{
+ "passes": 20,
+ "backend": "claude-code",
+ "replay": null,
+ "model": "claude-opus-5-5",
+ "effort": "max",
+ "max_usd": null,
+ "handoff_every": 40,
+ "max_turns": 1000,
+ "max_code_runs": 300,
+ "kernel_seconds": 900,
+ "kernel_memory_gb": 20,
+ "max_output_tokens": 128000,
+ "max_context": 600000,
+ "gpu_idle_minutes": 30,
+ "claude_bin": "/home/wspagent/.local/bin/claude",
+ "presence_penalty": 1.5,
+ "start_from": "/opt/wsp/runs/pilot-10/submission",
+ "brief": "/opt/wsp/harness/briefs/pilot-12.md"
+}
