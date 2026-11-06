@@ -205,6 +205,7 @@ def seed_for(key, sample):
 def generation(k, req):
     items = [(pid, PROBLEMS[pid]["problem"]) for pid in req.get("problems", [])]
     items += [(f"prompt/{i}", msg) for i, msg in enumerate(req.get("prompts", []))]
+    items += [(key, msg) for key, msg in req.get("items", [])]  # the driver's own questions (the panel)
     n, max_tokens = int(req.get("n", 1)), int(req.get("max_tokens", MAX_NEW))
     variants = [req.get("baseline", "original"), "edited"] if req["model"] == "both" else [req["model"]]
     result = {"outputs": {}, "seconds": {}}

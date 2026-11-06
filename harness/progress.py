@@ -351,8 +351,12 @@ def request(run, k):
     return r, wall
 
 
+def kind_of(r):
+    return "panel" if r.get("panel") else r["type"]
+
+
 def earlier_passes(run, k, kind):
-    walls = [w for j in range(1, k) for r, w in [request(run, j)] if r and w and r["type"] == kind]
+    walls = [w for j in range(1, k) for r, w in [request(run, j)] if r and w and kind_of(r) == kind]
     if not walls:
         return None
     lo, hi = min(walls), max(walls)
@@ -361,9 +365,11 @@ def earlier_passes(run, k, kind):
 
 
 def describe_request(r):
-    what = [r["type"].replace("_", "-")]
+    what = ["panel" if r.get("panel") else r["type"].replace("_", "-")]
     what.append(f"{r.get('baseline', 'original')} vs edited" if r["model"] == "both" else f"model {r['model']}")
-    if r["type"] == "generate":
+    if r.get("panel"):
+        what.append(f"{len(r.get('items', []))} questions ({', '.join(r['panel'])})")
+    elif r["type"] == "generate":
         parts = [f"{len(r[key])} {key if len(r[key]) != 1 else key[:-1]}" for key in ("problems", "prompts")
                  if r.get(key)]
         n = r.get("n", 1)
@@ -379,6 +385,8 @@ def generation_states(run, k, r, since, now, graded=False):
     states, t0, first_open = [], since, True
     for v in variants:
         stem = f"{run}/work/gen_{k}_{v}" if len(variants) > 1 else f"{run}/work/gen_{k}"
+        if r.get("panel") and not os.path.exists(f"{stem}.raw.jsonl"):  # the driver moves panel answers out of /work
+            stem = stem.replace(f"{run}/work/", f"{run}/panel/")
         done = mtime(f"{stem}.raw.jsonl")
         if done is not None:
             took = (f" {'generated ' if graded else ''}in {secs(done - t0)}") if done > t0 else ""
@@ -478,7 +486,7 @@ def colab_forward_rows(name, run, st, cfg, now, since, head, p, P):
                 rows.append(row("", remote_generation_states(r, w, k, t_req, now)))
             elif w.get("busy") != k:
                 rows.append(row("", dim("the worker has not picked the request up yet · ") + worker_line(w, now)))
-        if hint := earlier_passes(run, k, r["type"]):
+        if hint := earlier_passes(run, k, kind_of(r)):
             rows.append(row("", dim(hint)))
         return rows
     if r["type"] == "generate":
@@ -513,7 +521,7 @@ def forward_rows(name, run, st, cfg, log, now, since, turn):
         rows = [row("Now", yellow(head + f"pass {p} of {P} on the GPU, {secs(now - t_req)} so far · {what}"))]
         if r["type"] == "generate":
             rows.append(row("", generation_states(run, k, r, t_req, now)))
-        if hint := earlier_passes(run, k, r["type"]):
+        if hint := earlier_passes(run, k, kind_of(r)):
             rows.append(row("", dim(hint)))
         return rows
     if r["type"] == "generate":

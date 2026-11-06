@@ -10,6 +10,9 @@
                               read-only copy in /start that "model": "start" and "baseline": "start" run
     [--brief FILE]            text added to the prompt under THIS RUN (copied to runs/<run>/brief.md)
     [--gpu 5090|5080]         the GPU of the run's GPU server (default 5090; see gpus.py)
+    [--panel]                 offer the agent the panel: {"type": "panel"} answers a fixed set of questions beyond
+                              code (MMLU-Pro, MATH, IFEval-style, MBPP test tasks; none in the evaluation or the
+                              practice set) and reports per suite the paired difference edited - start (README, "Panel")
 
 Starts the kernel container for /opt/wsp/runs/<run>/, sends the editor prompt (prompt.txt), and
 loops. Each agent reply must hold one ```python block, run in the kernel, or one ```forward
@@ -59,8 +62,15 @@ CACHE = f"{WSP}/cache"
 SECRETS = f"{WSP}/secrets/anthropic.env"
 COLAB_KEY = f"{WSP}/secrets/colab"  # key: what the Colab worker must send to the relay (--gpu colab)
 IMAGE = "wsp-runtime:1"
+GRADE_IMAGE = "wsp-grade:1"  # wsp-runtime:1 plus math-verify and the IFEval checkers' dependencies (eval/Dockerfile.grade)
+EVAL = f"{WSP}/eval"
+# The panel's questions and grading data (eval/prepare_panel.py); never mounted where the agent can read it.
+# Tests point WSP_PANEL at a small panel and WSP_PANEL_MAX_TOKENS lower.
+PANEL = os.environ.get("WSP_PANEL", f"{WSP}/panel/final/panel.jsonl")
+PANEL_SUITES = ("choice", "math", "instructions", "code")  # MMLU-Pro, MATH, IFEval-style, MBPP
 OUT_CHARS = 10_000
 MAX_NEW = 32768
+PANEL_MAX_TOKENS = int(os.environ.get("WSP_PANEL_MAX_TOKENS", MAX_NEW))
 FULL_ATTN = {3, 7, 11, 15, 19, 23}
 FORWARD_TIMEOUT = 5 * 3600
 CATEGORIES = ["cut_at_max_tokens", "no_code", "syntax_error", "wrong_interface", "runtime_error", "timeout",
@@ -71,7 +81,7 @@ DEFAULTS = dict(passes=50, backend="claude-code", replay=None, model="claude-opu
                 handoff_every=0, max_turns=1000, max_code_runs=300, kernel_seconds=900, kernel_memory_gb=20,
                 max_output_tokens=128000, max_context=400_000, gpu_idle_minutes=30,
                 claude_bin="/home/wspagent/.local/bin/claude", presence_penalty=0.0, start_from=None, brief=None,
-                gpu="5090")
+                gpu="5090", panel=False)
 AGENT_USER = "wspagent"
 # Claude Code's replies when a subscription limit is reached, e.g. "Claude AI usage limit reached|<epoch>"
 # or "You've hit your session limit · resets 5am".
@@ -363,6 +373,20 @@ class Run:
                 for line in open(f"{PRACTICE}/{fn}"):
                     self.problems[json.loads(line)["id"]] = True
         prompt = open(f"{HARNESS}/prompt.txt").read().strip()
+        self.panel, self.panel_suites = [], []
+        if self.cfg["panel"]:
+            if not os.path.exists(PANEL):
+                raise SystemExit(f"--panel: {PANEL} does not exist (eval/prepare_panel.py builds it)")
+            self.panel, count = [], Counter()
+            for p in map(json.loads, open(PANEL)):  # q: a stable label without the question, for /work/panel_<k>.jsonl
+                count[p["suite"]] += 1
+                about = (p["instruction_id_list"] if p["suite"] == "instructions" else
+                         f"{p.get('subject', '')}, {p['difficulty']}" if p["suite"] == "math" else p["difficulty"])
+                self.panel.append({"id": p["id"], "suite": p["suite"], "problem": p["problem"], "about": about,
+                                   "q": f"{p['suite']}/{count[p['suite']]}"})
+            self.panel_suites = [x for x in PANEL_SUITES if any(p["suite"] == x for p in self.panel)]
+            os.makedirs(f"{self.dir}/panel", exist_ok=True)
+            prompt = self.panel_prompt(prompt)
         if os.path.exists(f"{self.dir}/brief.md"):
             prompt += "\n\nTHIS RUN.\n" + open(f"{self.dir}/brief.md").read().strip()
         for key in ("passes", "max_code_runs", "kernel_seconds", "kernel_memory_gb", "handoff_every"):
@@ -380,6 +404,29 @@ class Run:
         self.stopped_llama = False
         self.gpu_used_at = None  # when the GPU server last finished a pass; None while it is not running
         self.messages = []
+
+    def panel_prompt(self, prompt):
+        """prompt.txt with the panel's description (prompt_panel.txt) as forward pass (c)."""
+        text = open(f"{HARNESS}/prompt_panel.txt").read().rstrip()
+        names = {"choice": "multiple choice", "math": "competition math", "instructions": "instruction following",
+                 "code": "code"}
+        sizes = [f"{sum(p['suite'] == x for p in self.panel)} {names[x]} ({x})" for x in self.panel_suites]
+        base = "start" if self.has_start else "original"
+        key = (', and "baseline": "start" (the default: this run\'s starting edit) or "original" (the unedited model)'
+               if self.has_start else " (the baseline is the unedited model, \"original\")")
+        if os.path.exists(f"{self.dir}/panel/base_{base}.jsonl"):  # put there before the run started, or a resume
+            gen = f"The {base} answers are already generated, and every panel pass reuses them"
+        else:
+            gen = (f"The {base} answers are generated in your first panel pass, which therefore takes about twice as "
+                   f"long, and later passes reuse them")
+        for k, v in {"PANEL_TOTAL": f"{len(self.panel):,}", "PANEL_SIZES": ", ".join(sizes),
+                     "PANEL_NAMES": ", ".join(f'"{x}"' for x in self.panel_suites), "PANEL_BASE_KEY": key,
+                     "PANEL_BASE": base, "PANEL_BASE_GEN": gen}.items():
+            text = text.replace("{{%s}}" % k, v)
+        head = "A forward pass is one of two things"
+        assert head in prompt and "\n\nHOW TO WORK." in prompt, "prompt.txt changed: place the panel text by hand"
+        prompt = prompt.replace(head, "A forward pass is one of three things")
+        return prompt.replace("\n\nHOW TO WORK.", f"\n{text}\n\nHOW TO WORK.", 1)
 
     # --- bookkeeping ---
 
@@ -894,6 +941,22 @@ class Run:
         if not isinstance(req, dict):
             raise Refused("the block must hold one JSON object")
         weights = ("original", "edited", "start") if self.has_start else ("original", "edited")
+        if req.get("type") == "panel":
+            if not self.panel:
+                raise Refused('this run has no panel: "type" must be "generate" or "teacher_forced"')
+            unknown = set(req) - {"type", "suites", "baseline"}
+            if unknown:
+                raise Refused(f"unknown keys {sorted(unknown)}")
+            suites = req.get("suites", self.panel_suites)
+            if not isinstance(suites, list) or not suites or len(set(suites)) < len(suites) or \
+                    not all(x in self.panel_suites for x in suites):
+                raise Refused('"suites" must be a list of distinct suites from ' +
+                              ", ".join(f'"{x}"' for x in self.panel_suites))
+            bases = ["start", "original"] if self.has_start else ["original"]
+            baseline = req.get("baseline", bases[0])
+            if baseline not in bases:
+                raise Refused('"baseline" must be ' + " or ".join(f'"{b}"' for b in bases))
+            return {"type": "panel", "suites": [x for x in self.panel_suites if x in suites], "baseline": baseline}
         if req.get("type") == "generate":
             unknown = set(req) - {"type", "model", "problems", "problems_file", "prompts", "prompts_file", "n",
                                   "max_tokens", "activations", "baseline"}
@@ -979,7 +1042,7 @@ class Run:
             else:
                 out["chats"], out["enable_thinking"] = chats, bool(req.get("enable_thinking", False))
             return out
-        raise Refused('"type" must be "generate" or "teacher_forced"')
+        raise Refused('"type" must be "generate" or "teacher_forced"' + (' or "panel"' if self.panel else ""))
 
     def run_forward(self, body):
         s, c = self.state, self.cfg
@@ -998,13 +1061,16 @@ class Run:
         k = s["requests"]
         self.save_state()
         path = f"{self.dir}/requests/fwd_{k}.json"
+        gpu_req = self.panel_request(req) if req["type"] == "panel" else req
         with open(path + ".tmp", "w") as f:
-            json.dump(req, f)
+            json.dump(gpu_req, f)
         os.replace(path + ".tmp", path)
-        self.log(f"request {k}: {req['type']}/{req['model']}")
-        self.snapshot_edit(k, req)
+        self.log(f"request {k}: {req['type']}/{gpu_req['model']}")
+        self.snapshot_edit(k, {"type": req["type"], "model": gpu_req["model"]})
         res, err = self.wait_result(k, path)
         self.gpu_used_at = time.time()
+        if req["type"] == "panel":
+            self.hide_panel_outputs(k)
         if err:
             return f"[request {k} failed, no pass used] {err}"
         if not res["ok"]:
@@ -1013,7 +1079,8 @@ class Run:
         s["passes_used"] += 1
         head = f"[forward pass {s['passes_used']} of {c['passes']} used (request {k}), {res['wall_seconds']:.0f} s]"
         try:
-            body = self.summarize_generation(k, req, res) if req["type"] == "generate" else self.summarize_tf(k, req)
+            body = (self.summarize_generation(k, req, res) if req["type"] == "generate" else
+                    self.summarize_panel(k, req, res) if req["type"] == "panel" else self.summarize_tf(k, req))
         except Exception as e:  # noqa: BLE001 - the pass ran; report what went wrong in summarizing it
             self.log(f"summary of request {k} failed: {type(e).__name__}: {e}")
             body = f"(the pass ran, but the harness failed to summarize it: {type(e).__name__}: {e})"
@@ -1164,6 +1231,118 @@ class Run:
             line += f" attn layers: {meta['attn_layer']}."
         return line
 
+    # --- the panel (README, "Panel") ---
+
+    def panel_cache(self, base):
+        """The baseline's graded panel answers by question id (runs/<run>/panel/base_<base>.jsonl): the baseline's
+        weights never change in a run, so its answers are generated once."""
+        path = f"{self.dir}/panel/base_{base}.jsonl"
+        return {r["id"]: r for r in map(json.loads, open(path))} if os.path.exists(path) else {}
+
+    def panel_request(self, req):
+        """The GPU server's request for a panel pass: the edited model on the chosen suites, and the baseline as well
+        ("model": "both") while its answers to them are not cached yet."""
+        items = [p for p in self.panel if p["suite"] in req["suites"]]
+        cached = self.panel_cache(req["baseline"])
+        out = {"type": "generate", "model": "edited", "items": [[p["id"], p["problem"]] for p in items], "n": 1,
+               "max_tokens": PANEL_MAX_TOKENS, "panel": req["suites"]}
+        if not all(p["id"] in cached for p in items):
+            out.update(model="both", baseline=req["baseline"])
+        return out
+
+    def hide_panel_outputs(self, k):
+        """Moves a panel pass's answers out of /work, into runs/<run>/panel/, which the agent cannot read."""
+        for path in glob.glob(f"{self.dir}/work/gen_{k}.raw.jsonl") + glob.glob(f"{self.dir}/work/gen_{k}_*.raw.jsonl"):
+            os.replace(path, f"{self.dir}/panel/{os.path.basename(path)}")
+
+    def grade_panel(self, raw_name):
+        """Grades runs/<run>/panel/<raw_name> in the no-GPU sandbox with the evaluation's graders (grade_panel.py)."""
+        r = sh("docker", "run", "--rm", "--network", "none", "--read-only", "--tmpfs", "/tmp:rw,size=2g,mode=1777",
+               "--user", "65534:65534", "--cap-drop", "ALL", "--security-opt", "no-new-privileges",
+               "--memory", "16g", "--pids-limit", "512", "--cpus", "12", "-w", "/tmp",
+               "-e", "PYTHONPATH=/harness:/evalbin", "-v", f"{PANEL}:/panel/panel.jsonl:ro",
+               "-v", f"{HARNESS}:/harness:ro", "-v", f"{EVAL}/suites.py:/evalbin/suites.py:ro",
+               "-v", f"{EVAL}/ifeval:/evalbin/ifeval:ro", "-v", f"{self.dir}/panel:/work:ro",
+               GRADE_IMAGE, "python3", "-W", "ignore", "/harness/grade_panel.py", f"/work/{raw_name}", timeout=7200)
+        rows = [json.loads(l) for l in r.stdout.splitlines() if l.strip()]
+        n_raw = sum(1 for _ in open(f"{self.dir}/panel/{raw_name}"))
+        if len(rows) != n_raw:
+            raise RuntimeError(f"the panel grader returned {len(rows)} of {n_raw} rows: {r.stderr[-500:]}")
+        with open(f"{self.dir}/panel/{raw_name.replace('.raw.jsonl', '.jsonl')}", "w") as f:
+            for row in rows:
+                f.write(json.dumps(row) + "\n")
+        return rows
+
+    @staticmethod
+    def panel_suite(suite, e, b, base):
+        """One suite's line: edited rows e and baseline rows b, in the same question order."""
+        n = len(e)
+        pe = np.array([r["status"] == "pass" for r in e], float)
+        pb = np.array([r["status"] == "pass" for r in b], float)
+        d = pe - pb
+        m, se = 100 * d.mean(), (100 * d.std(ddof=1) / math.sqrt(n) if n > 1 else float("nan"))
+
+        def share(rows, test):
+            return pct(sum(bool(test(r)) for r in rows), n)
+
+        none = "no_code" if suite == "code" else "no_answer"
+        line = (f"  {suite} ({n}): edited {pct(pe.sum(), n)} vs {base} {pct(pb.sum(), n)}, {m:+.1f} points (SE "
+                f"{se:.1f}); fail->pass {int(((pe == 1) & (pb == 0)).sum())}, pass->fail "
+                f"{int(((pe == 0) & (pb == 1)).sum())}; cut at max_tokens "
+                f"{share(e, lambda r: r['finish_reason'] == 'length')} ({base} "
+                f"{share(b, lambda r: r['finish_reason'] == 'length')}); no answer "
+                f"{share(e, lambda r: r['status'] == none)} ({share(b, lambda r: r['status'] == none)}); "
+                f"loop-flagged {share(e, lambda r: r['loop'])} ({share(b, lambda r: r['loop'])}); mean length "
+                f"{np.mean([r['n_tokens'] for r in e]):,.0f} tokens "
+                f"({np.mean([r['n_tokens'] for r in e]) - np.mean([r['n_tokens'] for r in b]):+,.0f})")
+        if suite == "instructions":
+            ok = [sum(r.get("inst_ok", 0) for r in rows) / max(sum(r.get("inst_total", 0) for r in rows), 1)
+                  for rows in (e, b)]
+            line += f"; single constraints followed {100 * ok[0]:.1f}% ({100 * ok[1]:.1f}%)"
+        if suite == "code":
+            ce, cb = Counter(r["status"] for r in e), Counter(r["status"] for r in b)
+            fails = [f"{c} {ce[c]} ({cb[c]})" for c in CATEGORIES if ce[c] or cb[c]]
+            line += "; failures: " + (", ".join(fails) or "none")
+        return line, m, se
+
+    def summarize_panel(self, k, req, res):
+        base = req["baseline"]
+        rows = {v: self.grade_panel(os.path.basename(raw)) for v, raw in res["outputs"].items()}
+        cache = self.panel_cache(base)
+        if base in rows:
+            cache.update({r["id"]: r for r in rows[base]})
+            path = f"{self.dir}/panel/base_{base}.jsonl"
+            with open(path + ".tmp", "w") as f:
+                for r in cache.values():
+                    f.write(json.dumps(r) + "\n")
+            os.replace(path + ".tmp", path)
+        E = {r["id"]: r for r in rows["edited"]}
+        with open(f"{self.dir}/work/panel_{k}.jsonl", "w") as f:
+            for p in self.panel:
+                if p["id"] in E:
+                    e, b = E[p["id"]], cache[p["id"]]
+                    f.write(json.dumps({"q": p["q"], "suite": p["suite"], "about": p["about"], "baseline": base,
+                                        "status": e["status"], "base_status": b["status"], "tokens": e["n_tokens"],
+                                        "base_tokens": b["n_tokens"], "cut": e["finish_reason"] == "length",
+                                        "base_cut": b["finish_reason"] == "length"}) + "\n")
+        lines = [f"Panel: {len(E):,} questions, one answer each, edited - {base} paired over the same questions (the "
+                 f"answers are not shown; in brackets: {base}):"]
+        diffs = []
+        for suite in req["suites"]:
+            ids = sorted(i for i in E if E[i]["suite"] == suite)
+            line, m, se = self.panel_suite(suite, [E[i] for i in ids], [cache[i] for i in ids], base)
+            lines.append(line)
+            diffs.append((m, se))
+        if len(diffs) > 1:
+            m = float(np.mean([d[0] for d in diffs]))
+            se = math.sqrt(sum(d[1] ** 2 for d in diffs)) / len(diffs)
+            lines.append(f"  mean over the {len(diffs)} suites: {m:+.1f} points (SE {se:.1f})")
+        secs = ", ".join(f"{v} {t:.0f} s" for v, t in res.get("seconds", {}).items())
+        lines.append(f"Per question: /work/panel_{k}.jsonl. Time: {secs}." +
+                     (f" The {base} answers were generated in this pass; later panel passes reuse them."
+                      if base in rows else ""))
+        return "\n".join(lines)
+
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -1189,6 +1368,8 @@ def main():
     ap.add_argument("--brief", help="a text file added to the prompt under THIS RUN")
     ap.add_argument("--gpu", choices=sorted(GPUS),
                     help="the GPU of the run's GPU server (default 5090; colab: a Colab notebook, README)")
+    ap.add_argument("--panel", action="store_true", default=None,
+                    help='offer the agent {"type": "panel"}, the cross-suite check (README, "Panel")')
     args = ap.parse_args()
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*", args.run):
         raise SystemExit("run names use letters, digits, '.', '_' and '-'")

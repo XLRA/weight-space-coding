@@ -15,6 +15,7 @@ __pycache__/
 /scratch/*/
 /scratch/*.log
 /scratch/*.out
+/scratch/*.pgid
 
 !/eval/
 /eval/*
@@ -40,6 +41,7 @@ __pycache__/
 /runs/*
 !/runs/pilot-*/
 !/runs/combo-*/
+!/runs/panel-*/
 /runs/*/*
 !/runs/*/brief.md
 !/runs/*/config.json

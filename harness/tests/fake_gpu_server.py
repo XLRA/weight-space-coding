@@ -1,7 +1,7 @@
 """Stand-in for gpu_server.py with no GPU, for tests of the Colab relay and worker (colab_local_worker.py).
 
 Same protocol: writes /requests/server.ready, then answers each /requests/fwd_<k>.json with fwd_<k>.result.json.
-A generation writes gen_<k>[_<variant>].raw.jsonl rows that hold a wrong solution (n rows per problem and prompt);
+A generation writes gen_<k>[_<variant>].raw.jsonl rows that hold a wrong solution (n rows per problem, prompt and item);
 a teacher-forced request writes small tokens.npy and token_logprobs.npy, with meta.json, in /work/fwd_<k>/. FAKE_SECONDS (default 20) is each request's time.
 """
 import glob
@@ -18,6 +18,7 @@ TEXT = "<think>\nA stand-in answer.\n</think>\n\n```python\ndef solution(*args):
 
 def generation(k, req):
     keys = list(req.get("problems", [])) + [f"prompt/{i}" for i in range(len(req.get("prompts", [])))]
+    keys += [key for key, _ in req.get("items", [])]  # the driver's own questions (the panel)
     variants = [req.get("baseline", "original"), "edited"] if req["model"] == "both" else [req["model"]]
     result = {"outputs": {}, "seconds": {}}
     for v in variants:
