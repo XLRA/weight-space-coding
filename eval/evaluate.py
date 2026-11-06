@@ -39,7 +39,7 @@ import numpy as np
 import suites as S
 
 sys.path.insert(0, "/opt/wsp/harness")
-from gpus import GPUS  # noqa: E402
+from gpus import GPUS, LOCAL  # noqa: E402
 
 WSP = "/opt/wsp"
 EVAL = f"{WSP}/eval"
@@ -399,7 +399,7 @@ def main():
                    help="0 = the editing runs' coding setting; the paper's Experiment 8 used 1.5")
     r.add_argument("--reuse-original", metavar="NAME",
                    help="copy the unedited model's answers from results/NAME (same samples, limit and presence penalty)")
-    r.add_argument("--gpu", choices=sorted(GPUS), default="5090",
+    r.add_argument("--gpu", choices=LOCAL, default="5090",
                    help="5090 (default; llama-swap is paused) or 5080 (beside other services)")
     p = sub.add_parser("report")
     p.add_argument("name")
