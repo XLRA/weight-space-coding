@@ -963,11 +963,16 @@ def grpo_detail(name, args, j, now):
     rows = tail_jsonl(f"{d}/steps.jsonl")
     if j["state"] == "failed":
         return red(clip(failure(tail_text(f"{d}/train.log")), 70)) + (dim(f" · after step {rows[-1]['step']}") if rows else "")
+    if j["state"] == "stopped":  # train/runs/<arm>/stopped holds why (a stop rule, or two failed attempts)
+        why = (open(f"{d}/stopped").read().strip() if os.path.exists(f"{d}/stopped") else "") or "stopped"
+        return yellow(clip(why, 80)) + (dim(f" · after step {rows[-1]['step']}") if rows else "")
     if not rows:
         cfg = json_or(f"{d}/config.json", {})
         shape = (f"{total} steps · {cfg.get('prompts') or arg(args, '--prompts', 64)} problems × "
                  f"{cfg.get('group') or arg(args, '--group', 8)} answers, at most "
                  f"{int(cfg.get('max_new') or arg(args, '--max-new', 16384)):,} tokens")
+        if j["state"] == "queued":  # what it waits for first: lines are cut at 130 columns
+            return (f"after {j['after']} · " if j.get("after") else "") + dim(shape)
         return shape + (dim(" · loading vLLM and the trainer, then step 1") if j["state"] == "running" else "")
     r, last = rows[-1], rows[-5:]
     per = sum(x["seconds"]["total"] for x in last) / len(last)
@@ -993,8 +998,15 @@ def rft_detail(name, args, j, now):
     if j["state"] == "waiting":
         n = cfg.get("problems") or arg(args, "--problems", "all")
         return f"{rounds} rounds · {n} problems × {cfg.get('samples') or arg(args, '--samples', 8)} answers"
-    events = [l[20:] for l in lines if STAMPED.match(l) and re.match(r"round \d+: ", l[20:])]
-    now_s = events[-1] if events and j["state"] == "running" else ("loading vLLM" if j["state"] == "running" else "")
+    stamped = [l[20:] for l in lines if STAMPED.match(l)]
+    events = [l for l in stamped if re.match(r"round \d+: ", l)]
+    now_s = ""
+    if j["state"] == "running":
+        now_s = events[-1] if events else "loading vLLM"
+        if stamped and stamped[-1].startswith("vLLM now holds"):  # sampling has begun; no chunk is logged yet
+            r = 1 + max([int(m[1]) for l in events if (m := re.match(r"round (\d+): (checkpoint saved|already done)", l))],
+                        default=0)
+            now_s = f"round {r}: sampling the first {cfg.get('chunk') or 256} problems"
     return " · ".join(([now_s] if now_s else []) + parts) or f"{rounds} rounds"
 
 
@@ -1086,6 +1098,13 @@ def train_jobs(now, keep=24 * 3600):
         else:
             j["state"] = "waiting"
         jobs.append(j)
+    for q in json_or(f"{TRAIN}/queue.json", []) or []:  # queued by a chain (train/grpo-queue-*.sh), not started yet
+        if isinstance(q, dict) and q.get("kind") in TRAIN_DETAIL and (q["kind"], q.get("name")) not in live:
+            after = q.get("after", "")  # a hook run before it (train/queue/after-<after>.sh) names itself in "# shows:"
+            shows = next((l[8:].strip() for l in tail_text(f"{TRAIN}/queue/after-{after}.sh")[:5]
+                          if l.startswith("# shows:")), "") if after else ""
+            jobs.append({"name": q["name"], "kind": q["kind"], "gpu": q.get("gpu", "?"), "t": now, "state": "queued",
+                         "args": q.get("args", ""), "after": f"{after} and {shows}" if shows else after})
     ended = []
     for log in glob.glob(f"{TRAIN}/runs/*/train.log"):
         name, t = os.path.basename(os.path.dirname(log)), mtime(log)
@@ -1095,8 +1114,9 @@ def train_jobs(now, keep=24 * 3600):
             continue
         lines = tail_text(log)
         ok = any(STAMPED.match(l) and l[20:] == "done" for l in lines[-50:])
+        stopped = os.path.exists(f"{os.path.dirname(log)}/stopped")
         ended.append({"name": name, "kind": kind, "gpu": gpu_in_log(log), "t": t,
-                      "state": "done" if ok else "failed", "args": ""})
+                      "state": "done" if ok else "stopped" if stopped else "failed", "args": ""})
     for log in glob.glob(f"{TRAIN}/checks/*.log"):
         m, t = re.fullmatch(r"(logprobs|push)-(\w+)\.log", os.path.basename(log)), mtime(log)
         if not m:  # e.g. logprobs-5080.run1.log, a kept earlier run
@@ -1113,7 +1133,7 @@ def train_jobs(now, keep=24 * 3600):
         ok = os.path.exists(f"{os.path.dirname(log)}/summary.json")
         ended.append({"name": name, "kind": "ckpt", "gpu": gpu_in_log(log), "t": t,
                       "state": "done" if ok else "failed", "args": ""})
-    order = {"running": 0, "grading": 1, "waiting": 2}
+    order = {"running": 0, "grading": 1, "waiting": 2, "queued": 3}
     jobs.sort(key=lambda j: (order[j["state"]], j["t"]))
     ended.sort(key=lambda j: -j["t"])
     for j in jobs + ended:
@@ -1130,7 +1150,7 @@ def train_label(j):
     return f"{j['name']} {TRAIN_KINDS[j['kind']]}"
 
 
-def train_block(jobs, now, most=8):
+def train_block(jobs, now, most=10):
     if not jobs:
         return [row("Training", dim("nothing running, waiting or finished in the last day (train/)"))]
     width = max(len(train_label(j)) for j in jobs[:most]) + 2
@@ -1139,7 +1159,9 @@ def train_block(jobs, now, most=8):
         state = {"running": lambda: yellow(f"▸ running {minutes(now - j['t'])}"),
                  "grading": lambda: yellow("▸ grading"),
                  "waiting": lambda: dim(f"◷ waiting {minutes(now - j['t'])}"),
+                 "queued": lambda: dim("◷ queued"),
                  "done": lambda: green(f"✓ done {clock(j['t'], now)}"),
+                 "stopped": lambda: yellow(f"■ stopped {clock(j['t'], now)}"),
                  "failed": lambda: red(f"✗ failed {clock(j['t'], now)}")}[j["state"]]()
         out.append(row("Training" if not out else "",
                        f"{train_label(j):<{width}}{dim('RTX ' + j['gpu'])}  {pad(state, 23)}{j['detail']}"))
@@ -1154,10 +1176,12 @@ def gpu_block(train=()):
         if j["state"] == "running":
             users.setdefault(j["gpu"], []).append({"check": train_label(j), "ckpt": f"check {j['name']}"}
                                                   .get(j["kind"], f"train {j['name']}"))
-    waiting = {}
+    waiting, queued = {}, {}
     for j in train:
         if j["state"] == "waiting":
             waiting[j["gpu"]] = waiting.get(j["gpu"], 0) + 1
+        elif j["state"] == "queued":
+            queued[j["gpu"]] = queued.get(j["gpu"], 0) + 1
     q = sh("nvidia-smi", "--query-gpu=index,temperature.gpu,power.draw,utilization.gpu,memory.used,memory.total",
            "--format=csv,noheader,nounits")
     rows = {r[0]: r for r in (l.split(", ") for l in q.splitlines()) if len(r) == 6}
@@ -1180,6 +1204,8 @@ def gpu_block(train=()):
         who = ", ".join(users.get(card, [])) or dim("idle")
         if waiting.get(card):
             who += dim(f" +{waiting[card]} waiting")
+        if queued.get(card):
+            who += dim(f" +{queued[card]} queued")
         if g["llama_swap"]:
             swap = sh("docker", "inspect", "-f", "{{.State.Status}}", "llama-swap")
             extra = f"llama-swap {'stopped' if swap == 'exited' else swap}"

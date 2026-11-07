@@ -18,7 +18,8 @@ Each step:
    min(rho A, clip(rho, 1 - clip_low, 1 + clip_high) A), with rho = exp(logp - old), times a truncated importance
    weight min(exp(old - logp_vllm), tis_cap) that corrects for the sampler's small numerical differences, summed
    over tokens and divided by the part's token count (token-level averaging). No KL term. Gradient clip --grad-clip,
-   AdamW, learning rate --lr after --warmup steps of linear warm-up.
+   AdamW, learning rate --lr after --warmup steps of linear warm-up. A part whose gradient norm is not finite is
+   skipped rather than written into the weights (counted in steps.jsonl as updates_skipped).
 5. Push the new weights to vLLM.
 
 Writes /train/runs/<arm>/: config.json, steps.jsonl (one line per step), samples/step_<k>.jsonl.gz (every answer
@@ -128,6 +129,23 @@ def main():
         opt.load_state_dict(st["opt"])
         step0 = st["step"]
         log(f"resumed at step {step0}")
+        # Steps logged after the last checkpoint are redone: their rows move to steps.redone.jsonl, so steps.jsonl
+        # keeps one row per step.
+        if os.path.exists(f"{OUT}/steps.jsonl"):
+            def step_of(line):
+                try:
+                    return json.loads(line)["step"]
+                except (ValueError, KeyError, TypeError):
+                    return None  # a line cut off by the crash
+            rows = [(l, step_of(l)) for l in open(f"{OUT}/steps.jsonl").read().splitlines() if l.strip()]
+            later = [l for l, s in rows if s is None or s > step0]
+            if later:
+                with open(f"{OUT}/steps.redone.jsonl", "a") as f:
+                    f.write("".join(l + "\n" for l in later))
+                with open(f"{OUT}/steps.jsonl.tmp", "w") as f:
+                    f.write("".join(l + "\n" for l, s in rows if s is not None and s <= step0))
+                os.replace(f"{OUT}/steps.jsonl.tmp", f"{OUT}/steps.jsonl")
+                log(f"{len(later)} logged steps after step {step0} moved to steps.redone.jsonl")
     else:
         json.dump(cfg, open(f"{OUT}/config.json", "w"), indent=1)
     push(llm, model)  # vLLM now holds exactly the trainer's weights (the start edit, or the resumed state)
@@ -173,7 +191,7 @@ def main():
                 kept_groups.append(i)
         kept = [a for a in answers if "adv" in a and len(a["ids"]) > 0]
 
-        stats = {"loss": [], "clip_frac": [], "tis_mean": [], "mismatch_abs": [], "grad_norm": []}
+        stats = {"loss": [], "clip_frac": [], "tis_mean": [], "mismatch_abs": [], "grad_norm": [], "skipped": 0}
         if kept:
             model.eval()
             with torch.no_grad():
@@ -204,7 +222,11 @@ def main():
                     tis_sum += float(tis.sum())
                     stats["mismatch_abs"].append(float((old - vlp).abs().mean()))
                 gn = torch.nn.utils.clip_grad_norm_(params, args.grad_clip)
-                opt.step()
+                if torch.isfinite(gn):
+                    opt.step()
+                else:  # a NaN or inf norm would be written into every weight: skip this mini-batch's update instead
+                    stats["skipped"] += 1
+                    log(f"step {step}: non-finite gradient norm, one mini-batch's update skipped")
                 stats["loss"].append(part_loss)
                 stats["clip_frac"].append(clipped / n_tok)
                 stats["tis_mean"].append(tis_sum / n_tok)
@@ -214,6 +236,7 @@ def main():
                 del a["old"]
         t_train = time.time() - t0 - t_gen - t_grade
         torch.cuda.empty_cache()  # release the trainer's cached activations and logits before vLLM maps its memory back
+        free_gb = torch.cuda.mem_get_info()[0] / 2**30  # what vLLM's wake-up has to fit in (--gpu-memory of the GPU)
         llm.wake_up()
         push(llm, model)
         t_all = time.time() - t0
@@ -233,6 +256,7 @@ def main():
                "mean_tokens": mean(lens), "max_tokens": max(lens),
                "loss": mean(stats["loss"]), "clip_frac": mean(stats["clip_frac"]), "tis_mean": mean(stats["tis_mean"]),
                "mismatch_abs": mean(stats["mismatch_abs"]), "grad_norm": mean(stats["grad_norm"]),
+               "updates_skipped": stats["skipped"], "free_gb_before_wake": round(free_gb, 2),
                "seconds": {"generate": round(t_gen), "grade": round(t_grade), "train": round(t_train),
                            "total": round(t_all)},
                "time": time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())}
@@ -245,7 +269,8 @@ def main():
                                     "text": a["text"]}) + "\n")
         log(f"step {step}: pass {row['pass_rate']:.3f}, kept {len(kept_groups)}/{len(batch)} groups, "
             f"cut {row['cut_share']:.2f}, mean {row['mean_tokens']:.0f} tokens, loss {row['loss']}, "
-            f"gen {t_gen:.0f}s grade {t_grade:.0f}s train {t_train:.0f}s total {t_all:.0f}s")
+            f"gen {t_gen:.0f}s grade {t_grade:.0f}s train {t_train:.0f}s total {t_all:.0f}s, "
+            f"{free_gb:.1f} GiB free before waking vLLM")
         if step % args.ckpt_every == 0 or step == args.steps:
             save_checkpoint(model, opt, step)
     log("done")

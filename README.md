@@ -226,8 +226,12 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
 - **Checks before training, passed:**
   - The trainer's log-probs match vLLM's to 0.015 per token on average, with a 99th percentile of 0.12.
   - After a training step, vLLM holds the trainer's new weights.
-- **Running:** the two RFT arms, R-O and R-E. Every checkpoint is checked on the panel and on held-back validation problems, against its arm's starting model.
-- **The starting models' checks so far:** O passes 5.2% of the validation answers and runs 76% of them to the 32k cap. Its panel mean is 26.7%.
+- **Running:** the two RFT arms, R-E and then R-O's second round. Every checkpoint is checked on the panel and on held-back validation problems, against its arm's starting model.
+- **Queued behind them:** GRPO from E (G-E), then from O (G-O), 150 steps each. G-O stops at step 50 unless its validation pass rate has risen by more than two standard errors. Between the two, the RFT arms get their held-out evaluations, on the checkpoint the plan's rule picks.
+- **The starting models' checks:**
+  - **O** passes 5.2% of the validation answers and runs 76% of them to the 32k cap. Its panel mean is 26.7%.
+  - **E** passes 10.0% and runs 4% to the cap. Its panel mean is 51.1%: choice 45.6%, math 61.6%, instructions 77.6%, code 19.6%.
+  - **E reopens its reasoning:** 608 of its 965 finished validation answers have a second `</think>`, with more reasoning and draft code after the first, against none of O's. So 38% of its answers do not parse under the practice grader, which reads after the first `</think>`. The held-out suites read after the last one, which is more lenient here, so the training reward is the stricter of the two on E's format.
 - **R-O's first round:** 4.2% of its 11,344 practice answers passed, and 79% ran to the 16k cap. Its 305 kept passing answers average 2,400 tokens, against 13,400 for all answers.
 - **R-O's first checkpoint, paired against O** (SE in brackets):
 
@@ -242,6 +246,7 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
 
   - **One round on its own passing answers doubled the validation pass rate:** 51 of the 252 problems passed at least once, against 27.
   - **Like the edits, it learned to finish, at a cost to multiple choice.** 33% of its validation answers ran to the 32k cap, against 76%. Most of the answers it now finishes are still wrong: wrong answers rose from 56 to 314 of 1,008, and passes from 52 to 104.
+  - **E alone does as well on validation** (10.0% against 10.3%) and is 18 points higher on the panel (51.1% against 33.0%).
 
 ## What we've learned so far
 

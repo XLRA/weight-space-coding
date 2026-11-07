@@ -1,3 +1,3 @@
 arm,round,sampled_from,problems,answers,pass_rate,pass_rate_mbpp,pass_rate_apps,problems_with_a_pass,kept_answers,cut_share,loop_share,mean_tokens,mean_tokens_kept,sampled_tokens,sampling_seconds,sft_steps,sft_tokens,nll_first,nll_last,sft_seconds,sft_peak_gb,checkpoint
-R-E,1,,,,,,,,,,,,,9154451,832,0,0,,,0,,False
+R-E,1,,,,,,,,,,,,,68327122,6916,0,0,,,0,,False
 R-O,1,original,1418,11344,0.04222496473906911,0.11926605504587157,0.028229166666666666,199,305,0.7942524682651622,0.7788258110014105,13404.374911847674,2409.0196721311477,152059229,18723,20,1469502,0.4348623475525528,0.32958316802978516,200.3,11.67,True

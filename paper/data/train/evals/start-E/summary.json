@@ -1,0 +1,51 @@
+{
+ "name": "start-E",
+ "panel": {
+  "choice": {
+   "n": 250,
+   "pass": 45.6,
+   "cut": 1.6,
+   "mean_tokens": 8751
+  },
+  "math": {
+   "n": 250,
+   "pass": 61.6,
+   "cut": 3.2,
+   "mean_tokens": 13519
+  },
+  "instructions": {
+   "n": 250,
+   "pass": 77.6,
+   "cut": 2.0,
+   "mean_tokens": 4610
+  },
+  "code": {
+   "n": 250,
+   "pass": 19.6,
+   "cut": 2.4,
+   "mean_tokens": 3867
+  }
+ },
+ "val": {
+  "answers": 1008,
+  "pass": 10.02,
+  "by_source": {
+   "mbpp": 25.0,
+   "apps": 6.12
+  },
+  "problems_with_a_pass": 50,
+  "cut": 4.27,
+  "mean_tokens": 9333,
+  "status": {
+   "runtime_error": 98,
+   "wrong_interface": 21,
+   "syntax_error": 384,
+   "wrong_answer": 348,
+   "cut_at_max_tokens": 43,
+   "pass": 101,
+   "no_code": 9,
+   "timeout": 4
+  }
+ },
+ "panel_mean": 51.1
+}
