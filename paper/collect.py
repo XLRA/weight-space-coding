@@ -104,7 +104,7 @@ def run_row(name, d):
         "model": cfg.get("model", ""), "effort": cfg.get("effort", ""),
         "presence_penalty": cfg.get("presence_penalty", 0), "passes_used": st.get("passes_used", ""),
         "passes_budget": cfg.get("passes", ""), "requests": st.get("requests", ""), "turns": st.get("turn", ""),
-        "conversations": st.get("conv", ""), "code_runs": st.get("code_runs", ""),
+        "conversations": st["conv"] + 1 if isinstance(st.get("conv"), int) else "", "code_runs": st.get("code_runs", ""),
         "output_tokens": tok.get("output_tokens", ""), "cache_read_tokens": tok.get("cache_read_input_tokens", ""),
         "limit_waits": st.get("limit_waits", ""), "limit_wait_hours": round(st.get("limit_wait_seconds", 0) / 3600, 2),
         "started": stamps[0] if stamps else "", "last_event": stamps[-1] if stamps else "",

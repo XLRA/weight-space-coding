@@ -171,8 +171,10 @@ Held out, paired against `pilot-14` (SE in brackets):
 - **`pilot-17`: copying text from the prompt under the presence penalty** (attention tensors only, 20 passes).
   - **The edit:** three rank-1 terms in `q_proj`, layer 15 head 7 and layer 11 head 1.
   - **Held out:** IFEval +2.8; every other suite within about a point.
-- **`pilot-18`: function interfaces and identifiers in code answers** (12 passes, on a cloud L4; in progress).
-- **Neither finished edit lifted its target by much beyond noise, and one broke a suite the agent never measured.** That led to the panel.
+- **`pilot-18`: function interfaces and identifiers in code answers** (12 passes, on a cloud L4; held-out evaluation in progress).
+  - **The edit:** two near-dead neurons of layer 22's MLP (6,144 weights) made into a capped pair. It fires on the last token of the prompt's function name in a `def` line and pushes toward `(`, so the first `def` no longer runs past the given name (`min_Num` → `min_Num_sum_even`).
+  - **On its own practice problems,** paired against `pilot-14` on problems not used for choices: the targeted renames fell from 20 to 7 of 512 answers. Pass rates moved +1.2 (2.0) on MBPP-style and −2.8 (2.6) on HumanEval-style prompts, both within noise.
+- **Neither of the first two edits lifted its target by much beyond noise held out, and one broke a suite the agent never measured.** That led to the panel.
 
 ### The panel
 
@@ -193,11 +195,12 @@ From round 5 on, the agent can ask for a **panel pass**: 1,000 fixed questions t
   - **So only differences beyond about two standard errors count:** about 5 points on one suite, 2.5 on the mean.
 - **Built by** `eval/prepare_panel.py`. The reference answers are checked with the same graders; `paper/data/panel.csv` lists the questions by id.
 
-### Round 5 (planned): `pilot-19` consolidates round 4
+### Round 5 (running): `pilot-19` consolidates round 4
 
 - **Starts from** `pilot-14`, with 24 passes and the panel.
-- **Candidates in its working directory:** the changes of `pilot-16`, `pilot-17` and `pilot-18`, each on its own and summed.
-- **The goal:** one edit that keeps what helps across all four panel suites and drops what costs elsewhere.
+- **Candidates in its working directory:** the changes of `pilot-16`, `pilot-17` and `pilot-18`, each on its own and summed. The three touch disjoint tensors (layer 23's MLP, attention in layers 11 and 15, layer 22's MLP), so the sum keeps each change unaltered.
+- **What its brief gives:** the held-out results of `pilot-16` and `pilot-17`, `pilot-18`'s own practice numbers, and the panel's two noise checks.
+- **The goal:** one edit that does best on the five held-out suites together, with none clearly worse than `pilot-14`. It keeps or narrows changes, and adds no new mechanisms.
 
 ## What we've learned so far
 

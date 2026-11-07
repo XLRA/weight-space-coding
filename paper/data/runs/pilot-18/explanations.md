@@ -597,3 +597,371 @@ What would change my plan:
 
 Files are ready. Pass 10 runs v3 against the starting edit on the 96 APPS problems (graded by the harness) and the 160 reshuffled set-B MBPP prompts (graded by me), one sample each.
 
+## Turn 140 (python)
+
+Something is badly wrong: with v3, 99–100% of answers ran to the 32,768-token limit without being flagged as loops, while v2 (which contains the same end-of-name pair) produced normal answers in passes 6–8. Removing two neurons cannot plausibly cause that, so I suspect the saved tensors or the served weights. Let me look at what v3 generated and verify the edit files on disk against /work/v2 and the originals.
+
+## Turn 141 (python)
+
+Found the cause, and it is my bug, not the method. v3 generates a stream of `(`-tokens from the first token, so the end-of-name pair fires everywhere. In code run 125 a top-level loop assigned `b = tpos9(...)`, overwriting the constant direction b with an integer. When I built v3 in run 126, the gate rows got a scalar added to every element and the up rows became a constant vector, so the neurons fire at every position. Pass 10's v3 answers are therefore invalid (the starting edit's answers in that pass are fine). I'll restore b from the saved parts, rebuild v3, and verify that its rows 2979/2055 are identical to v2's (validated in passes 6–8) and that rows 2126/1878 equal the originals.
+
+## Turn 142 (python)
+
+The corrected v3 is saved: rows 2979/2055 are byte-identical to v2's (the version validated in passes 6–8), and 2126/1878 are back to the original weights. I'll refresh the /work/v3 copy and log the bug, so a restart can't reuse the corrupted version. With two passes left, pass 11 will confirm the corrected v3 against the starting edit on fresh seeds: 160 set-B MBPP prompts in a new order, plus 96 APPS problems (the 34 introductory and 62 interview problems not used in pass 10). Pass 12 is reserved for HE-style prompts and the prose/math checks with v3.
+
+## Turn 143 (forward)
+
+Pass 11 is the first valid generation test of the corrected v3. It runs v3 and the starting edit on 96 APPS problems (graded by the harness) and the 160 set-B MBPP prompts in a fresh order (graded by me), one sample each.
+
+What I expect:
+- **Normal behaviour:** typical lengths, cut rates near the starting edit's (about 3–5%).
+- **MBPP:** fewer name extensions.
+- **APPS:** unchanged pass rate and failure mix.
+
+What would change my plan:
+- Any sign of broken output (long garbage, mass cuts) would mean another construction error. I'd fall back to the verified v2 end pair or to the starting edit.
+- A clear APPS degradation (new NameErrors or syntax errors) would point to helper-name truncation.
+
+## Turn 144 (python)
+
+The corrected v3 behaves normally: APPS 9 vs 9 passes of 96 (+0.0, SE 3.3; 5 vs 5 discordant), no rise in NameErrors (1 vs 1) or syntax errors (36 vs 35), fewer cut answers (8 vs 2). Now I'll grade the 160 set-B MBPP prompts for both models, with the same mechanism breakdown (extensions, truncations, arity, renames).
+
+## Turn 145 (python)
+
+Pass 11 on set B is less favourable: 26.9% vs 23.8% (−3.1, SE 3.5; 13 fail→pass vs 18 pass→fail), and name extensions are 3 vs 3. The pass difference is within noise, but the extension count deserves a look, since the end-of-name ramp should have prevented most of them. Let me inspect the extension cases of both models: the names, and for v3 whether its first def already extended the name (the decision the neuron should affect).
+
+## Turn 146 (python)
+
+The residual extensions in v3 are expected cases. mbpp/1 (min_cost → min_cost_path) is one where pass 9 measured only 0.72 probability of ending the name. mbpp/832 is the known hard case (0.01 even with the push). In mbpp/873 the first def was correct (`fibonacci`) and a later recursive version got the suffix. So pass 11 drew a less favourable sample.
+
+Pooled over the three set-B passes (480 MBPP answers per model, P7/P8 with v2 and P11 with v3), the picture is:
+- extensions fell from 14 to 6;
+- the pass rate is 26.5% vs 27.1% (+0.6, SE about 2.0), below what I can resolve.
+
+The last pass must cover what I still lack for the final edit v3 itself: HE-style prompts and the prose, math and multiple-choice checks. Pass 12 will contain:
+- all 160 HE-style set-B prompts in a fresh order;
+- the 24 math, 24 instruction-following and 16 multiple-choice items;
+- 32 set-B MBPP prompts.
+
+## Turn 147 (forward)
+
+Pass 12 is the last forward pass. It runs v3 and the starting edit on 256 own prompts:
+- all 160 HE-style set-B prompts in a fresh order;
+- 24 math, 24 instruction-following and 16 multiple-choice items, at different prompt positions than in pass 8 (likely fresh seeds);
+- 32 set-B MBPP prompts.
+
+What I expect: HE-style and the non-code checks unchanged within noise. The neurons only act at the end of a function name inside a def line, and they never fired in prose or math in the teacher-forced checks.
+
+What would change my plan: a clear drop on HE-style prompts, or in math or instruction following, would argue for submitting the starting edit unchanged instead of v3.
+
+## Turn 148 (python)
+
+All forward passes are used. Let me grade pass 12 as before: HE-style and MBPP items with run_tests, math by the last `\boxed{}`, instruction following by my checkers, and multiple choice by the last "The answer is (X)" after `</think>`.
+
+## Turn 149 (python)
+
+The last pass raises a concern. HE-style set B went 54 → 44 of 160 (−6.2, SE 3.4; 10 fail→pass vs 20 pass→fail), and pooled over all HE comparisons (passes 6, 7, 8, 12) the total is 125 → 116 of 385 (about −2.3). MBPP is +3 of 32; math 20 → 21, instruction following 23 → 21, multiple choice 15 → 15, all within noise. Before deciding what to submit, I need to know whether the HE drop is drift or a mechanism. One plausible mechanism: in HE prompts the signature is given, and at the end of the copied name my push favours common first-parameter tokens over uncommon ones by up to ~0.8 nats. That could rename the first parameter and leave the body using the prompt's name (a NameError). Let me compare the pass→fail cases' def lines with the given signatures, and the runtime error types.
+
+## Turn 150 (python)
+
+The HE losses don't look like the edit's mechanism:
+- v3 copies the given parameters in 138 of 160 answers (the starting edit 136).
+- NameErrors are fewer (5 vs 8).
+- The 20 pass→fail cases have the correct signature and are mostly wrong answers, as drift would produce.
+
+(The `'int]]'` entries are my parser splitting type annotations at commas; irrelevant.)
+
+Still, one HE-specific pathway exists. HE prompts contain a `def name(` line inside the user turn, so the ramp also fires there and adds its push vector to the residual at the prompt's name-end token, which later layers read. Let me measure how large that perturbation is relative to the residual, and pool all HE and MBPP comparisons by inverse-variance weighting.
+
+## Turn 151 (python)
+
+Two important numbers. Pooled over set B, MBPP is +1.1 (SE 2.0) and HE-style −2.1 (SE 2.3). And the push vector is large: at the cap its norm is 3.3, about 36% of the residual norm at layer 22. Because the ramp saturates at every correctly ended name (and at the signature inside HE prompts), it rewrites a third of the residual at those tokens, which later positions read through attention. That could act beyond the intended logit push. Pass 5 (v1 with uncapped, even larger pushes vs the starting edit, same texts) lets me test whether HE texts were disturbed more than MBPP texts after the def line: mean |Δ log-prob| of the actual tokens following def-name ends, split by prompt type.
+
+## Turn 152 (python)
+
+No sign of an HE-specific pathway in pass 5 (v1, which had even larger pushes). Tokens after the decision points changed by the same small amount in HE texts as in MBPP texts (mean |Δ log-prob| 0.015 vs 0.016 per token), with fewer large changes (0.01% vs 0.06% of tokens). Together with the preserved signatures, I attribute the HE estimate (−2.1 ± 2.3) to drift, but I'll report it as the main risk.
+
+My decision is to keep v3. Its pass-rate gain is not established at my sample sizes. The case rests on held-out mechanism evidence:
+- extensions fell from 14 to 6 over the set-B passes;
+- in pass 7, half of the extension problems became passes;
+- pass 9 shows the end-of-name push acting where intended on held-out answers.
+
+I'll keep the tested cap of 4 rather than an untested variant. Let me complete the counts for the report (pass 12 MBPP mechanism counts, NameErrors per pass), verify the final files once more, and finish the notes.
+
+## Turn 153 (python)
+
+One file in /work/edited contains pickled data. Let me list the directory to see what it is before verifying again (only the tensor .npy files should be compared).
+
+## Turn 154 (python)
+
+Pass 12 ran before the restart, but its result is not in my notes. First I will find its output files and the grading helpers that survived in the kernel. Then I can grade it and record it.
+
+What would change the plan: if pass 12's files are missing or the edited side looks broken (as in pass 10), I have no passes left. I would then have to decide between v3 and the starting edit on the evidence already in the notes.
+
+## Turn 155 (python)
+
+The kernel still has the grading helpers (`grade8`, `grade_prompts`, `mech8`, `mech_counts`, `report`). Next I will read their signatures and sources so I can reuse them on pass 12 rather than rewrite the grading. I will also check the structure of `p12_map.json`. If the sources are not retrievable, I will rebuild the grading from the map and the existing primitives (`run_tests`, `classify_answer`, `last_boxed`).
+
+## Turn 156 (python)
+
+I can't see the sources, but `grade_prompts(G, mp)` takes the answers and a map, so it is probably the generalized grader I used for passes 11 and 12. Before trusting it I want to see:
+
+- one map entry of each kind (he, mbpp, math, IF, MC);
+- the record fields in `gen_12_*.jsonl` and how they differ from the `.raw.jsonl` files.
+
+That tells me what the helper must have expected.
+
+## Turn 157 (python)
+
+The map has 160 HE, 32 MBPP, 24 math, 24 IF (indexed by `k`) and 16 MC items. The harness left the own-prompt answers ungraded. I will try `grade_prompts` on a small mixed slice (a few items of each kind) to see its output format and timing before grading all 512 answers. If it fails, for instance because a global it relied on is gone, I will rebuild the grading by hand.
+
+## Turn 158 (python)
+
+`grade_prompts` fails on a string index at its line 8. It probably expected the map keyed by prompt id, or a different container. I will make one cheap retry with the map as a dict keyed by `'prompt/i'`. At the same time I will look for the IF-item list that the `k` field indexes, which I need either way. If the retry fails, I will write the grader explicitly from the primitives.
+
+## Turn 159 (python)
+
+The dict map fails the same way, so the helper expects some other structure and I will stop guessing. The IF checkers are in `if_items` (24), and `math_items` and `mc_items` hold the other check sets. I will inspect one entry of each so I can write an explicit grader.
+
+## Turn 160 (python)
+
+Each IF item is a `(prompt, checker)` tuple whose checker is a kernel function, and math and MC items are `(prompt, answer)` tuples. Before writing the grader I need the call signatures of the helpers it will use (`after_think`, `last_boxed`, `norm_ans`, `filter_code`, `classify_answer`, `mech_counts`, `status_lab`, `my_run`, the checkers). A quick probe will show what they return.
+
+## Turn 161 (python)
+
+The helpers take simple arguments: `status_lab(r, qid)`, `classify_answer(r)`, `last_boxed`, and the checkers take the post-think answer. I will test `status_lab` and `classify_answer` on two HE records and two MBPP records, timing each, to see what labels they return before running them on all 384 code answers (192 per model).
+
+## Turn 162 (python)
+
+`classify_answer` looks the problem up by `r['id']`, so own-prompt records (`'prompt/i'`) have to be relabelled with their practice qid first. I will retry with a copy of each record whose `id` is the qid.
+
+## Turn 163 (python)
+
+These helpers only classify a status that is already in the record; they do not run tests. So the grading pipeline is: `filter_code` (to mimic the evaluation's dropping of example calls and asserts), then `run_tests(code, qid)`, then write `status`/`exc` into a relabelled copy of the record, then `classify_answer`. I will run this over all 192 code answers per model with a time guard and checkpoint results to `/work/grade12.json`, so a slow sandbox cannot lose progress.
+
+## Turn 164 (python)
+
+`filter_code` returned a non-string for one answer. The traceback also shows that `run_tests` itself AST-parses the code in the harness's `grade_code`, which suggests it applies the evaluation's filtering by itself. I will check this directly. If a passing reference with `assert False` appended at top level still passes, `run_tests` filters, and I should pass the raw extracted code as the harness does for graded problems. I will also see what `filter_code` returned.
+
+## Turn 165 (python)
+
+`run_tests` already applies the evaluation's filtering: the reference with a failing top-level assert and an undefined call appended still passes. `filter_code` returns `None` on code that does not parse. So I will grade the raw extracted code exactly as the harness does. I will discard the partial checkpoint and regrade from scratch.
+
+## Turn 166 (python)
+
+All 384 code answers are graded (43 s). Now the pass-12 summary per model:
+
+- **HE-style (160) and MBPP-B (32):** pass rate, paired flips, standard error of the paired difference, and failure categories (cut, no code, syntax, wrong interface with its kind, TypeError, NameError, other runtime, timeout, wrong answer).
+- **Checks:** math (last `\boxed{}` after `</think>`), IF (the stored checker on the post-think answer) and MC (last "The answer is (X)").
+
+What would change my decision: a clear drop of v3 on HE-style or on the checks, beyond about 1.5 SE.
+
+## Turn 167 (python)
+
+Pass 12 is a warning sign. On HE-style prompts v3 is at 44/160 against 54/160 for start (−6.2 points, SE 3.4; 20 p→f, 10 f→p). MBPP-B is +3 of 32. The checks show math 20→21, IF 23→21 and MC 15→15.
+
+Pooled over all HE-style passes, the effect is about −2.3 ± 2.3, so it could be drift. But it could also be my mechanism. At a kept name end, the push favours the about 60 `(param` tokens seen in MBPP answers (`(arr`, `(s`, `(n`…) over other `(` tokens, with a relative bias of up to about 0.8 nats. In HE-style answers the parameter names are given, so this could cause parameter renaming.
+
+I will test this directly. For every HE answer I will parse the prompt's signature and the answer's entry-point def, and classify each as same parameters, renamed parameters, or a different number. I will cross-tab this with pass/fail for both models.
+
+- If v3 renames parameters more often, especially in its p→f answers, the push is implicated and I can fix it.
+- If the signatures are identical and the failures are logic, the drop is drift.
+
+## Turn 168 (python)
+
+The parameter-renaming hypothesis is refuted. In HE-style answers, v3's entry-point signature equals the prompt's in 144/160 answers (start 145/160). Of the 20 p→f pairs, 17 have the identical signature and fail on wrong answers or NameErrors. So the HE drop is not caused by changed names or parameters at the def.
+
+Two possible systematic routes remain:
+
+1. **The ramp's off-target tail.** `silu(s) − silu(s−4)` is not exactly zero where the detector is silent. It slightly lowers all `(` tokens everywhere.
+2. **The removed original function of the repurposed neurons 2979 and 2055.**
+
+Both can be measured from saved teacher-forced activations without a pass:
+
+- Pass 9 (v2 edited, held-out texts) has `mlp_act` of layer 22 at both neurons, which gives the net push `a2979 − a2055` at every token.
+- Pass 3 (start model) has the neurons' original activations.
+
+First I will locate those files.
+
+## Turn 169 (python)
+
+Both data sets exist:
+
+- `fwd_3`: the start model, whose layer-22 MLP equals the original, on 220 texts, with `mlp_act` of layer 22.
+- `fwd_9`: v2 on 287 held-out texts. Its neurons 2979 and 2055 are exactly v3's, because v3's layer-22 MLP input does not depend on the other two neurons.
+
+With memory-mapping I will read only the two neuron columns and measure:
+
+1. **v3's net drive** `a2979 − a2055` at every token. I want the share of tokens where it fires and the mean tail where it does not, in units of the push (about 1 nat per unit on `(param` tokens).
+2. **The original activity** of 2979 and 2055, which the repurposing removed.
+
+If the tail is around −0.1 or larger in size, or the original neurons were clearly active, that would point to a systematic off-target effect worth fixing.
+
+## Turn 170 (python)
+
+The off-target analysis rules out a systematic tail effect:
+
+- **Net drive of v3** (`a2979 − a2055`, 275,611 held-out tokens): it fires (above 0.5) at 0.18% of tokens. Elsewhere its mean is −0.0026 units, which is about 0.003 nats on `(` tokens, and the 1st percentile is −0.066.
+- **Original neurons 2979 and 2055:** mean |a| is about 0.05 and the maximum about 0.3.
+
+So the edit is practically silent outside name ends, and nothing in the residual tail explains a drop in logic quality.
+
+One route needs checking: firing in the middle of helper names. The detector also scores helper-name ends high, and pass 9 saw 2 mid-name firings on helpers that extend an earlier name. In an HE-style answer, a helper such as `count_vowels_helper` could be cut to `count_vowels(`. That would redefine the entry point and give a NameError (the helper is called but never defined) or a wrong answer.
+
+I will run the HE p→f answers and all HE NameError and TypeError answers locally with `my_run` to get the error messages. I will also check whether v3's final code defines the entry point twice or calls undefined helper names. This is on-target for the run: NameErrors are one of the identifier failures I am meant to fix.
+
+## Turn 171 (python)
+
+No duplicate entry-point defs and no truncated helper names, so the helper route is refuted too. 15 of the 20 HE p→f answers have a single correct-signature def and fail on logic (wrong answer, an AttributeError or a TypeError).
+
+The remaining question is what the NameErrors (4 of the p→f) and the larger TypeError count of v3 (13 vs 8) consist of. NameErrors from a renamed parameter or a missing import are on-target for this run. TypeErrors from arity would implicate the edit. I will collect the exception messages with `my_run` for every HE NameError and TypeError of both models.
+
+## Turn 172 (python)
+
+The HE error messages show ordinary bugs and identifier slips in both models, and nothing tied to the edit.
+
+| | start | v3 |
+|---|---|---|
+| renamed-variable NameErrors | 4 (`base`, `value`, `key`, `max_counts`) | 2 (`current_max_`, `filtered_array`) |
+| missing-import NameErrors | 4 (`math` ×2, `re`, `floor`) | 3 (`Counter`, `re`, `List`) |
+
+v3 also has one keyword-argument rename (`count_ways(n_rows=…)`) and one 4→2 parameter drop (`are_Equal`). That drop happens at the closing parenthesis, where the end pair does not act. The other v3 TypeErrors are type bugs. So the HE deficit is mostly extra wrong answers with correct signatures (77 vs 68). Together with the negligible off-target tail, this points to sampling drift rather than a mechanism.
+
+Next I will finish the pass-12 bookkeeping. I will classify the MBPP-B wrong-interface failures by kind (extension or other rename, for the pooled extension count) and look at the IF items that changed (23→21). If v3's IF failures involve code-like text where the neuron could fire, that would matter; otherwise it is noise on 24 items.
+
+## Turn 173 (python)
+
+The pass-12 MBPP-B part is consistent with the mechanism. Start's two end-of-name extensions (`min_Num` → `min_Num_sum_even`, and one more) are gone in v3: v3 writes the correct `min_Num` and then fails on arity. Start's four no-def answers became one in v3 (two of them now pass).
+
+The pooled confirmation count of extensions (P7, P8, P11, P12; 512 MBPP-B answers per model) is now 16 → 6.
+
+Math changed by +1 for v3 (two start failures fixed, one of them a cut; one v3 cut). IF lost 3 and gained 1. Before I call that noise I want to see the three IF instructions that v3 failed and the start of its answers. Item 187's answer seems to be almost entirely non-ASCII. I need to know whether that is a language drift or the instruction asked for it.
+
+## Turn 174 (python)
+
+The IF differences are ordinary misses in prose: a missing keyword (190), one placeholder instead of two (198), and a degenerate two-emoji tweet (187). None of them involves a `def` line, the only place where the end-of-name neuron fires (pass 5 showed zero firing in prose). Item 187's emoji-only short answer looks like the no-answer or early-end family that the starting edit's layer-23 neurons and the other MLP run deal with, not my layer-22 pair. So I count IF 23→21 and math 20→21 as noise.
+
+Before deciding, I will record the pass-12 results in the notes so they survive a restart. I will also look for stored per-answer grades of passes 7, 8 and 11. My final report needs the confirmation-set table (wrong names, TypeError, NameError, other) pooled over all set-B passes, and I only have the summary numbers in my notes.
+
+## Turn 175 (python)
+
+Only pass 12 has stored per-answer grades, so I will regrade the code answers of passes 7, 8 and 11. That is about 900 `run_tests` calls, around 100 s at the speed seen above. First I need the formats of their maps (`p7_he_items.json`, `p8_map.json`, `p11_map.json`) and the record ids. If a map's format is unclear, I will match prompts to problems by their text instead.
+
+## Turn 176 (python)
+
+The formats are clear:
+
+- Pass 7: 160 harness-graded `mbpp/*` records plus 96 HE prompts mapped by `p7_he_items[i]`.
+- Pass 8: 256 prompts mapped by `p8_map`.
+- Pass 11: 96 APPS records plus 160 MBPP prompts mapped by `p11_map`.
+
+I will regrade every ungraded code answer with `run_tests` on the raw code and keep the harness grades of the problem records. Each answer is then classified with `classify_answer`, which separates name kinds (extension, other, no def) and arity TypeErrors. Everything is saved to `/work/grade_all.json`.
+
+## Turn 177 (python)
+
+The regrade reproduces every pass count in my notes. Now the pooled confirmation table, edited minus start, per category, with paired standard errors over the same items. I will show it separately for:
+
+- the v2 passes (7, 8), whose edit had the arity pair as well;
+- the v3 passes (11, 12), which use the final edit;
+- MBPP-style and HE-style prompts.
+
+This is the table for the final report. It also shows whether any failure category grows systematically under v3.
+
+## Turn 178 (python)
+
+Pooled over all set-B confirmation passes (512 MBPP-style answers per model), with paired standard errors:
+
+| category | start | edited | difference (points) |
+|---|---|---|---|
+| end-of-name extensions | 16 | 6 | −2.0 ± 0.8 |
+| NameErrors | 17 | 7 | −2.0 ± 0.9 |
+| no-def answers | 15 | 8 | −1.4 ± 0.9 |
+| arity TypeErrors | 53 | 43 | −2.0 ± 1.1 |
+| other renames | 28 | 36 | +1.6 ± 1.0 |
+| other runtime errors | 19 | 32 | +2.5 ± 1.3 |
+| wrong answers | 173 | 186 | +2.5 ± 2.5 |
+| pass | 135 | 141 | +1.2 ± 2.0 |
+
+- The arity drop comes entirely from the v2 passes (36→23), when the arity pair was in the edit. Under v3 it is 17→20, as designed.
+- The rises in other runtime errors and wrong answers fit with interface fixes exposing wrong logic.
+- HE-style (288 per model): pass 94→86 (−2.8 ± 2.6), driven by wrong answers. Cuts went 11→5 and timeouts 3→0.
+
+The NameError drop appears in both v2 and v3 (10→5 and 7→2), which I did not design for. One possible link to the mechanism: code that calls the function by the given name, recursively or from a helper, while its def carries an extended or variant name, or the reverse. If the undefined names are function names related to the given name, the end-of-name repair explains it. If they are ordinary variables or imports, it is chance. I will get the messages for all MBPP-style NameErrors of both models.
+
+## Turn 179 (python)
+
+Many of these NameErrors name the entry point itself: `min_length` (mbpp/528, in three separate start passes), `max_product` (mbpp/922) and `min_cost` (mbpp/1). Others name an extended variant of it, such as `listify_list_string`. The harness checks the entry point before running, so such code must contain a def with the given name that is not a module-level function when the test runs. Possible reasons are a nested def, a def inside a class or a `__main__` guard, or a call to the given name from a differently named def.
+
+mbpp/528 is striking: start fails with this NameError in P7, P11 and P12, while v3 or v2 passes twice and gets a wrong answer once. I will read the start and edited code for mbpp/528 (P12) and mbpp/922 (P11) to see the structure.
+
+## Turn 180 (python)
+
+This changes the accounting. The P11 start answer for mbpp/922 defines `max_product_pair`, an end-of-name extension of the given `max_product`, yet the harness graded it as a NameError and not as a wrong interface. The interface check may match the entry point as a substring or something similar. If so, some extension renames are hidden among the NameErrors, and some of the NameError drop (17→7) is the extension repair at work.
+
+I will find the rule with constructed code on mbpp/922: the reference renamed to `max_product_pair` (suffix), to `find_max_product` (prefix), and to `max_prod` (truncation). I will also re-show the right `mbpp/528` items, filtered by kind, since the earlier display picked the HE-style item.
+
+## Turn 181 (python)
+
+The harness flags all three plain renames of the reference as wrong interface, so its check is not a substring test. But the start answer for mbpp/528 defines `min_length_lists` (an extension of `min_length`) and is graded as a NameError on `min_length`. The model's code probably also mentions the given name somewhere, for example in an example call, so the harness accepts the interface, runs the tests, and the call fails. Either way, these are wrong-name failures that my classification counted as NameErrors.
+
+I will reclassify every NameError whose undefined name is the entry point as a wrong name. Its kind is set from the module-level defs: extension if a def starts with the given name, otherwise other or no def. Then I will recompute the pooled wrong-name table, so that the report counts extensions correctly for both models.
+
+## Turn 182 (python)
+
+A slip: `test_format` is the string `"function"`, and the entry point is in its own field (`mb[qid]['entry_point']`), as the earlier display code handled. I will rerun with that fix.
+
+## Turn 183 (python)
+
+The failed block stopped before it defined `table2` and `CAT3`, so I will define them again together with the reclassification. The hypothesis is the same.
+
+## Turn 184 (python)
+
+With entry-point NameErrors counted as wrong names, the targeted mechanism is clearly confirmed on held-out confirmation problems (512 MBPP-style answers per model):
+
+| | start | edited | difference (points) |
+|---|---|---|---|
+| end-of-name extensions | 20 | 7 | −2.5 ± 0.9 |
+| all wrong names | 69 | 54 | −2.9 ± 1.6 |
+| pass | 135 | 141 | +1.2 ± 2.0 |
+
+HE-style wrong names are unchanged (3 vs 3), as expected when the name is given in a signature. The HE pass rate (−2.8 ± 2.6) remains the one worry.
+
+One more route could affect HE logic without changing the final signature. The detector partly "reads intention", so inside the thinking it may cut planned helper names that extend the given name (`lcm_helper` written as `lcm(`). That would leave duplicate drafts of the main def and could confuse the reasoning. I can test this from the texts alone: over all set-B answers, count `def <given>(` and `def <given>_…(` occurrences in the whole text for both models. Fewer extension-helper defs and more duplicate given-name defs under the edit would support this route.
+
+## Turn 185 (python)
+
+This route is negligible for HE-style answers: extended-name defs occur 6 times in 5 answers for start and 3 times in 2 answers for the edit, out of 288. So it cannot explain an 8-pass deficit. In MBPP-style answers the edit cuts extended-name defs anywhere in the text from 95 occurrences in 33 answers to 20 in 8. That is the designed effect, visible in the thinking drafts that the final def copies.
+
+One category still rises in MBPP-style answers: other runtime errors, 19 → 32 (+2.5 ± 1.3). If the fix exposes buggy logic, the edited model's new runtime errors should mostly pair with start answers that failed on a wrong name or interface. If instead they pair with start passes or wrong answers spread over many exception types, something else is going on. I will cross-tab the new runtime errors against the start partner's category and exception type.
+
+## Turn 186 (python)
+
+The rise in other runtime errors is mostly not "fix exposes a bug". Of the 29 new ones, about 10 pair with start failures on names, arity or NameErrors. The rest swap with wrong answers in both directions (13 one way, 8 the other) and are spread over ordinary logic exceptions (IndexError 10, ValueError 8, …). That is trajectory variation; a 1.9-SE deviation in one of about 13 failure categories is within what multiple comparisons give by chance.
+
+So the evidence is complete:
+
+- **Mechanism confirmed** on held-out problems: extensions 20→7 (−2.5 ± 0.9 points); extended-name defs anywhere in the text 95→20.
+- **Pass rate:** no measurable effect (MBPP-style +1.2 ± 2.0, HE-style −2.8 ± 2.6). I found no mechanism for HE harm.
+
+With no passes left, the candidates are the tested configurations only. I choose v3 over v2 because v2's arity pair misfired at helper closes in stdio code and gave no pass gains.
+
+Now I will verify that `/work/edited` is exactly that:
+
+1. The nine starting tensors are byte-identical to `/start`.
+2. The three layer-22 tensors differ from the original only in rows or columns 2979 and 2055.
+3. Those rows match a fresh reconstruction from `/work/v2_parts.npy`, the clean parts; the pass-10 failure came from a corrupted global `b`.
+4. The edit is byte-identical to `/work/v3`.
+
+## Turn 187 (python)
+
+`/work/edited` is exactly v3:
+
+- The nine starting tensors are byte-identical to `/start`.
+- My changes are confined to layer 22: `gate_proj` and `up_proj` rows 2979 and 2055, and `down_proj` columns 2979 and 2055, with 2,048 entries each (6,144 weights).
+- The edit is identical to `/work/v3`.
+
+Two things remain for the report:
+
+1. Check that those rows equal the designed construction from the saved clean parts. The intended values are: gate `wE + cE·b` for 2979 and `wE + (cE−4)·b` for 2055; up `b` for both; down `+vE2` for 2979 and `−vE2` for 2055. I will also compute the rank of each change against the original.
+2. Recompute the TypeError and NameError rows with the right labels. Non-arity TypeErrors are labelled `typeerr_other` by `classify_answer`, so my last table dropped them.
+

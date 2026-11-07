@@ -152,4 +152,6 @@ pilot-18,6,6,104,2026-11-06 20:12:42,generate,both,159,1239.2,NVIDIA L4,True,Fal
 pilot-18,7,7,114,2026-11-06 20:38:07,generate,both,160,1419.4,NVIDIA L4,True,False
 pilot-18,8,8,123,2026-11-06 21:05:12,generate,both,256,1446.3,NVIDIA L4,True,False
 pilot-18,9,9,131,2026-11-06 21:32:13,teacher_forced,edited,287,77.1,NVIDIA L4,True,False
-pilot-18,10,,,2026-11-06 21:48:35,generate,both,96,,local,False,False
+pilot-18,10,10,139,2026-11-06 21:48:35,generate,both,96,11672.3,NVIDIA L4,True,False
+pilot-18,11,11,143,2026-11-07 01:04:41,generate,both,96,2296.6,NVIDIA L4,True,False
+pilot-18,12,12,147,2026-11-07 01:45:10,generate,both,256,1555.7,NVIDIA L4,True,False
