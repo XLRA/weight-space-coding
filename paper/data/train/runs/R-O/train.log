@@ -1,0 +1,18 @@
+2026-11-07 09:04:54 waiting for the 5090
+2026-11-07 09:04:54 stopping llama-swap to free the 5090
+2026-11-07 09:30:27 round 1: sampled problems 1-256 of 1418: 12475210 tokens in 1421s (8781 tok/s)
+2026-11-07 10:34:48 round 1: sampled problems 257-512 of 1418: 30846760 tokens in 3862s (7988 tok/s)
+2026-11-07 11:37:39 round 1: sampled problems 513-768 of 1418: 30429308 tokens in 3765s (8083 tok/s)
+2026-11-07 12:38:18 round 1: sampled problems 769-1024 of 1418: 29581073 tokens in 3628s (8154 tok/s)
+2026-11-07 13:42:56 round 1: sampled problems 1025-1280 of 1418: 31305334 tokens in 3878s (8073 tok/s)
+2026-11-07 14:19:09 round 1: sampled problems 1281-1418 of 1418: 17421544 tokens in 2169s (8031 tok/s)
+2026-11-07 14:19:16 round 1: pass rate 0.042, 199 of 1418 problems with a pass, 305 answers kept, cut 0.794, mean 13404 tokens
+2026-11-07 14:19:17 round 1: fine-tuning on 305 answers, 734751 tokens (stop token appended to 0)
+2026-11-07 14:20:19 round 1: step 1/20, nll 0.4349, grad norm 6.748, lr 2.00e-06, 74209 tokens in 61.5s
+2026-11-07 14:21:34 round 1: step 10/20, nll 0.3627, grad norm 2.320, lr 7.78e-06, 83353 tokens in 7.6s
+2026-11-07 14:22:38 round 1: step 20/20, nll 0.3296, grad norm 4.818, lr 9.61e-08, 8276 tokens in 0.7s
+2026-11-07 14:22:38 round 1: checkpoint saved
+CUDA Error: out of memory at /workspace/csrc/cumem_allocator.cpp:163
+(EngineCore pid=257) ERROR 11-07 14:22:39 [core.py:1750] RuntimeError: CUDA Error: out of memory at /workspace/csrc/cumem_allocator.cpp:163
+Exception: Call to wake_up method failed: CUDA Error: out of memory at /workspace/csrc/cumem_allocator.cpp:163
+2026-11-07 14:22:41 llama-swap started again

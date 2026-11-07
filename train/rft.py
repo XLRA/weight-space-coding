@@ -87,6 +87,9 @@ class Sampler:
     def hold(self, folder):
         """Awake, holding the weights of a submission folder (None: the original)."""
         if self.asleep:
+            if torch.cuda.is_initialized():
+                free, total = torch.cuda.mem_get_info()
+                log(f"waking vLLM: {free / 2**30:.1f} of {total / 2**30:.1f} GiB free")
             self.llm.wake_up()
             self.asleep = False
         if folder != self.held:
@@ -245,6 +248,9 @@ def finetune(by_id, kept, r):
                 loss = -lp.sum() / n_tok
                 loss.backward()
                 nll += float(loss)
+                # The graph behind lp and loss holds every trainable parameter and its gradient. Kept past the last
+                # step, it held about 5.8 GiB after the model was deleted, and vLLM could not wake up on the 5090.
+                del lp, loss
             gn = torch.nn.utils.clip_grad_norm_(params, args.grad_clip)
             opt.step()
             row = {"step": step, "of": len(batches), "epoch": (step - 1) * args.batch // len(seqs) + 1, "lr": lr,
@@ -263,9 +269,11 @@ def finetune(by_id, kept, r):
                "tensors": "all 24 blocks, bf16 values as fp32"}, open(f"{d}.tmp/manifest.json", "w"), indent=1)
     os.replace(d + ".tmp", d)
     log(f"round {r}: checkpoint saved")
+    opt.zero_grad(set_to_none=True)
     del model, opt, params
     gc.collect()
     torch.cuda.empty_cache()
+    log(f"round {r}: trainer freed, {torch.cuda.memory_reserved() / 2**30:.2f} GiB still reserved by PyTorch")
 
 
 def main():

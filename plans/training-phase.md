@@ -1,12 +1,15 @@
 # Training phase: plan (draft, 2026-11-07)
 
-**Status:** approved as recommended on 2026-11-07, about 05:00 UTC. Step 1 of the timeline started then. Training starts once round 5's final edit is chosen.
+**Status:** approved as recommended on 2026-11-07, about 05:00 UTC. Step 1 is done (results under **Infrastructure**). E was frozen at 16:30 UTC as `pilot-14`'s edit (below). R-O started at 09:05 UTC and R-E at 16:42 UTC.
 
 **Changes:** any change to this recipe after a trained arm's held-out evaluation must be listed under **Deviations** at the end, with its date and reason.
 
 **Names used below:**
 - **O:** the unedited Qwen3.5-0.8B.
 - **E:** the final weight-space edit: `pilot-19`'s if it holds up held out (no suite clearly worse than `pilot-14`, at least level overall), otherwise `pilot-14`'s.
+  - **Frozen 2026-11-07 as `pilot-14`'s edit** (`runs/pilot-14/submission`, the same files as `runs/start-r4/submission`).
+  - **Why:** paired against `pilot-14` (`scratch/paired.py pilot-19-pp15 pilot-14-pp15`), `pilot-19` was clearly worse on no suite. But over the five suites it was −0.74 points (SE 0.53), so it was not level overall. "At least level" is read as a difference of zero or more.
+  - **Per suite:** code +0.65 (0.97), MMLU-Pro −1.80 (1.39), IFEval −1.94 (1.65), LiveCodeBench +0.29 (0.70), MATH-500 −0.90 (0.96).
 - **ΔE:** E minus O. It is sparse: a few columns, rows and rank-1 terms in about a dozen tensors.
 
 ## Decisions for you
@@ -93,6 +96,7 @@
   - **How far training moved each edited row:** in norm, and relative to the rest of its tensor.
 - **Portability** (question 4): T = G-O + ΔE, with its panel first, then held-out.
 - **Paper data:** `collect.py` gains `trainings.csv` (config, reward and length per step, checkpoints, GPU hours), the arms' evaluations, and lineage edges for training.
+  - **Done 2026-11-07:** `trainings.csv` (one row per arm), `rft_rounds.csv`, `rft_steps.csv`, `grpo_steps.csv`, `checkpoints.csv` (every check, paired with the arm's start), the arms in `lineage.csv`, and the small records under `paper/data/train/`. The held-out evaluations of the arms land in `evals.csv` like the agent runs'.
 
 ## Infrastructure
 
@@ -102,12 +106,21 @@
    - **The training loop is our own** (`train/grpo.py`, decided 2026-11-07), not TRL's GRPO. It reuses what the harness has already proven on this model and these versions: vLLM with the harness's weight-swap extension, the HF model built like `gpu_server.py`'s, and the evaluation's grader. TRL stays installed for reference.
 2. **Log-probs in chunks:** the vocabulary has 248,320 entries. Full fp32 logits for a 16k-token answer would take 16 GB.
 3. **Agreement check before any run:** on 50 sampled answers, the trainer's log-probs must match vLLM's to a small tolerance. It's done once per image and recorded.
+   - **Done 2026-11-07 on the 5080** (`train/check_logprobs.py`, `train/checks/logprobs-5080.json`): over 50 answers (138,710 tokens), the mean absolute difference is 0.015, the 99th percentile 0.12 and the largest 0.31. The probability ratio is within 0.89–1.12 for 98% of tokens.
+   - **Kernels:** the 18 linear-attention layers run on flash-linear-attention's kernels.
+   - **Speed:** a forward and backward pass on the 5080 takes 0.5 s at 4k tokens, 1.1 s at 8k and 2.5 s at 16k, with a peak of 6.5 GB. The first input of 8k and 16k tokens compiles once, taking 7 s and 14 s; new lengths after that do not recompile.
 4. **Grading:** the evaluation's sandbox (unprivileged, 2 GB memory, time limits), run as a pool on the server's 16 cores.
    - **Which grader:** the practice grader the agent used, `harness/grade.py`, which the panel's code suite also uses. The older copy in `scripts/` lacks its 2026-11-06 fixes: one BLAS thread per solution (otherwise a dozen solutions importing numpy at once fail with ImportError), and null bytes and deeply nested code graded instead of raising.
 5. **Memory on the 5090:**
    - The trainable weights (the 24 blocks, 498M parameters) with fp32 master copies, gradients and AdamW state take about 10 GB.
    - vLLM's weights and cache get about 10 GB.
    - Activations at one sequence per micro-batch, with checkpointing, fit in the remaining 10 GB.
+6. **Weight push (GRPO) checked 2026-11-07** (`train/check_push.py`, `train/checks/push-5080.json`, passed). After each step, vLLM must hold the trainer's new weights. The check:
+   - **Change:** it scaled the 24 MLP down-projections by 0.7 in the trainer and ran one step's cycle (vLLM asleep, a forward and backward pass, vLLM awake, push). vLLM's log-probs moved by 0.46 on average, as much as the trainer's, and stayed within 0.02 of the trainer's.
+   - **Undo:** undoing the change brought vLLM back to within 0.003 of where it started.
+7. **The GPU memory between RFT rounds** (fixed 2026-11-07): R-O's first round ended in an out-of-memory error as vLLM woke up for round 2 on the 5090.
+   - **Cause:** the graph behind the last answer's loss kept every trainable parameter and its gradient alive after the trainer was deleted, about 5.8 GiB. vLLM needs 25.6 GiB to wake up at 0.85 of the 5090.
+   - **Fix:** `rft.py` frees the graph after each answer and logs the free memory before waking vLLM. R-O resumes at round 2 from its saved round-1 checkpoint. The recipe is unchanged.
 
 ## Data hygiene
 
@@ -130,6 +143,9 @@
 | Day 5 | 5. Held-out evaluations of G-E, G-O and T, about 2.5 h each. Then the analysis, and both repos. | about 8 h |
 
 - **Total:** about 80–110 GPU-hours on the 5090, so about 4 days with llama-swap stopped. Checkpoint panels and validation run on the 5080 throughout, at about 35 minutes per checkpoint.
+- **Measured on day 1:**
+  - **Checks:** start-O's check took 4.4 hours on the 5080, not 35 minutes. 76% of its validation answers ran to the 32k cap, and the 5080 generated 2,700 tokens a second. Checks of models that finish their answers should be much faster.
+  - **R-O:** round 1 took 5.3 hours on the 5090: 152M tokens sampled at about 8,100 tokens a second (79% of answers ran to the 16k cap), then 3 minutes of fine-tuning.
 
 ## Risks
 

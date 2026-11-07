@@ -15,6 +15,9 @@ G() { (cd /opt/wsp/harness && python3 -c "from gpus import GPUS; print(GPUS['$GP
 DEV=$(G device); LOCK=/opt/wsp/runs/$(G lock); SWAP=$(G llama_swap)
 LOG=/opt/wsp/train/runs/$ARM/train.log
 mkdir -p /opt/wsp/train/runs/$ARM
+# One line per launch (paper/collect.py reads the arm's start from it: inside the container it is always /start).
+printf '{"time": "%s", "gpu": "%s", "kind": "%s", "start": "%s", "args": "%s"}\n' "$(date -u '+%F %T')" "$GPU" \
+  "$KIND" "${START:-original}" "${REST[*]}" >> /opt/wsp/train/runs/$ARM/launches.jsonl
 MOUNT_START=(); ARG_START=()
 if [ -n "$START" ]; then MOUNT_START=(-v "$START:/start:ro"); ARG_START=(--start /start); fi
 

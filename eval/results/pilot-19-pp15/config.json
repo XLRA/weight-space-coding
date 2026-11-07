@@ -1,0 +1,33 @@
+{
+ "submission": "/opt/wsp/runs/pilot-19/submission",
+ "tensors": [
+  "model.language_model.layers.10.mlp.down_proj.weight.npy",
+  "model.language_model.layers.11.self_attn.q_proj.weight.npy",
+  "model.language_model.layers.13.mlp.down_proj.weight.npy",
+  "model.language_model.layers.14.mlp.down_proj.weight.npy",
+  "model.language_model.layers.15.self_attn.q_proj.weight.npy",
+  "model.language_model.layers.19.self_attn.q_proj.weight.npy",
+  "model.language_model.layers.22.mlp.down_proj.weight.npy",
+  "model.language_model.layers.22.mlp.gate_proj.weight.npy",
+  "model.language_model.layers.22.mlp.up_proj.weight.npy",
+  "model.language_model.layers.23.mlp.down_proj.weight.npy",
+  "model.language_model.layers.23.mlp.gate_proj.weight.npy",
+  "model.language_model.layers.23.mlp.up_proj.weight.npy",
+  "model.language_model.layers.23.self_attn.q_proj.weight.npy"
+ ],
+ "suites": {
+  "code": 4,
+  "mmlupro": 1,
+  "ifeval": 2,
+  "lcb": 4,
+  "math500": 4
+ },
+ "models": [
+  "original",
+  "edited"
+ ],
+ "limit_per_set": 0,
+ "presence_penalty": 1.5,
+ "gpu": "5090",
+ "original_from": "pilot-10-pp15"
+}

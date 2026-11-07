@@ -1,0 +1,45 @@
+{
+ "gpu": "5080",
+ "start": "/start",
+ "texts": 16,
+ "tokens": 12370,
+ "down_proj_tensors_scaled": 24,
+ "vllm_vs_trainer_before": {
+  "mean_abs": 0.02205,
+  "p99": 0.1513,
+  "max": 0.4043
+ },
+ "vllm_vs_trainer_after_change": {
+  "mean_abs": 0.02146,
+  "p99": 0.1418,
+  "max": 0.3658
+ },
+ "vllm_moved_by_the_change": {
+  "mean_abs": 0.46349,
+  "p99": 3.3162,
+  "max": 10.0374
+ },
+ "trainer_moved_by_the_change": {
+  "mean_abs": 0.46444,
+  "p99": 3.2879,
+  "max": 9.9777
+ },
+ "vllm_vs_trainer_after_undo": {
+  "mean_abs": 0.02185,
+  "p99": 0.1502,
+  "max": 0.4371
+ },
+ "vllm_after_undo_vs_before": {
+  "mean_abs": 0.00329,
+  "p99": 0.0897,
+  "max": 0.3326
+ },
+ "tolerance": 0.0541,
+ "tests": {
+  "agrees_after_the_change": true,
+  "the_change_reached_vllm": true,
+  "agrees_after_undoing_it": true,
+  "vllm_back_where_it_was": true
+ },
+ "pass": true
+}

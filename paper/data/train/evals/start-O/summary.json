@@ -1,0 +1,50 @@
+{
+ "name": "start-O",
+ "panel": {
+  "choice": {
+   "n": 250,
+   "pass": 43.6,
+   "cut": 33.2,
+   "mean_tokens": 14857
+  },
+  "math": {
+   "n": 250,
+   "pass": 8.8,
+   "cut": 92.8,
+   "mean_tokens": 30942
+  },
+  "instructions": {
+   "n": 250,
+   "pass": 46.0,
+   "cut": 50.0,
+   "mean_tokens": 17595
+  },
+  "code": {
+   "n": 250,
+   "pass": 8.4,
+   "cut": 18.8,
+   "mean_tokens": 7349
+  }
+ },
+ "val": {
+  "answers": 1008,
+  "pass": 5.16,
+  "by_source": {
+   "mbpp": 12.98,
+   "apps": 3.12
+  },
+  "problems_with_a_pass": 27,
+  "cut": 75.79,
+  "mean_tokens": 25314,
+  "status": {
+   "wrong_interface": 72,
+   "cut_at_max_tokens": 764,
+   "runtime_error": 53,
+   "wrong_answer": 56,
+   "syntax_error": 9,
+   "pass": 52,
+   "timeout": 2
+  }
+ },
+ "panel_mean": 26.7
+}

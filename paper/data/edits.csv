@@ -116,6 +116,19 @@ pilot-18,final,model.language_model.layers.23.mlp.down_proj.weight,1024x3584,5.2
 pilot-18,final,model.language_model.layers.23.mlp.gate_proj.weight,3584x1024,25.735435,0.711363,5.117218,4096,4,0.9169,1.0
 pilot-18,final,model.language_model.layers.23.mlp.up_proj.weight,3584x1024,0.565088,0.026596,0.043823,4096,4,0.3285,1.0
 pilot-18,final,model.language_model.layers.23.self_attn.q_proj.weight,4096x1024,10.513654,0.312995,0.058787,524288,1,1.0,1.0
+pilot-19,final,model.language_model.layers.10.mlp.down_proj.weight,1024x3584,2.484616,0.163009,0.377852,2048,1,1.0,1.0
+pilot-19,final,model.language_model.layers.11.self_attn.q_proj.weight,4096x1024,0.713312,0.024683,0.01816,196608,1,1.0,1.0
+pilot-19,final,model.language_model.layers.13.mlp.down_proj.weight,1024x3584,3.497751,0.227911,0.466836,3072,2,0.8584,1.0
+pilot-19,final,model.language_model.layers.14.mlp.down_proj.weight,1024x3584,1.193546,0.078822,0.224929,1024,1,1.0,1.0
+pilot-19,final,model.language_model.layers.15.self_attn.q_proj.weight,4096x1024,13.1773,0.410216,0.116415,458752,2,0.9982,1.0
+pilot-19,final,model.language_model.layers.19.self_attn.q_proj.weight,4096x1024,12.141128,0.380775,0.040429,1310720,1,1.0,1.0
+pilot-19,final,model.language_model.layers.22.mlp.down_proj.weight,1024x3584,1.199677,0.068474,0.57819,2048,2,0.9487,1.0
+pilot-19,final,model.language_model.layers.22.mlp.gate_proj.weight,3584x1024,2.838418,0.084685,0.264408,2048,2,0.9506,1.0
+pilot-19,final,model.language_model.layers.22.mlp.up_proj.weight,3584x1024,0.467955,0.024407,0.048975,2048,2,0.562,1.0
+pilot-19,final,model.language_model.layers.23.mlp.down_proj.weight,1024x3584,5.252832,0.319962,0.341421,4096,4,0.9225,1.0
+pilot-19,final,model.language_model.layers.23.mlp.gate_proj.weight,3584x1024,25.735435,0.711363,5.117218,4096,4,0.9169,1.0
+pilot-19,final,model.language_model.layers.23.mlp.up_proj.weight,3584x1024,0.565088,0.026596,0.043823,4096,4,0.3285,1.0
+pilot-19,final,model.language_model.layers.23.self_attn.q_proj.weight,4096x1024,10.513654,0.312995,0.058787,524288,1,1.0,1.0
 pilot-19,request 1,model.language_model.layers.10.mlp.down_proj.weight,1024x3584,2.484616,0.163009,0.377852,2048,1,1.0,1.0
 pilot-19,request 1,model.language_model.layers.13.mlp.down_proj.weight,1024x3584,3.497751,0.227911,0.466836,3072,2,0.8584,1.0
 pilot-19,request 1,model.language_model.layers.14.mlp.down_proj.weight,1024x3584,1.193546,0.078822,0.224929,1024,1,1.0,1.0
@@ -382,3 +395,29 @@ pilot-19,request 22,model.language_model.layers.23.mlp.down_proj.weight,1024x358
 pilot-19,request 22,model.language_model.layers.23.mlp.gate_proj.weight,3584x1024,25.735435,0.711363,5.117218,4096,4,0.9169,1.0
 pilot-19,request 22,model.language_model.layers.23.mlp.up_proj.weight,3584x1024,0.565088,0.026596,0.043823,4096,4,0.3285,1.0
 pilot-19,request 22,model.language_model.layers.23.self_attn.q_proj.weight,4096x1024,10.513654,0.312995,0.058787,524288,1,1.0,1.0
+pilot-19,request 23,model.language_model.layers.10.mlp.down_proj.weight,1024x3584,2.484616,0.163009,0.377852,2048,1,1.0,1.0
+pilot-19,request 23,model.language_model.layers.11.self_attn.q_proj.weight,4096x1024,0.713312,0.024683,0.01816,196608,1,1.0,1.0
+pilot-19,request 23,model.language_model.layers.13.mlp.down_proj.weight,1024x3584,3.497751,0.227911,0.466836,3072,2,0.8584,1.0
+pilot-19,request 23,model.language_model.layers.14.mlp.down_proj.weight,1024x3584,1.193546,0.078822,0.224929,1024,1,1.0,1.0
+pilot-19,request 23,model.language_model.layers.15.self_attn.q_proj.weight,4096x1024,13.1773,0.410216,0.116415,458752,2,0.9982,1.0
+pilot-19,request 23,model.language_model.layers.19.self_attn.q_proj.weight,4096x1024,12.141128,0.380775,0.040429,1310720,1,1.0,1.0
+pilot-19,request 23,model.language_model.layers.22.mlp.down_proj.weight,1024x3584,1.199677,0.068474,0.57819,2048,2,0.9487,1.0
+pilot-19,request 23,model.language_model.layers.22.mlp.gate_proj.weight,3584x1024,2.838418,0.084685,0.264408,2048,2,0.9506,1.0
+pilot-19,request 23,model.language_model.layers.22.mlp.up_proj.weight,3584x1024,0.467955,0.024407,0.048975,2048,2,0.562,1.0
+pilot-19,request 23,model.language_model.layers.23.mlp.down_proj.weight,1024x3584,5.252832,0.319962,0.341421,4096,4,0.9225,1.0
+pilot-19,request 23,model.language_model.layers.23.mlp.gate_proj.weight,3584x1024,25.735435,0.711363,5.117218,4096,4,0.9169,1.0
+pilot-19,request 23,model.language_model.layers.23.mlp.up_proj.weight,3584x1024,0.565088,0.026596,0.043823,4096,4,0.3285,1.0
+pilot-19,request 23,model.language_model.layers.23.self_attn.q_proj.weight,4096x1024,10.513654,0.312995,0.058787,524288,1,1.0,1.0
+pilot-19,request 24,model.language_model.layers.10.mlp.down_proj.weight,1024x3584,2.484616,0.163009,0.377852,2048,1,1.0,1.0
+pilot-19,request 24,model.language_model.layers.11.self_attn.q_proj.weight,4096x1024,0.713312,0.024683,0.01816,196608,1,1.0,1.0
+pilot-19,request 24,model.language_model.layers.13.mlp.down_proj.weight,1024x3584,3.497751,0.227911,0.466836,3072,2,0.8584,1.0
+pilot-19,request 24,model.language_model.layers.14.mlp.down_proj.weight,1024x3584,1.193546,0.078822,0.224929,1024,1,1.0,1.0
+pilot-19,request 24,model.language_model.layers.15.self_attn.q_proj.weight,4096x1024,13.1773,0.410216,0.116415,458752,2,0.9982,1.0
+pilot-19,request 24,model.language_model.layers.19.self_attn.q_proj.weight,4096x1024,12.141128,0.380775,0.040429,1310720,1,1.0,1.0
+pilot-19,request 24,model.language_model.layers.22.mlp.down_proj.weight,1024x3584,1.199677,0.068474,0.57819,2048,2,0.9487,1.0
+pilot-19,request 24,model.language_model.layers.22.mlp.gate_proj.weight,3584x1024,2.838418,0.084685,0.264408,2048,2,0.9506,1.0
+pilot-19,request 24,model.language_model.layers.22.mlp.up_proj.weight,3584x1024,0.467955,0.024407,0.048975,2048,2,0.562,1.0
+pilot-19,request 24,model.language_model.layers.23.mlp.down_proj.weight,1024x3584,5.252832,0.319962,0.341421,4096,4,0.9225,1.0
+pilot-19,request 24,model.language_model.layers.23.mlp.gate_proj.weight,3584x1024,25.735435,0.711363,5.117218,4096,4,0.9169,1.0
+pilot-19,request 24,model.language_model.layers.23.mlp.up_proj.weight,3584x1024,0.565088,0.026596,0.043823,4096,4,0.3285,1.0
+pilot-19,request 24,model.language_model.layers.23.self_attn.q_proj.weight,4096x1024,10.513654,0.312995,0.058787,524288,1,1.0,1.0

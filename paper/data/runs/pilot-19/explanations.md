@@ -502,3 +502,45 @@ The final edit is restored and verified. With 3 passes left, I'll use them for c
 
 The broad set is ready (256 prompts, 11 instruction types). (`answer_part` from before the kernel restart needs redefining, which I'll do when grading.) Launching the paired run: starting edit vs final edit.
 
+## Turn 125 (python)
+
+Grading the broad IF set per instruction type, paired (redefining the answer extractor first).
+
+## Turn 126 (python)
+
+Broad instruction following: **+3.9 (3.2)** overall, driven by repeat-the-request prompts (55.0% → 72.5%, +17.5 ± 10.7). The other ten types together are +1.4 (3.2); individual types swing both ways within their large errors (quotation −15 ± 15, no commas +20 ± 12). One unexpected number: empty answers fell from 13 (5% of answers) to 5 with the final edit. Empty finals are exactly the stopper's target. If they come from re-close cycles, the copy change may reduce them indirectly, since an answer that copies the prompt instead of the thinking's drafts looks less like a loop to the repetition detectors. I'll check how those empty answers arise in each model.
+
+## Turn 127 (python)
+
+This links the candidates: with the final edit, prose answers re-close far less often (2+ closes: 34 → 19 of 256), empty finals after a re-close fall 6 → 2, and turns ending inside the thinking fall 7 → 3. That matches the expected mechanism: the copy change makes answers reproduce the prompt rather than the thinking's drafts, so the answer looks less like a verbatim loop to the repetition detectors whose `</think>` push starts re-close cycles. Before relying on this, I'll check it in my other prose passes (13: short requests; 14: long repeat requests), which need no new forward pass.
+
+## Turn 128 (python)
+
+Across all three prose passes the picture is mixed: answers with 2+ closes 115 → 97 of 768, but the drop comes almost entirely from pass 22 (passes 13 and 14 are flat). Empty or unclosed answers fell 18 → 7, about 2σ, yet the panel's instruction suite showed no such drop (no answer 3 vs 2 of 250). I'll report it only as suggestive. I'll use the second-to-last pass to replicate the broad instruction-following result on a fresh request family (emails, announcements, speeches and reviews with specific names, numbers and places), with the same instruction types plus all-capitals. This firms up the final edit's IF effect beyond the repeat prompts and tests whether the drop in empty answers recurs.
+
+## Turn 129 (forward)
+
+Launching the second broad instruction-following test (starting edit vs final edit) on the 256 new prompts.
+
+## Turn 130 (python)
+
+Grading pass 23 per instruction type, then pooling with pass 22 (512 broad-IF pairs), and recounting empty answers and re-closes.
+
+## Turn 131 (python)
+
+The second broad set replicates the first: overall **+4.3 (3.0)**, repeat prompts +18.8 (9.7), other types +1.0 (2.9). Pooled over both broad sets (512 pairs): **all instructions +4.1 (2.2)**, repeat-the-request +18.2 (7.1), and the other eleven types +1.2 (2.2), so no type shows a cost. The drop in re-closes did not replicate (6 vs 10 here), so I'll treat the earlier difference as noise. Empty or unclosed answers keep falling (10 → 5 here; 28 → 12 over four prose passes), which is suggestive only.
+
+I'll spend the last pass on the core benchmark: one more fresh code set for the final edit (MBPP-style prompts with another rewording of the test instruction, and HumanEval-style prompts whose doctest shows a test not used before), bringing the fresh code evidence to 1,024 pairs.
+
+## Turn 132 (forward)
+
+Launching the last forward pass: paired code confirmation (starting edit vs final edit) on 256 fresh items.
+
+## Turn 133 (python)
+
+All 24 passes are used. I'll grade pass 24 and, since the kernel restart erased my earlier grading variables, regrade the other fresh code passes (11, 15, 17) from their files with the same extraction, so the pooled final-edit code estimate over all four fresh sets (1,024 pairs) comes from one consistent grader.
+
+## Turn 134 (python)
+
+The last fresh code set lands within noise too (MBPP-style −6.2 ± 4.1, HumanEval-style +1.6 ± 3.7). Pooled over all four fresh sets, 1,024 pairs graded consistently, the final edit's code effect is **+0.2 (1.4)**: MBPP-style −0.4 (2.1), HumanEval-style +0.8 (2.0). Extension renames in final code fell 27 → 9 and correct names rose 417 → 438; cuts 14 vs 18. To finish, I'll verify that /work/edited holds exactly the final edit, count the changed weights relative to /start per tensor, and write the final summary to the notes.
+

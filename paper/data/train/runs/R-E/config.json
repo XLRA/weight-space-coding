@@ -1,0 +1,27 @@
+{
+ "arm": "R-E",
+ "start": "/start",
+ "data": "/train/data/train.jsonl",
+ "problems": null,
+ "rounds": 2,
+ "samples": 8,
+ "keep": 2,
+ "max_new": 16384,
+ "chunk": 256,
+ "epochs": 2,
+ "batch": 32,
+ "lr": 1e-05,
+ "warmup": 5,
+ "grad_clip": 1.0,
+ "seed": 1,
+ "gpu_memory": 0.85,
+ "sampling": {
+  "temperature": 0.6,
+  "top_p": 0.95,
+  "top_k": 20,
+  "min_p": 0.0,
+  "presence_penalty": 1.5
+ },
+ "torch": "2.13.0+cu130",
+ "started": "2026-11-07 16:42:43"
+}

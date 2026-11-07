@@ -1,0 +1,27 @@
+{
+ "round": 1,
+ "sampled_from": "start",
+ "problems": 1418,
+ "answers": 11344,
+ "pass_rate": 0.04222496473906911,
+ "problems_with_a_pass": 199,
+ "kept_answers": 305,
+ "cut_share": 0.7942524682651622,
+ "status": {
+  "wrong_interface": 718,
+  "wrong_answer": 670,
+  "cut_at_max_tokens": 9010,
+  "pass": 479,
+  "runtime_error": 404,
+  "syntax_error": 52,
+  "timeout": 8,
+  "no_code": 3
+ },
+ "pass_rate_by_source": {
+  "mbpp": 0.11926605504587157,
+  "apps": 0.028229166666666666
+ },
+ "mean_tokens": 13404.374911847674,
+ "mean_tokens_kept": 2409.0196721311477,
+ "loop_share": 0.7788258110014105
+}
