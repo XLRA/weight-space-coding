@@ -155,14 +155,14 @@ For comparison, the paper's 50-pass math edit gained +5.2 (MMLU-Pro), +41.3 (IFE
 
 Held out, paired against `pilot-14` (SE in brackets):
 
-| Suite | `pilot-16` | `pilot-17` |
-|---|---|---|
-| MBPP+ and HumanEval+ | −0.97 (0.77) | −0.78 (0.91) |
-| HumanEval+ only | −0.15 (1.38) | +0.46 (1.54) |
-| MMLU-Pro | **−4.60 (1.30)** | −1.00 (1.36) |
-| IFEval | +2.03 (1.43) | +2.77 (1.64) |
-| LiveCodeBench | −0.57 (0.78) | +0.43 (0.74) |
-| MATH-500 | −0.85 (0.91) | −0.90 (0.95) |
+| Suite | `pilot-16` | `pilot-17` | `pilot-18` |
+|---|---|---|---|
+| MBPP+ and HumanEval+ | −0.97 (0.77) | −0.78 (0.91) | −0.55 (0.94) |
+| HumanEval+ only | −0.15 (1.38) | +0.46 (1.54) | +2.13 (1.85) |
+| MMLU-Pro | **−4.60 (1.30)** | −1.00 (1.36) | −2.10 (1.35) |
+| IFEval | +2.03 (1.43) | +2.77 (1.64) | +1.02 (1.62) |
+| LiveCodeBench | −0.57 (0.78) | +0.43 (0.74) | 0.00 (0.67) |
+| MATH-500 | −0.85 (0.91) | −0.90 (0.95) | −1.45 (0.98) |
 
 - **`pilot-16`: turns that end with no answer** (MLP tensors only, 20 passes).
   - **The edit:** one row of layer 23's `gate_proj` (1,024 weights). `pilot-14`'s cycle stopper now fires at a segment boundary instead of right after a `</think>`.
@@ -171,10 +171,11 @@ Held out, paired against `pilot-14` (SE in brackets):
 - **`pilot-17`: copying text from the prompt under the presence penalty** (attention tensors only, 20 passes).
   - **The edit:** three rank-1 terms in `q_proj`, layer 15 head 7 and layer 11 head 1.
   - **Held out:** IFEval +2.8; every other suite within about a point.
-- **`pilot-18`: function interfaces and identifiers in code answers** (12 passes, on a cloud L4; held-out evaluation in progress).
+- **`pilot-18`: function interfaces and identifiers in code answers** (12 passes, on a cloud L4).
   - **The edit:** two near-dead neurons of layer 22's MLP (6,144 weights) made into a capped pair. It fires on the last token of the prompt's function name in a `def` line and pushes toward `(`, so the first `def` no longer runs past the given name (`min_Num` → `min_Num_sum_even`).
   - **On its own practice problems,** paired against `pilot-14` on problems not used for choices: the targeted renames fell from 20 to 7 of 512 answers. Pass rates moved +1.2 (2.0) on MBPP-style and −2.8 (2.6) on HumanEval-style prompts, both within noise.
-- **Neither of the first two edits lifted its target by much beyond noise held out, and one broke a suite the agent never measured.** That led to the panel.
+  - **Held out:** no code gain, −0.55 (0.94). The practice numbers' signs flipped (MBPP+ −1.7, HumanEval+ +2.1), and every suite stayed within two standard errors.
+- **None of the three edits lifted its target by much beyond noise held out, and one broke a suite the agent never measured.** That led to the panel.
 
 ### The panel
 
@@ -201,11 +202,18 @@ From round 5 on, the agent can ask for a **panel pass**: 1,000 fixed questions t
 - **Candidates in its working directory:** the changes of `pilot-16`, `pilot-17` and `pilot-18`, each on its own and summed. The three touch disjoint tensors (layer 23's MLP, attention in layers 11 and 15, layer 22's MLP), so the sum keeps each change unaltered.
 - **What its brief gives:** the held-out results of `pilot-16` and `pilot-17`, `pilot-18`'s own practice numbers, and the panel's two noise checks.
 - **The goal:** one edit that does best on the five held-out suites together, with none clearly worse than `pilot-14`. It keeps or narrows changes, and adds no new mechanisms.
+- **It is the last pilot.** The rule set before round 5 was one more code pilot only if `pilot-18` gained more than about 2 points of code beyond two standard errors, and it did not.
+
+### Next: the training phase
+
+The final edit (E) and the original model (O) will be trained on the same practice problems, with rejection-sampling fine-tuning (RFT) and with GRPO on test pass/fail, under one fixed recipe. The questions are whether training improves coding beyond what the edits did, whether starting from E helps training, and whether the edits survive it. The plan, with its recipe, checkpoint rule and data hygiene, is [`plans/training-phase.md`](plans/training-phase.md). The training code is in `train/`.
 
 ## What we've learned so far
 
 - **Weight-space programming carries over to code.** A 10-pass edit chosen only on code problems roughly doubled the held-out code pass rate at presence penalty 0, and transferred to math and instruction following.
-- **Most of the early gain is loop control,** as in the paper: the unedited 0.8B model loops in its thinking on most hard prompts.
+- **Most of the gain is loop control,** as in the paper: the unedited 0.8B model loops in its thinking on most hard prompts.
+  - **The cut rates show it.** At presence penalty 1.5 the unedited model hits the 32,768-token limit on 19% of code answers, 33% of MMLU-Pro, 73% of IFEval, 94% of MATH-500 and 98% of LiveCodeBench answers. `pilot-14`'s edit cuts 0.3–4.5%.
+  - **Where finishing is not the obstacle, there is no gain.** HumanEval+ moved +0.6 (1.7), and LiveCodeBench's medium and hard problems not at all. The edits unlock what the model can already do; they do not yet show it learning to code better.
 - **Targeted edits are small and interpretable.** They are a few neurons or rank-1 gates, each with a mechanism the agent can state, and they compose when they touch disjoint tensors.
 - **The agent's own checks overstate held-out gains on suites they don't resemble.** IFEval, for example, rose +18 on its own prompts but +2.9 held out.
 - **Later rounds trade between suites rather than lifting all of them.**
@@ -222,11 +230,13 @@ From round 5 on, the agent can ask for a **panel pass**: 1,000 fixed questions t
 | `baseline/` | Baseline results and the rendered evaluation prompt |
 | `runs/<run>/` | Each run's brief, config, final report, the agent's explanations, its log and its submitted-edit manifest |
 | `paper/` | `collect.py` and `data/`: per-run, per-pass, per-evaluation, per-panel-pass and per-tensor tables, the panel's question list, plus the full agent transcripts, for a write-up |
+| `plans/` | The training phase's plan |
+| `train/` | The training phase: its image, the practice split and overlap check, the GRPO and RFT trainers, the pre-training checks and the checkpoint checks |
 | `scratch/` | One-off analysis scripts |
 
-Model weights, datasets and edit tensors are not included. The data sources are MBPP, APPS, EvalPlus (MBPP+ and HumanEval+), MMLU-Pro, IFEval, LiveCodeBench, MATH and MATH-500, and `argilla/ifeval-like-data`, all public.
+Model weights, datasets and edit tensors are not included. `train/prepare_data.py` rebuilds the training and validation split from the public datasets. The data sources are MBPP, APPS, EvalPlus (MBPP+ and HumanEval+), MMLU-Pro, IFEval, LiveCodeBench, MATH and MATH-500, and `argilla/ifeval-like-data`, all public.
 
-**Software:** vLLM 0.32.0, transformers 5.19.0 and torch 2.13.0 (CUDA 13.0), Python 3.12. GPUs: RTX 5090, RTX 5080, and a cloud L4 for `pilot-18`.
+**Software:** vLLM 0.32.0, transformers 5.19.0 and torch 2.13.0 (CUDA 13.0), Python 3.12. GPUs: RTX 5090, RTX 5080, and a cloud L4 for `pilot-18` (Google Colab). The cloud GPU was then dropped as too slow: `pilot-18` took 8.5 hours for 12 passes, against 2.75 to 4.6 hours for 20 passes on the local cards.
 
 ## Citation
 

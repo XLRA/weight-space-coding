@@ -9,7 +9,8 @@ Writes:
                   GPU seconds, GPU, whether it ran, and whether the edit at that moment was snapshotted;
 - passes.jsonl    the same, with the request (minus its texts) and the summary the agent got back, in full;
 - evals.csv       one row per held-out evaluation, suite and subset: original and edited score, paired difference
-                  and its standard error, number of problems;
+                  and its standard error, number of problems, flips, and each model's share of answers cut at the
+                  token limit or loop-flagged and its mean length;
 - lineage.csv     run -> the edit it started from, so the chain of edits can be drawn;
 - edits.csv       the anatomy of each run's final edit and of every per-pass snapshot: per tensor, the change
                   against the original weights (Frobenius norm, relative norm, largest entry, entries changed), its
@@ -207,12 +208,19 @@ def eval_rows():
         for suite, subsets in (rep.get("paired") or {}).items():
             for sub, p in subsets.items():
                 mo = (rep.get("models") or {}).get(suite, {})
-                key, orig = metric((mo.get("original") or {}).get(sub))
-                _, edit = metric((mo.get("edited") or {}).get(sub))
+                bo, be = (mo.get("original") or {}).get(sub) or {}, (mo.get("edited") or {}).get(sub) or {}
+                key, orig = metric(bo)
+                _, edit = metric(be)
                 out.append({"eval": name, "run": run, "presence_penalty": cfg.get("presence_penalty", ""),
                             "suite": suite, "subset": sub, "metric": key, "original": orig, "edited": edit,
                             "diff": p.get("diff", ""), "se": p.get("se", ""), "problems": p.get("problems", ""),
-                            "fail_to_pass": p.get("fail_to_pass", ""), "pass_to_fail": p.get("pass_to_fail", "")})
+                            "fail_to_pass": p.get("fail_to_pass", ""), "pass_to_fail": p.get("pass_to_fail", ""),
+                            # How often each model hit the 32,768-token limit or was loop-flagged (% of answers), and
+                            # its mean answer length: most of the edits' gain is answers that now finish.
+                            "original_cut": bo.get("cut", ""), "edited_cut": be.get("cut", ""),
+                            "original_loop": bo.get("loop", ""), "edited_loop": be.get("loop", ""),
+                            "original_mean_tokens": bo.get("mean_tokens", ""),
+                            "edited_mean_tokens": be.get("mean_tokens", "")})
     return out
 
 

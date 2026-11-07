@@ -3,6 +3,11 @@
 /*
 !/.gitignore
 !/README.md
+!/plans/
+!/train/
+/train/runs/
+/train/evals/
+/train/checks/*.log
 
 !/harness/
 __pycache__/

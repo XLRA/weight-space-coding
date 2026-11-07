@@ -20,14 +20,21 @@ Below the runs:
 - evaluations running now or finished in the last day (eval/results/<name>, not smoke or e2e tests): GPU, how long,
   which suite, how many answers, the speed and about how long the suite has left (from eval/<name>.out), or when
   done the edited model's overall score per suite;
-- both GPUs (temperature, power, use, memory, the jobs running on each now, llama-swap);
+- the training phase's jobs (train/, plans/training-phase.md) running, grading, waiting for their GPU's lock, or
+  finished in the last day: GRPO runs (step, pass rate, groups kept, answer length, time per step and left,
+  checkpoints), RFT runs (the round's sampling or fine-tuning, and each finished round's pass rate), the log-prob
+  agreement check (its agreement, timing and kernels), and checkpoint checks (stage, then the panel mean and validation
+  pass rate, paired with the arm's start);
+- both GPUs (temperature, power, use, memory, the jobs running on each now and how many wait for it, llama-swap);
 - the temperature logger's warnings (gpu_temps.py).
 
 --watch redraws every SECONDS in place, on the terminal's alternate screen, fitted to the window (the
-explanation is shortened first when the window is small). Ctrl-C stops watching; the runs go on.
+explanation is shortened first when the window is small, then the runs' last lines, so the GPUs stay in view).
+Ctrl-C stops watching; the runs go on.
 With one run it shows more of the explanation and the last lines of driver.log.
 """
 import calendar
+import glob
 import json
 import os
 import re
@@ -877,8 +884,280 @@ def run_block(name, now, width, expl_lines, detail, evs):
     return out
 
 
-def gpu_block():
+# --- the training phase (train/, plans/training-phase.md) ---
+
+TRAIN = "/opt/wsp/train"
+TRAIN_KINDS = {"grpo": "GRPO", "rft": "RFT", "check": "", "ckpt": "check"}
+STAMPED = re.compile(r"\d{4}-\d\d-\d\d \d\d:\d\d:\d\d ")
+
+
+def tail_text(path, nbytes=1 << 16):
+    try:
+        with open(path, "rb") as f:
+            f.seek(0, 2)
+            f.seek(max(f.tell() - nbytes, 0))
+            return f.read().decode("utf-8", "replace").splitlines()
+    except OSError:
+        return []
+
+
+def failure(lines):
+    """The last exception line of a log, or its last line."""
+    for l in reversed(lines):
+        if re.match(r"[\w.]*(Error|Exception)\b", l.strip()):
+            return l.strip()
+    return next((l.strip() for l in reversed(lines) if l.strip()), "no log")
+
+
+def gpu_in_log(path):
+    """The GPU a launcher waited for, from the first lines of its log."""
+    try:
+        with open(path, "rb") as f:
+            head = f.read(4096).decode("utf-8", "replace").splitlines()
+    except OSError:
+        return "?"
+    return next((m.group(1) for l in head if (m := re.search(r"waiting for the (\S+)$", l))), "?")
+
+
+def json_or(path, default=None):
+    try:
+        return json.load(open(path))
+    except (OSError, ValueError):
+        return default
+
+
+def arg(args, flag, default):
+    m = re.search(rf"{flag} (\S+)", args)
+    return m.group(1) if m else default
+
+
+def train_processes():
+    """The training phase's launchers alive now: [{"pid", "kind", "gpu", "name", "args"}]."""
+    out = []
+    pat = r"/opt/wsp/train/(run-train|run-grpo|run-ckpt)[.]sh|flock .* --name wsp-train-check-"
+    for line in sh("pgrep", "-af", pat).splitlines():
+        if m := re.match(r"(\d+) bash /opt/wsp/train/run-train\.sh (\S+) (grpo|rft) (\S+)(.*)", line):
+            out.append({"pid": m[1], "kind": m[3], "gpu": m[2], "name": m[4], "args": m[5]})
+        elif m := re.match(r"(\d+) bash /opt/wsp/train/run-grpo\.sh (\S+) (\S+)(.*)", line):
+            out.append({"pid": m[1], "kind": "grpo", "gpu": m[2], "name": m[3], "args": m[4]})
+        elif m := re.match(r"(\d+) flock \S+ docker run --rm --name wsp-train-check-(push-)?(\S+)", line):
+            out.append({"pid": m[1], "kind": "check", "gpu": m[3], "name": f"{'push' if m[2] else 'log-probs'}-{m[3]}",
+                        "args": ""})
+        elif m := re.match(r"(\d+) bash /opt/wsp/train/run-ckpt\.sh (\S+) (\S+) \S+ ?(\S*)", line):
+            out.append({"pid": m[1], "kind": "ckpt", "gpu": m[2], "name": m[3], "args": m[4]})
+    return out
+
+
+def ckpt_stage(name):
+    """The last stage run-ckpt.sh logged for a check: waiting, grading the panel, grading the validation answers."""
+    for l in reversed(tail_text(f"{TRAIN}/evals/{name}/log")):
+        for key in ("grading the validation answers", "grading the panel", "waiting for the"):
+            if STAMPED.match(l) and key in l:
+                return "waiting" if key == "waiting for the" else key
+    return "waiting"
+
+
+def grpo_detail(name, args, j, now):
+    d = f"{TRAIN}/runs/{name}"
+    total = json_or(f"{d}/config.json", {}).get("steps") or int(arg(args, "--steps", 150))
+    rows = tail_jsonl(f"{d}/steps.jsonl")
+    if j["state"] == "failed":
+        return red(clip(failure(tail_text(f"{d}/train.log")), 70)) + (dim(f" · after step {rows[-1]['step']}") if rows else "")
+    if not rows:
+        cfg = json_or(f"{d}/config.json", {})
+        shape = (f"{total} steps · {cfg.get('prompts') or arg(args, '--prompts', 64)} problems × "
+                 f"{cfg.get('group') or arg(args, '--group', 8)} answers, at most "
+                 f"{int(cfg.get('max_new') or arg(args, '--max-new', 16384)):,} tokens")
+        return shape + (dim(" · loading vLLM and the trainer, then step 1") if j["state"] == "running" else "")
+    r, last = rows[-1], rows[-5:]
+    per = sum(x["seconds"]["total"] for x in last) / len(last)
+    n_ck = len([x for x in os.listdir(f"{d}/checkpoints")]) if os.path.isdir(f"{d}/checkpoints") else 0
+    s = (f"{bar(r['step'], total, 10)} step {r['step']}/{total} · pass {100 * r['pass_rate']:.0f}% · "
+         f"kept {r['groups_kept']}/{r['problems']} groups · {r['mean_tokens']:,.0f} tok/answer · {secs(per)}/step")
+    if j["state"] == "running" and r["step"] < total:
+        s += f" · ≈ {minutes((total - r['step']) * per)} left"
+    if j["state"] == "done":
+        s += f" · pass {100 * rows[0]['pass_rate']:.0f}% → {100 * r['pass_rate']:.0f}%" if len(rows) > 1 else ""
+    return s + (f" · {n_ck} checkpoint{'s' if n_ck != 1 else ''}" if n_ck else "")
+
+
+def rft_detail(name, args, j, now):
+    d = f"{TRAIN}/runs/{name}"
+    cfg = json_or(f"{d}/config.json", {})
+    rounds = cfg.get("rounds") or int(arg(args, "--rounds", 2))
+    done = [s for r in range(1, rounds + 1) if (s := json_or(f"{d}/round_{r}/summary.json"))]
+    parts = [f"round {s['round']}: pass {100 * s['pass_rate']:.0f}%, {s['kept_answers']:,} kept" for s in done]
+    lines = tail_text(f"{d}/train.log")
+    if j["state"] == "failed":
+        return red(clip(failure(lines), 70))
+    if j["state"] == "waiting":
+        n = cfg.get("problems") or arg(args, "--problems", "all")
+        return f"{rounds} rounds · {n} problems × {cfg.get('samples') or arg(args, '--samples', 8)} answers"
+    events = [l[20:] for l in lines if STAMPED.match(l) and re.match(r"round \d+: ", l[20:])]
+    now_s = events[-1] if events and j["state"] == "running" else ("loading vLLM" if j["state"] == "running" else "")
+    return " · ".join(([now_s] if now_s else []) + parts) or f"{rounds} rounds"
+
+
+def push_detail(gpu, j):
+    if j["state"] == "waiting":
+        return "does vLLM get the trainer's weights each step? a large change taken through a step"
+    if j["state"] == "running":
+        return "taking a large change through a training step's sleep, wake and push"
+    out = json_or(f"{TRAIN}/checks/push-{gpu}.json")
+    if j["state"] == "failed" or not out:
+        return red(clip(failure(tail_text(f"{TRAIN}/checks/push-{gpu}.log")), 70))
+    s = (f"vLLM vs trainer {out['vllm_vs_trainer_before']['mean_abs']:.4f} before, "
+         f"{out['vllm_vs_trainer_after_change']['mean_abs']:.4f} after a change that moved vLLM by "
+         f"{out['vllm_moved_by_the_change']['mean_abs']:.3f}, {out['vllm_vs_trainer_after_undo']['mean_abs']:.4f} undone")
+    return ("push works · " if out["pass"] else red("push FAILED · ")) + s
+
+
+def check_detail(name, args, j, now):
+    gpu = name.rsplit("-", 1)[-1]
+    if name.startswith("push-"):
+        return push_detail(gpu, j)
+    if j["state"] == "waiting":
+        return "trainer vs vLLM log-probs on 50 answers, and fwd+bwd timing"
+    if j["state"] == "running":
+        return "sampling 50 answers, then scoring them with the trainer"
+    out = json_or(f"{TRAIN}/checks/logprobs-{gpu}.json")
+    if j["state"] == "failed" or not out:
+        return red(clip(failure(tail_text(f"{TRAIN}/checks/logprobs-{gpu}.log")), 70))
+    a, fb = out["agreement"], out["fwd_bwd"]
+    if "kernels" in out:  # recorded from transformers' decorator: fla, or the slow reference path
+        fast = out["kernels"].get("torch_chunk_gated_delta_rule", "").startswith("fla.")
+    else:
+        fast = not any("gated_delta" in w for w in out["linear_attention_fallback_warnings"])
+    kernels = "delta rule on fla" if fast else red("delta rule on the slow reference path")
+    times = ", ".join(f"{int(n) // 1024}k {v['seconds']} s" for n, v in sorted(fb.items(), key=lambda x: int(x[0])))
+    peak = max(v["peak_gb"] for v in fb.values())
+    recompiles = any(v.get("new_length_seconds", 0) > 3 * v["seconds"] + 0.5 for v in fb.values())
+    return (f"mean |Δ| {a['mean_abs']:.4f} · p99 {a['abs_p50_p90_p99_p999'][2]:.3f} · over 0.1: "
+            f"{100 * a['share_abs_over_0.1']:.1f}% · fwd+bwd {times}, peak {peak} GB · {kernels}"
+            + (yellow(" · recompiles for each new length") if recompiles else ""))
+
+
+def ckpt_detail(name, args, j, now):
+    d = f"{TRAIN}/evals/{name}"
+    base = args or json_or(f"{d}/summary.json", {}).get("vs_base", {}).get("base")
+    if j["state"] == "waiting":
+        return "panel 1,000 + validation 252 × 4" + (dim(f" · paired with {base}") if base else "")
+    if j["state"] == "running":
+        return "generating 2,008 answers (the panel, then the validation problems)"
+    if j["state"] == "grading":
+        return j["stage"]
+    s = json_or(f"{d}/summary.json")
+    if j["state"] == "failed" or not s:
+        return red(clip(failure(tail_text(f"{d}/log")), 70))
+    out = f"panel mean {s['panel_mean']:.1f}% · validation {s['val']['pass']:.1f}%"
+    if v := s.get("vs_base"):
+        pm, vv = v["panel_mean"], v["val"]
+        out += (f" · against {v['base']}: panel {pm['diff']:+.1f} (SE {pm['se']:.1f}), "
+                f"validation {vv['diff']:+.1f} (SE {vv['se']:.1f})")
+    return out
+
+
+TRAIN_DETAIL = {"grpo": grpo_detail, "rft": rft_detail, "check": check_detail, "ckpt": ckpt_detail}
+
+
+def train_jobs(now, keep=24 * 3600):
+    """The training phase's jobs: running, grading, or waiting for their GPU's lock, then those finished in the last
+    day, newest first. [{"name", "kind", "gpu", "state", "t", "detail"}]; state is running, grading, waiting, done or
+    failed, and t is when it started (live) or ended (finished)."""
+    procs = train_processes()
+    boxes = set(sh("docker", "ps", "--format", "{{.Names}}").split())
+    starts = {}
+    if procs:
+        for l in sh("ps", "-o", "pid=,etimes=", "-p", ",".join(p["pid"] for p in procs)).splitlines():
+            if len(l.split()) == 2 and l.split()[1].isdigit():
+                starts[l.split()[0]] = now - int(l.split()[1])
+    jobs, live = [], set()
+    for p in procs:
+        kind, name, gpu = p["kind"], p["name"], p["gpu"]
+        live.add((kind, name))
+        box = {"check": f"wsp-train-check-{'push-' if name.startswith('push-') else ''}{gpu}",
+               "ckpt": f"wsp-ckpt-{name.replace('/', '-')}"}.get(kind, f"wsp-train-{name}")
+        j = {"name": name, "kind": kind, "gpu": gpu, "t": starts.get(p["pid"], now), "args": p["args"]}
+        if box in boxes:
+            j["state"] = "running"
+            j["t"] = iso(sh("docker", "inspect", "-f", "{{.State.StartedAt}}", box)) or j["t"]
+        elif kind == "ckpt" and (stage := ckpt_stage(name)) != "waiting":
+            j["state"], j["stage"] = "grading", stage
+        else:
+            j["state"] = "waiting"
+        jobs.append(j)
+    ended = []
+    for log in glob.glob(f"{TRAIN}/runs/*/train.log"):
+        name, t = os.path.basename(os.path.dirname(log)), mtime(log)
+        cfg = json_or(f"{os.path.dirname(log)}/config.json", {})
+        kind = "rft" if "rounds" in cfg or os.path.isdir(f"{os.path.dirname(log)}/round_1") else "grpo"
+        if any(n == name for k_, n in live if k_ in ("grpo", "rft")) or not t or now - t > keep:
+            continue
+        lines = tail_text(log)
+        ok = any(STAMPED.match(l) and l[20:] == "done" for l in lines[-50:])
+        ended.append({"name": name, "kind": kind, "gpu": gpu_in_log(log), "t": t,
+                      "state": "done" if ok else "failed", "args": ""})
+    for log in glob.glob(f"{TRAIN}/checks/*.log"):
+        m, t = re.fullmatch(r"(logprobs|push)-(\w+)\.log", os.path.basename(log)), mtime(log)
+        if not m:  # e.g. logprobs-5080.run1.log, a kept earlier run
+            continue
+        gpu, name = m[2], f"{'push' if m[1] == 'push' else 'log-probs'}-{m[2]}"
+        if ("check", name) in live or not t or now - t > keep:
+            continue
+        ok = os.path.exists(log[:-4] + ".json") and mtime(log[:-4] + ".json") >= t - 5
+        ended.append({"name": name, "kind": "check", "gpu": gpu, "t": t, "state": "done" if ok else "failed", "args": ""})
+    for log in glob.glob(f"{TRAIN}/evals/**/log", recursive=True):
+        name, t = os.path.relpath(os.path.dirname(log), f"{TRAIN}/evals"), mtime(log)
+        if ("ckpt", name) in live or not t or now - t > keep:
+            continue
+        ok = os.path.exists(f"{os.path.dirname(log)}/summary.json")
+        ended.append({"name": name, "kind": "ckpt", "gpu": gpu_in_log(log), "t": t,
+                      "state": "done" if ok else "failed", "args": ""})
+    order = {"running": 0, "grading": 1, "waiting": 2}
+    jobs.sort(key=lambda j: (order[j["state"]], j["t"]))
+    ended.sort(key=lambda j: -j["t"])
+    for j in jobs + ended:
+        try:
+            j["detail"] = TRAIN_DETAIL[j["kind"]](j["name"], j["args"], j, now)
+        except (OSError, ValueError, KeyError, TypeError, IndexError, ZeroDivisionError) as e:
+            j["detail"] = red(f"cannot read its progress: {type(e).__name__}")
+    return jobs + ended
+
+
+def train_label(j):
+    if j["kind"] == "check":
+        return "push check" if j["name"].startswith("push-") else "log-prob check"
+    return f"{j['name']} {TRAIN_KINDS[j['kind']]}"
+
+
+def train_block(jobs, now, most=8):
+    if not jobs:
+        return [row("Training", dim("nothing running, waiting or finished in the last day (train/)"))]
+    width = max(len(train_label(j)) for j in jobs[:most]) + 2
+    out = []
+    for j in jobs[:most]:
+        state = {"running": lambda: yellow(f"▸ running {minutes(now - j['t'])}"),
+                 "grading": lambda: yellow("▸ grading"),
+                 "waiting": lambda: dim(f"◷ waiting {minutes(now - j['t'])}"),
+                 "done": lambda: green(f"✓ done {clock(j['t'], now)}"),
+                 "failed": lambda: red(f"✗ failed {clock(j['t'], now)}")}[j["state"]]()
+        out.append(row("Training" if not out else "",
+                       f"{train_label(j):<{width}}{dim('RTX ' + j['gpu'])}  {pad(state, 23)}{j['detail']}"))
+    if len(jobs) > most:
+        out.append(row("", dim(f"and {len(jobs) - most} more")))
+    return out
+
+
+def gpu_block(train=()):
     users = running_jobs()
+    for j in train:
+        if j["state"] == "running":
+            users.setdefault(j["gpu"], []).append({"check": train_label(j), "ckpt": f"check {j['name']}"}
+                                                  .get(j["kind"], f"train {j['name']}"))
+    waiting = {}
+    for j in train:
+        if j["state"] == "waiting":
+            waiting[j["gpu"]] = waiting.get(j["gpu"], 0) + 1
     q = sh("nvidia-smi", "--query-gpu=index,temperature.gpu,power.draw,utilization.gpu,memory.used,memory.total",
            "--format=csv,noheader,nounits")
     rows = {r[0]: r for r in (l.split(", ") for l in q.splitlines()) if len(r) == 6}
@@ -899,6 +1178,8 @@ def gpu_block():
         temp = f"{t:>3.0f} °C"
         temp = red(temp) if t >= 83 else yellow(temp) if t >= 75 else temp
         who = ", ".join(users.get(card, [])) or dim("idle")
+        if waiting.get(card):
+            who += dim(f" +{waiting[card]} waiting")
         if g["llama_swap"]:
             swap = sh("docker", "inspect", "-f", "{{.State.Status}}", "llama-swap")
             extra = f"llama-swap {'stopped' if swap == 'exited' else swap}"
@@ -969,17 +1250,22 @@ def frame(names, cols, rows, every):
     header = spread(f" {bold('Agent runs and evaluations')}  {dim('Qwen3.5-0.8B weight editing')}",
                     time.strftime("%H:%M:%S UTC", time.gmtime(now)), width)
     footer = dim(f" redraws every {every} s · Ctrl-C stops watching; the runs carry on") if every else None
-    evs = evaluations(now)
-    tail = [rule(width)] + eval_block(evs, now) + [rule(width)] + gpu_block() + [temp_line()]
+    evs, tj = evaluations(now), train_jobs(now)
+    tail = ([rule(width)] + eval_block(evs, now) + [rule(width)] + train_block(tj, now) + [rule(width)]
+            + gpu_block(tj) + [temp_line()] + ([rule(width), footer] if footer else []))
     for expl in ([8, 4, 2, 0] if single else [3, 2, 1, 0]):
-        lines = [header, rule(width)]
+        body = []
         for i, name in enumerate(names):
             if i:
-                lines.append("")
-            lines += run_block(name, now, width, expl, single, evs)
-        lines += tail + ([rule(width), footer] if footer else [])
-        if rows is None or len(lines) <= rows:
+                body.append("")
+            body += run_block(name, now, width, expl, single, evs)
+        if rows is None or 2 + len(body) + len(tail) <= rows:
             break
+    if rows is not None and 2 + len(body) + len(tail) > rows:
+        # Still too tall with the shortest explanation: cut the runs' last lines (driver.log), not the GPUs below.
+        keep = max(rows - 2 - len(tail), 0)
+        body = body[:keep - 1] + [dim("   … (window too short for the rest of the run)")] if keep else []
+    lines = [header, rule(width)] + body + tail
     if rows is not None:
         lines = lines[:rows]
     return [clip(l, width) for l in lines]

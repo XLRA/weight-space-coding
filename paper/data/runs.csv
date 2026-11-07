@@ -10,4 +10,4 @@ pilot-15,instructions that constrain the whole answer,done,claude-code,combo-12-
 pilot-16,turns that end with no answer (MLP only),done,claude-code,start-r4,pilot-16.md,5090,claude-opus-5-5,max,1.5,20,20,21,154,1,132,321420,33808780,0,0.0,2026-11-06 15:29:54,2026-11-06 20:05:48,4.6
 pilot-17,copying text from the prompt (attention only),done,claude-code,start-r4,pilot-17.md,5080,claude-opus-5-5,max,1.5,20,20,20,154,1,132,315027,34345058,0,0.0,2026-11-06 15:29:57,2026-11-06 18:14:51,2.75
 pilot-18,the code answer's interface and identifiers (Colab),done,claude-code,start-r4,pilot-18.md,colab,claude-opus-5-5,max,1.5,12,12,12,188,2,174,383530,33490246,0,0.0,2026-11-06 17:56:59,2026-11-07 02:29:15,8.54
-pilot-19,consolidating round 4 with the panel,running,claude-code,start-r4,pilot-19.md,5090,claude-opus-5-5,max,1.5,0,24,0,2,1,2,613,10338,0,0.0,2026-11-07 02:31:06,2026-11-07 02:31:20,0.0
+pilot-19,consolidating round 4 with the panel,running,claude-code,start-r4,pilot-19.md,5090,claude-opus-5-5,max,1.5,21,24,22,124,1,100,247909,24056179,0,0.0,2026-11-07 02:31:06,2026-11-07 06:32:53,4.03

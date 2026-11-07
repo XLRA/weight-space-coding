@@ -1,0 +1,380 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.26kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/wsp-runtime:1
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/2] FROM docker.io/library/wsp-runtime:1@sha256:f66ea311db38c5382bdd00fa9460531bcc48ebb6d5e430c1cb7a4fde05a33f4f
+#4 resolve docker.io/library/wsp-runtime:1@sha256:f66ea311db38c5382bdd00fa9460531bcc48ebb6d5e430c1cb7a4fde05a33f4f done
+#4 CACHED
+
+#5 [2/2] RUN pip list --format=freeze > /opt/base-constraints.txt  && pip install -c /opt/base-constraints.txt trl liger-kernel flash-linear-attention  && pip list --format=freeze > /opt/train-freeze.txt  && python3 -c "import trl, fla, liger_kernel, torch, transformers, vllm; print('trl', trl.__version__, 'fla', fla.__version__, 'torch', torch.__version__, 'transformers', transformers.__version__, 'vllm', vllm.__version__)"
+#5 0.896 Collecting trl
+#5 1.027   Downloading trl-1.17.1-py3-none-any.whl.metadata (13 kB)
+#5 1.062 Collecting liger-kernel
+#5 1.093   Downloading liger_kernel-0.8.5-py3-none-any.whl.metadata (40 kB)
+#5 1.140 Collecting flash-linear-attention
+#5 1.164   Downloading flash_linear_attention-0.6.0-py3-none-any.whl.metadata (44 kB)
+#5 1.175 Requirement already satisfied: accelerate>=1.11.0 in /usr/local/lib/python3.12/dist-packages (from trl) (1.15.0)
+#5 1.211 Collecting datasets>=4.7.0 (from trl)
+#5 1.237   Downloading datasets-5.1.0-py3-none-any.whl.metadata (24 kB)
+#5 1.248 Requirement already satisfied: huggingface_hub>=0.34.0 in /usr/local/lib/python3.12/dist-packages (from trl) (2.2.0)
+#5 1.248 Requirement already satisfied: jinja2 in /usr/local/lib/python3.12/dist-packages (from trl) (3.1.6)
+#5 1.248 Requirement already satisfied: numpy>=1.26.0 in /usr/local/lib/python3.12/dist-packages (from trl) (2.2.6)
+#5 1.248 Requirement already satisfied: packaging>20.0 in /usr/local/lib/python3.12/dist-packages (from trl) (26.3)
+#5 1.248 Requirement already satisfied: pandas>=2.1.1 in /usr/local/lib/python3.12/dist-packages (from trl) (3.1.0)
+#5 1.249 Requirement already satisfied: psutil>=5.9.4 in /usr/local/lib/python3.12/dist-packages (from trl) (7.2.2)
+#5 1.351 Collecting pyarrow>=21.0.0 (from trl)
+#5 1.372   Downloading pyarrow-26.0.1-cp312-cp312-manylinux_2_28_x86_64.whl.metadata (3.0 kB)
+#5 1.374 Requirement already satisfied: pyyaml>=6.0.1 in /usr/local/lib/python3.12/dist-packages (from trl) (6.0.3)
+#5 1.374 Requirement already satisfied: torch>=2.6.0 in /usr/local/lib/python3.12/dist-packages (from trl) (2.13.0+cu130)
+#5 1.374 Requirement already satisfied: transformers>=4.56.2 in /usr/local/lib/python3.12/dist-packages (from trl) (5.19.0)
+#5 1.375 Requirement already satisfied: triton>=2.3.1 in /usr/local/lib/python3.12/dist-packages (from liger-kernel) (3.7.1)
+#5 1.403 Collecting fla-core==0.6.0 (from flash-linear-attention)
+#5 1.436   Downloading fla_core-0.6.0-py3-none-any.whl.metadata (44 kB)
+#5 1.443 Requirement already satisfied: einops in /usr/local/lib/python3.12/dist-packages (from fla-core==0.6.0->flash-linear-attention) (0.8.2)
+#5 1.444 Requirement already satisfied: regex>=2025.10.22 in /usr/local/lib/python3.12/dist-packages (from transformers>=4.56.2->trl) (2026.9.29)
+#5 1.445 Requirement already satisfied: tokenizers<0.24.0,>=0.23.1 in /usr/local/lib/python3.12/dist-packages (from transformers>=4.56.2->trl) (0.23.3)
+#5 1.445 Requirement already satisfied: typer in /usr/local/lib/python3.12/dist-packages (from transformers>=4.56.2->trl) (0.27.3)
+#5 1.445 Requirement already satisfied: safetensors>=0.8.0 in /usr/local/lib/python3.12/dist-packages (from transformers>=4.56.2->trl) (0.8.0)
+#5 1.445 Requirement already satisfied: tqdm>=4.60 in /usr/local/lib/python3.12/dist-packages (from transformers>=4.56.2->trl) (4.70.1)
+#5 1.450 Requirement already satisfied: click<9.0.0,>=8.4.2 in /usr/local/lib/python3.12/dist-packages (from huggingface_hub>=0.34.0->trl) (8.5.0)
+#5 1.450 Requirement already satisfied: filelock>=3.10.0 in /usr/local/lib/python3.12/dist-packages (from huggingface_hub>=0.34.0->trl) (4.2.1)
+#5 1.450 Requirement already satisfied: fsspec>=2023.5.0 in /usr/local/lib/python3.12/dist-packages (from huggingface_hub>=0.34.0->trl) (2026.9.0)
+#5 1.450 Requirement already satisfied: hf-xet<2.0.0,>=1.6.0 in /usr/local/lib/python3.12/dist-packages (from huggingface_hub>=0.34.0->trl) (1.7.0)
+#5 1.450 Requirement already satisfied: httpx2<3,>=2.0.0 in /usr/local/lib/python3.12/dist-packages (from huggingface_hub>=0.34.0->trl) (2.13.1)
+#5 1.451 Requirement already satisfied: typing-extensions>=4.1.0 in /usr/local/lib/python3.12/dist-packages (from huggingface_hub>=0.34.0->trl) (4.16.0)
+#5 1.453 Requirement already satisfied: anyio>=4.10 in /usr/local/lib/python3.12/dist-packages (from httpx2<3,>=2.0.0->huggingface_hub>=0.34.0->trl) (4.15.1)
+#5 1.454 Requirement already satisfied: httpcore2==2.13.1 in /usr/local/lib/python3.12/dist-packages (from httpx2<3,>=2.0.0->huggingface_hub>=0.34.0->trl) (2.13.1)
+#5 1.454 Requirement already satisfied: idna>=3.18 in /usr/local/lib/python3.12/dist-packages (from httpx2<3,>=2.0.0->huggingface_hub>=0.34.0->trl) (3.20)
+#5 1.454 Requirement already satisfied: truststore>=0.10 in /usr/local/lib/python3.12/dist-packages (from httpx2<3,>=2.0.0->huggingface_hub>=0.34.0->trl) (0.10.5)
+#5 1.455 Requirement already satisfied: h11>=0.16 in /usr/local/lib/python3.12/dist-packages (from httpcore2==2.13.1->httpx2<3,>=2.0.0->huggingface_hub>=0.34.0->trl) (0.16.0)
+#5 1.458 Requirement already satisfied: dill<0.4.2,>=0.3.0 in /usr/local/lib/python3.12/dist-packages (from datasets>=4.7.0->trl) (0.4.1)
+#5 1.587 Collecting xxhash (from datasets>=4.7.0->trl)
+#5 1.611   Downloading xxhash-4.0.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (17 kB)
+#5 1.638 Collecting multiprocess<0.70.20 (from datasets>=4.7.0->trl)
+#5 1.662   Downloading multiprocess-0.70.19-py312-none-any.whl.metadata (7.5 kB)
+#5 1.698 INFO: pip is looking at multiple versions of datasets to determine which version is compatible with other requirements. This could take a while.
+#5 1.698 Collecting datasets>=4.7.0 (from trl)
+#5 1.719   Downloading datasets-5.0.1-py3-none-any.whl.metadata (23 kB)
+#5 1.727 Requirement already satisfied: requests>=2.32.2 in /usr/local/lib/python3.12/dist-packages (from datasets>=4.7.0->trl) (2.34.2)
+#5 1.727 Requirement already satisfied: httpx<1.0.0 in /usr/local/lib/python3.12/dist-packages (from datasets>=4.7.0->trl) (0.28.1)
+#5 1.752   Downloading datasets-5.0.0-py3-none-any.whl.metadata (23 kB)
+#5 1.784   Downloading datasets-4.8.5-py3-none-any.whl.metadata (19 kB)
+#5 1.816   Downloading datasets-4.8.4-py3-none-any.whl.metadata (19 kB)
+#5 1.845   Downloading datasets-4.8.3-py3-none-any.whl.metadata (19 kB)
+#5 1.882   Downloading datasets-4.8.2-py3-none-any.whl.metadata (19 kB)
+#5 1.911   Downloading datasets-4.8.1-py3-none-any.whl.metadata (19 kB)
+#5 1.916 INFO: pip is still looking at multiple versions of datasets to determine which version is compatible with other requirements. This could take a while.
+#5 1.943   Downloading datasets-4.8.0-py3-none-any.whl.metadata (19 kB)
+#5 1.982   Downloading datasets-4.7.0-py3-none-any.whl.metadata (19 kB)
+#5 2.042 Collecting accelerate>=1.11.0 (from trl)
+#5 2.065   Downloading accelerate-1.15.0-py3-none-any.whl.metadata (19 kB)
+#5 2.071 INFO: This is taking longer than usual. You might need to provide the dependency resolver with stricter constraints to reduce runtime. See https://pip.pypa.io/warnings/backtracking for guidance. If you want to abort this run, press Ctrl + C.
+#5 2.161 Collecting tokenizers<0.24.0,>=0.23.1 (from transformers>=4.56.2->trl)
+#5 2.181   Downloading tokenizers-0.23.3-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (9.8 kB)
+#5 2.221 Collecting huggingface_hub>=0.34.0 (from trl)
+#5 2.243   Downloading huggingface_hub-2.2.0-py3-none-any.whl.metadata (16 kB)
+#5 2.251 Collecting trl
+#5 2.273   Downloading trl-1.17.0-py3-none-any.whl.metadata (13 kB)
+#5 2.317   Downloading trl-1.16.0-py3-none-any.whl.metadata (12 kB)
+#5 2.344   Downloading trl-1.15.0-py3-none-any.whl.metadata (12 kB)
+#5 2.371   Downloading trl-1.14.2-py3-none-any.whl.metadata (12 kB)
+#5 2.405   Downloading trl-1.14.1-py3-none-any.whl.metadata (12 kB)
+#5 2.435   Downloading trl-1.14.0-py3-none-any.whl.metadata (12 kB)
+#5 2.468   Downloading trl-1.13.0-py3-none-any.whl.metadata (12 kB)
+#5 2.496   Downloading trl-1.12.0-py3-none-any.whl.metadata (12 kB)
+#5 2.524   Downloading trl-1.11.0-py3-none-any.whl.metadata (12 kB)
+#5 2.551   Downloading trl-1.10.0-py3-none-any.whl.metadata (12 kB)
+#5 2.579   Downloading trl-1.9.2-py3-none-any.whl.metadata (12 kB)
+#5 2.608   Downloading trl-1.9.1-py3-none-any.whl.metadata (12 kB)
+#5 2.639   Downloading trl-1.9.0-py3-none-any.whl.metadata (12 kB)
+#5 2.668   Downloading trl-1.8.0-py3-none-any.whl.metadata (12 kB)
+#5 2.697   Downloading trl-1.7.1-py3-none-any.whl.metadata (11 kB)
+#5 2.726   Downloading trl-1.7.0-py3-none-any.whl.metadata (11 kB)
+#5 2.759   Downloading trl-1.6.0-py3-none-any.whl.metadata (11 kB)
+#5 2.788   Downloading trl-1.5.1-py3-none-any.whl.metadata (11 kB)
+#5 2.818   Downloading trl-1.5.0-py3-none-any.whl.metadata (11 kB)
+#5 2.846   Downloading trl-1.4.0-py3-none-any.whl.metadata (11 kB)
+#5 2.873   Downloading trl-1.3.0-py3-none-any.whl.metadata (11 kB)
+#5 2.905   Downloading trl-1.2.0-py3-none-any.whl.metadata (11 kB)
+#5 2.932   Downloading trl-1.1.0-py3-none-any.whl.metadata (11 kB)
+#5 2.963   Downloading trl-1.0.0-py3-none-any.whl.metadata (11 kB)
+#5 2.994   Downloading trl-0.29.1-py3-none-any.whl.metadata (11 kB)
+#5 2.999 Collecting datasets>=3.0.0 (from trl)
+#5 3.023   Downloading datasets-4.6.1-py3-none-any.whl.metadata (19 kB)
+#5 3.051   Downloading datasets-4.6.0-py3-none-any.whl.metadata (19 kB)
+#5 3.080   Downloading datasets-4.5.0-py3-none-any.whl.metadata (19 kB)
+#5 3.107   Downloading datasets-4.4.2-py3-none-any.whl.metadata (19 kB)
+#5 3.135   Downloading datasets-4.4.1-py3-none-any.whl.metadata (19 kB)
+#5 3.163   Downloading datasets-4.4.0-py3-none-any.whl.metadata (19 kB)
+#5 3.191   Downloading datasets-4.3.0-py3-none-any.whl.metadata (18 kB)
+#5 3.220   Downloading datasets-4.2.0-py3-none-any.whl.metadata (18 kB)
+#5 3.246   Downloading datasets-4.1.1-py3-none-any.whl.metadata (18 kB)
+#5 3.271   Downloading datasets-4.1.0-py3-none-any.whl.metadata (18 kB)
+#5 3.300   Downloading datasets-4.0.0-py3-none-any.whl.metadata (19 kB)
+#5 3.325   Downloading datasets-3.6.0-py3-none-any.whl.metadata (19 kB)
+#5 3.352   Downloading datasets-3.5.1-py3-none-any.whl.metadata (19 kB)
+#5 3.382   Downloading datasets-3.5.0-py3-none-any.whl.metadata (19 kB)
+#5 3.406   Downloading datasets-3.4.1-py3-none-any.whl.metadata (19 kB)
+#5 3.439   Downloading datasets-3.4.0-py3-none-any.whl.metadata (19 kB)
+#5 3.467   Downloading datasets-3.3.2-py3-none-any.whl.metadata (19 kB)
+#5 3.500   Downloading datasets-3.3.1-py3-none-any.whl.metadata (19 kB)
+#5 3.530   Downloading datasets-3.3.0-py3-none-any.whl.metadata (19 kB)
+#5 3.554   Downloading datasets-3.2.0-py3-none-any.whl.metadata (20 kB)
+#5 3.587   Downloading datasets-3.1.0-py3-none-any.whl.metadata (20 kB)
+#5 3.615   Downloading datasets-3.0.2-py3-none-any.whl.metadata (20 kB)
+#5 3.647   Downloading datasets-3.0.1-py3-none-any.whl.metadata (20 kB)
+#5 3.680   Downloading datasets-3.0.0-py3-none-any.whl.metadata (19 kB)
+#5 3.685 Collecting trl
+#5 3.707   Downloading trl-0.29.0-py3-none-any.whl.metadata (11 kB)
+#5 3.738   Downloading trl-0.28.0-py3-none-any.whl.metadata (11 kB)
+#5 3.772   Downloading trl-0.27.2-py3-none-any.whl.metadata (11 kB)
+#5 3.803   Downloading trl-0.27.1-py3-none-any.whl.metadata (11 kB)
+#5 3.834   Downloading trl-0.27.0-py3-none-any.whl.metadata (11 kB)
+#5 3.871   Downloading trl-0.26.2-py3-none-any.whl.metadata (11 kB)
+#5 3.902   Downloading trl-0.26.1-py3-none-any.whl.metadata (11 kB)
+#5 3.934   Downloading trl-0.26.0-py3-none-any.whl.metadata (11 kB)
+#5 3.963   Downloading trl-0.25.1-py3-none-any.whl.metadata (11 kB)
+#5 3.998   Downloading trl-0.25.0-py3-none-any.whl.metadata (11 kB)
+#5 4.031   Downloading trl-0.24.0-py3-none-any.whl.metadata (11 kB)
+#5 4.067   Downloading trl-0.23.1-py3-none-any.whl.metadata (11 kB)
+#5 4.101   Downloading trl-0.23.0-py3-none-any.whl.metadata (11 kB)
+#5 4.136   Downloading trl-0.22.2-py3-none-any.whl.metadata (11 kB)
+#5 4.167   Downloading trl-0.22.1-py3-none-any.whl.metadata (11 kB)
+#5 4.206   Downloading trl-0.22.0-py3-none-any.whl.metadata (11 kB)
+#5 4.238   Downloading trl-0.21.0-py3-none-any.whl.metadata (11 kB)
+#5 4.272   Downloading trl-0.20.0-py3-none-any.whl.metadata (11 kB)
+#5 4.306   Downloading trl-0.19.1-py3-none-any.whl.metadata (10 kB)
+#5 4.339   Downloading trl-0.19.0-py3-none-any.whl.metadata (10 kB)
+#5 4.372   Downloading trl-0.18.2-py3-none-any.whl.metadata (11 kB)
+#5 4.402   Downloading trl-0.18.1-py3-none-any.whl.metadata (11 kB)
+#5 4.439   Downloading trl-0.18.0-py3-none-any.whl.metadata (11 kB)
+#5 4.471   Downloading trl-0.17.0-py3-none-any.whl.metadata (12 kB)
+#5 4.474 Requirement already satisfied: rich in /usr/local/lib/python3.12/dist-packages (from trl) (15.0.0)
+#5 4.508   Downloading trl-0.16.1-py3-none-any.whl.metadata (12 kB)
+#5 4.543   Downloading trl-0.16.0-py3-none-any.whl.metadata (12 kB)
+#5 4.576   Downloading trl-0.15.2-py3-none-any.whl.metadata (11 kB)
+#5 4.587 Collecting datasets>=2.21.0 (from trl)
+#5 4.614   Downloading datasets-2.21.0-py3-none-any.whl.metadata (21 kB)
+#5 4.621 Collecting trl
+#5 4.643   Downloading trl-0.15.1-py3-none-any.whl.metadata (11 kB)
+#5 4.680   Downloading trl-0.15.0-py3-none-any.whl.metadata (11 kB)
+#5 4.715   Downloading trl-0.14.0-py3-none-any.whl.metadata (12 kB)
+#5 4.753   Downloading trl-0.13.0-py3-none-any.whl.metadata (11 kB)
+#5 4.783   Downloading trl-0.12.2-py3-none-any.whl.metadata (11 kB)
+#5 4.818 INFO: pip is looking at multiple versions of trl to determine which version is compatible with other requirements. This could take a while.
+#5 4.842   Downloading trl-0.12.1-py3-none-any.whl.metadata (10 kB)
+#5 4.879   Downloading trl-0.12.0-py3-none-any.whl.metadata (10 kB)
+#5 4.911   Downloading trl-0.11.4-py3-none-any.whl.metadata (12 kB)
+#5 4.943 Collecting tyro>=0.5.11 (from trl)
+#5 4.967   Downloading tyro-1.0.17-py3-none-any.whl.metadata (12 kB)
+#5 4.977 Collecting datasets (from trl)
+#5 4.999   Downloading datasets-2.20.0-py3-none-any.whl.metadata (19 kB)
+#5 5.030 Collecting pyarrow-hotfix (from datasets->trl)
+#5 5.055   Downloading pyarrow_hotfix-0.7-py3-none-any.whl.metadata (3.6 kB)
+#5 5.056 Collecting datasets (from trl)
+#5 5.083   Downloading datasets-2.19.2-py3-none-any.whl.metadata (19 kB)
+#5 5.111   Downloading datasets-2.19.1-py3-none-any.whl.metadata (19 kB)
+#5 5.144   Downloading datasets-2.19.0-py3-none-any.whl.metadata (19 kB)
+#5 5.174   Downloading datasets-2.18.0-py3-none-any.whl.metadata (20 kB)
+#5 5.207   Downloading datasets-2.17.1-py3-none-any.whl.metadata (20 kB)
+#5 5.240   Downloading datasets-2.17.0-py3-none-any.whl.metadata (20 kB)
+#5 5.266   Downloading datasets-2.16.1-py3-none-any.whl.metadata (20 kB)
+#5 5.299   Downloading datasets-2.16.0-py3-none-any.whl.metadata (20 kB)
+#5 5.325   Downloading datasets-2.15.0-py3-none-any.whl.metadata (20 kB)
+#5 5.359   Downloading datasets-2.14.7-py3-none-any.whl.metadata (19 kB)
+#5 5.391   Downloading datasets-2.14.6-py3-none-any.whl.metadata (19 kB)
+#5 5.420   Downloading datasets-2.14.5-py3-none-any.whl.metadata (19 kB)
+#5 5.450   Downloading datasets-2.14.4-py3-none-any.whl.metadata (19 kB)
+#5 5.479   Downloading datasets-2.14.3-py3-none-any.whl.metadata (19 kB)
+#5 5.505   Downloading datasets-2.14.2-py3-none-any.whl.metadata (19 kB)
+#5 5.540   Downloading datasets-2.14.1-py3-none-any.whl.metadata (19 kB)
+#5 5.568   Downloading datasets-2.14.0-py3-none-any.whl.metadata (19 kB)
+#5 5.599   Downloading datasets-2.13.2-py3-none-any.whl.metadata (20 kB)
+#5 5.626   Downloading datasets-2.13.1-py3-none-any.whl.metadata (20 kB)
+#5 5.658   Downloading datasets-2.13.0-py3-none-any.whl.metadata (20 kB)
+#5 5.688   Downloading datasets-2.12.0-py3-none-any.whl.metadata (20 kB)
+#5 5.719   Downloading datasets-2.11.0-py3-none-any.whl.metadata (20 kB)
+#5 5.747   Downloading datasets-2.10.1-py3-none-any.whl.metadata (20 kB)
+#5 5.780   Downloading datasets-2.10.0-py3-none-any.whl.metadata (20 kB)
+#5 5.816   Downloading datasets-2.9.0-py3-none-any.whl.metadata (19 kB)
+#5 5.842   Downloading datasets-2.8.0-py3-none-any.whl.metadata (19 kB)
+#5 5.873   Downloading datasets-2.7.1-py3-none-any.whl.metadata (19 kB)
+#5 5.906   Downloading datasets-2.7.0-py3-none-any.whl.metadata (19 kB)
+#5 5.942   Downloading datasets-2.6.2-py3-none-any.whl.metadata (19 kB)
+#5 5.971   Downloading datasets-2.6.1-py3-none-any.whl.metadata (19 kB)
+#5 6.014   Downloading datasets-2.6.0-py3-none-any.whl.metadata (19 kB)
+#5 6.045   Downloading datasets-2.5.2-py3-none-any.whl.metadata (19 kB)
+#5 6.078   Downloading datasets-2.5.1-py3-none-any.whl.metadata (19 kB)
+#5 6.111   Downloading datasets-2.5.0-py3-none-any.whl.metadata (19 kB)
+#5 6.145   Downloading datasets-2.4.0-py3-none-any.whl.metadata (20 kB)
+#5 6.180   Downloading datasets-2.3.2-py3-none-any.whl.metadata (20 kB)
+#5 6.220   Downloading datasets-2.3.1-py3-none-any.whl.metadata (20 kB)
+#5 6.250   Downloading datasets-2.3.0-py3-none-any.whl.metadata (20 kB)
+#5 6.281   Downloading datasets-2.2.2-py3-none-any.whl.metadata (20 kB)
+#5 6.311   Downloading datasets-2.2.1-py3-none-any.whl.metadata (20 kB)
+#5 6.317 Requirement already satisfied: aiohttp in /usr/local/lib/python3.12/dist-packages (from datasets->trl) (3.14.5)
+#5 6.343   Downloading datasets-2.2.0-py3-none-any.whl.metadata (20 kB)
+#5 6.373   Downloading datasets-2.1.0-py3-none-any.whl.metadata (20 kB)
+#5 6.405   Downloading datasets-2.0.0-py3-none-any.whl.metadata (21 kB)
+#5 6.442   Downloading datasets-1.18.4-py3-none-any.whl.metadata (22 kB)
+#5 6.473   Downloading datasets-1.18.3-py3-none-any.whl.metadata (22 kB)
+#5 6.503   Downloading datasets-1.18.2-py3-none-any.whl.metadata (22 kB)
+#5 6.535   Downloading datasets-1.18.1-py3-none-any.whl.metadata (22 kB)
+#5 6.567   Downloading datasets-1.18.0-py3-none-any.whl.metadata (22 kB)
+#5 6.599   Downloading datasets-1.17.0-py3-none-any.whl.metadata (21 kB)
+#5 6.626   Downloading datasets-1.16.1-py3-none-any.whl.metadata (21 kB)
+#5 6.660   Downloading datasets-1.16.0-py3-none-any.whl.metadata (21 kB)
+#5 6.686   Downloading datasets-1.15.1-py3-none-any.whl.metadata (19 kB)
+#5 6.715   Downloading datasets-1.15.0-py3-none-any.whl.metadata (19 kB)
+#5 6.743   Downloading datasets-1.14.0-py3-none-any.whl.metadata (19 kB)
+#5 6.776   Downloading datasets-1.13.3-py3-none-any.whl.metadata (9.5 kB)
+#5 6.802   Downloading datasets-1.13.2-py3-none-any.whl.metadata (9.5 kB)
+#5 6.831   Downloading datasets-1.13.1-py3-none-any.whl.metadata (9.6 kB)
+#5 6.863   Downloading datasets-1.13.0-py3-none-any.whl.metadata (10 kB)
+#5 6.891   Downloading datasets-1.12.1-py3-none-any.whl.metadata (9.9 kB)
+#5 6.922   Downloading datasets-1.12.0-py3-none-any.whl.metadata (9.8 kB)
+#5 6.946   Downloading datasets-1.11.0-py3-none-any.whl.metadata (8.9 kB)
+#5 6.972   Downloading datasets-1.10.2-py3-none-any.whl.metadata (9.5 kB)
+#5 6.998   Downloading datasets-1.10.1-py3-none-any.whl.metadata (9.5 kB)
+#5 7.024   Downloading datasets-1.10.0-py3-none-any.whl.metadata (9.5 kB)
+#5 7.054   Downloading datasets-1.9.0-py3-none-any.whl.metadata (9.5 kB)
+#5 7.086   Downloading datasets-1.8.0-py3-none-any.whl.metadata (9.3 kB)
+#5 7.089 Collecting pyarrow<4.0.0,>=1.0.0 (from datasets->trl)
+#5 7.118   Downloading pyarrow-3.0.0.tar.gz (682 kB)
+#5 7.216      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 682.2/682.2 kB 10.0 MB/s  0:00:00
+#5 7.251   Installing build dependencies: started
+#5 10.09   Installing build dependencies: finished with status 'error'
+#5 10.10   error: subprocess-exited-with-error
+#5 10.10   
+#5 10.10   × installing build dependencies for pyarrow did not run successfully.
+#5 10.10   │ exit code: 2
+#5 10.10   ╰─> [89 lines of output]
+#5 10.10       Ignoring numpy: markers 'python_version < "3.9"' don't match your environment
+#5 10.10       Collecting cython>=0.29
+#5 10.10         Downloading cython-3.3.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (13 kB)
+#5 10.10       Collecting numpy==1.19.4
+#5 10.10         Downloading numpy-1.19.4.zip (7.3 MB)
+#5 10.10            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.3/7.3 MB 39.9 MB/s  0:00:00
+#5 10.10         Installing build dependencies: started
+#5 10.10         Installing build dependencies: finished with status 'done'
+#5 10.10         Getting requirements to build wheel: started
+#5 10.10         Getting requirements to build wheel: finished with status 'done'
+#5 10.10       ERROR: Exception:
+#5 10.10       Traceback (most recent call last):
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_internal/cli/base_command.py", line 109, in _run_wrapper
+#5 10.10           status = _inner_run()
+#5 10.10                    ^^^^^^^^^^^^
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_internal/cli/base_command.py", line 102, in _inner_run
+#5 10.10           return self.run(options, args)
+#5 10.10                  ^^^^^^^^^^^^^^^^^^^^^^^
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_internal/cli/req_command.py", line 106, in wrapper
+#5 10.10           return func(self, options, args)
+#5 10.10                  ^^^^^^^^^^^^^^^^^^^^^^^^^
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_internal/commands/install.py", line 478, in run
+#5 10.10           requirement_set = resolver.resolve(
+#5 10.10                             ^^^^^^^^^^^^^^^^^
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_internal/resolution/resolvelib/resolver.py", line 103, in resolve
+#5 10.10           result = self._result = resolver.resolve(
+#5 10.10                                   ^^^^^^^^^^^^^^^^^
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_vendor/resolvelib/resolvers/resolution.py", line 601, in resolve
+#5 10.10           state = resolution.resolve(requirements, max_rounds=max_rounds)
+#5 10.10                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_vendor/resolvelib/resolvers/resolution.py", line 434, in resolve
+#5 10.10           self._add_to_criteria(self.state.criteria, r, parent=None)
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_vendor/resolvelib/resolvers/resolution.py", line 150, in _add_to_criteria
+#5 10.10           if not criterion.candidates:
+#5 10.10                  ^^^^^^^^^^^^^^^^^^^^
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_vendor/resolvelib/structs.py", line 194, in __bool__
+#5 10.10           return bool(self._sequence)
+#5 10.10                  ^^^^^^^^^^^^^^^^^^^^
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_internal/resolution/resolvelib/found_candidates.py", line 165, in __bool__
+#5 10.10           self._bool = any(self)
+#5 10.10                        ^^^^^^^^^
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_internal/resolution/resolvelib/found_candidates.py", line 149, in <genexpr>
+#5 10.10           return (c for c in iterator if id(c) not in self._incompatible_ids)
+#5 10.10                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_internal/resolution/resolvelib/found_candidates.py", line 39, in _iter_built
+#5 10.10           candidate = func()
+#5 10.10                       ^^^^^^
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_internal/resolution/resolvelib/factory.py", line 181, in _make_candidate_from_link
+#5 10.10           base: BaseCandidate | None = self._make_base_candidate_from_link(
+#5 10.10                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_internal/resolution/resolvelib/factory.py", line 227, in _make_base_candidate_from_link
+#5 10.10           self._link_candidate_cache[link] = LinkCandidate(
+#5 10.10                                              ^^^^^^^^^^^^^^
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_internal/resolution/resolvelib/candidates.py", line 325, in __init__
+#5 10.10           super().__init__(
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_internal/resolution/resolvelib/candidates.py", line 167, in __init__
+#5 10.10           self.dist = self._prepare()
+#5 10.10                       ^^^^^^^^^^^^^^^
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_internal/resolution/resolvelib/candidates.py", line 245, in _prepare
+#5 10.10           dist = self._prepare_distribution()
+#5 10.10                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_internal/resolution/resolvelib/candidates.py", line 336, in _prepare_distribution
+#5 10.10           return preparer.prepare_linked_requirement(self._ireq, parallel_builds=True)
+#5 10.10                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_internal/operations/prepare.py", line 664, in prepare_linked_requirement
+#5 10.10           return self._prepare_linked_requirement(req, parallel_builds)
+#5 10.10                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_internal/operations/prepare.py", line 783, in _prepare_linked_requirement
+#5 10.10           dist = _get_prepared_distribution(
+#5 10.10                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_internal/operations/prepare.py", line 82, in _get_prepared_distribution
+#5 10.10           abstract_dist.prepare_distribution_metadata(
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_internal/distributions/sdist.py", line 63, in prepare_distribution_metadata
+#5 10.10           self._install_build_reqs(
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_internal/distributions/sdist.py", line 159, in _install_build_reqs
+#5 10.10           build_reqs = self._get_build_requires_wheel()
+#5 10.10                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_internal/distributions/sdist.py", line 131, in _get_build_requires_wheel
+#5 10.10           return backend.get_requires_for_build_wheel()
+#5 10.10                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_internal/utils/misc.py", line 734, in get_requires_for_build_wheel
+#5 10.10           return super().get_requires_for_build_wheel(config_settings=cs)
+#5 10.10                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_vendor/pyproject_hooks/_impl.py", line 196, in get_requires_for_build_wheel
+#5 10.10           return self._call_hook(
+#5 10.10                  ^^^^^^^^^^^^^^^^
+#5 10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_vendor/pyproject_hooks/_impl.py", line 402, in _call_hook
+#5 10.10           raise BackendUnavailable(
+#5 10.10       pip._vendor.pyproject_hooks._impl.BackendUnavailable: Cannot import 'setuptools.build_meta'
+#5 10.10       [end of output]
+#5 10.10   
+#5 10.10   note: This error originates from a subprocess, and is likely not a problem with pip.
+#5 10.10 
+#5 10.10 [notice] A new release of pip is available: 26.2.1 -> 26.3
+#5 10.10 [notice] To update, run: python3.12 -m pip install --upgrade pip
+#5 10.10 ERROR: Failed to build 'pyarrow' when installing build dependencies for pyarrow
+#5 ERROR: process "/bin/sh -c pip list --format=freeze > /opt/base-constraints.txt  && pip install -c /opt/base-constraints.txt trl liger-kernel flash-linear-attention  && pip list --format=freeze > /opt/train-freeze.txt  && python3 -c \"import trl, fla, liger_kernel, torch, transformers, vllm; print('trl', trl.__version__, 'fla', fla.__version__, 'torch', torch.__version__, 'transformers', transformers.__version__, 'vllm', vllm.__version__)\"" did not complete successfully: exit code: 1
+------
+ > [2/2] RUN pip list --format=freeze > /opt/base-constraints.txt  && pip install -c /opt/base-constraints.txt trl liger-kernel flash-linear-attention  && pip list --format=freeze > /opt/train-freeze.txt  && python3 -c "import trl, fla, liger_kernel, torch, transformers, vllm; print('trl', trl.__version__, 'fla', fla.__version__, 'torch', torch.__version__, 'transformers', transformers.__version__, 'vllm', vllm.__version__)":
+10.10         File "/usr/local/lib/python3.12/dist-packages/pip/_vendor/pyproject_hooks/_impl.py", line 402, in _call_hook
+10.10           raise BackendUnavailable(
+10.10       pip._vendor.pyproject_hooks._impl.BackendUnavailable: Cannot import 'setuptools.build_meta'
+10.10       [end of output]
+10.10   
+10.10   note: This error originates from a subprocess, and is likely not a problem with pip.
+10.10 
+10.10 [notice] A new release of pip is available: 26.2.1 -> 26.3
+10.10 [notice] To update, run: python3.12 -m pip install --upgrade pip
+10.10 ERROR: Failed to build 'pyarrow' when installing build dependencies for pyarrow
+------
+Dockerfile:10
+--------------------
+   9 |     ENV PIP_BREAK_SYSTEM_PACKAGES=1 PIP_NO_CACHE_DIR=1
+  10 | >>> RUN pip list --format=freeze > /opt/base-constraints.txt \
+  11 | >>>  && pip install -c /opt/base-constraints.txt trl liger-kernel flash-linear-attention \
+  12 | >>>  && pip list --format=freeze > /opt/train-freeze.txt \
+  13 | >>>  && python3 -c "import trl, fla, liger_kernel, torch, transformers, vllm; print('trl', trl.__version__, 'fla', fla.__version__, 'torch', torch.__version__, 'transformers', transformers.__version__, 'vllm', vllm.__version__)"
+  14 |     
+--------------------
+ERROR: failed to build: failed to solve: process "/bin/sh -c pip list --format=freeze > /opt/base-constraints.txt  && pip install -c /opt/base-constraints.txt trl liger-kernel flash-linear-attention  && pip list --format=freeze > /opt/train-freeze.txt  && python3 -c \"import trl, fla, liger_kernel, torch, transformers, vllm; print('trl', trl.__version__, 'fla', fla.__version__, 'torch', torch.__version__, 'transformers', transformers.__version__, 'vllm', vllm.__version__)\"" did not complete successfully: exit code: 1

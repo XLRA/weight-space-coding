@@ -1,0 +1,42 @@
+{
+ "gpu": "5080",
+ "start": null,
+ "torch": "2.13.0+cu130",
+ "agreement": {
+  "tokens": 138710,
+  "sequences": 50,
+  "mean_abs": 0.01537836529314518,
+  "mean_signed": -0.0006240231450647116,
+  "abs_p50_p90_p99_p999": [
+   0.001324931625276804,
+   0.056641586124897,
+   0.12295909225940704,
+   0.1920991688966751
+  ],
+  "abs_max": 0.31019091606140137,
+  "share_abs_over_0.1": 0.03683944791555405,
+  "share_abs_over_1": 0.0,
+  "per_sequence_sum_abs_median": 1.7806220054626465,
+  "token_ratio_exp_diff_p01_p99": [
+   0.8909173607826233,
+   1.1191128492355347
+  ],
+  "mean_new_tokens": 2774.2,
+  "cut": 41,
+  "vllm_generate_seconds": 17.9
+ },
+ "fwd_bwd": {
+  "4096": {
+   "seconds": 0.52,
+   "peak_gb": 5.45
+  },
+  "8192": {
+   "seconds": 7.09,
+   "peak_gb": 5.67
+  }
+ },
+ "trainable_params": 498112320,
+ "linear_attention_fallback_warnings": [
+  "`causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel."
+ ]
+}

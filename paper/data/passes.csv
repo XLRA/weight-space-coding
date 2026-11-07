@@ -155,3 +155,25 @@ pilot-18,9,9,131,2026-11-06 21:32:13,teacher_forced,edited,287,77.1,NVIDIA L4,Tr
 pilot-18,10,10,139,2026-11-06 21:48:35,generate,both,96,11672.3,NVIDIA L4,True,False
 pilot-18,11,11,143,2026-11-07 01:04:41,generate,both,96,2296.6,NVIDIA L4,True,False
 pilot-18,12,12,147,2026-11-07 01:45:10,generate,both,256,1555.7,NVIDIA L4,True,False
+pilot-19,1,1,14,2026-11-07 03:05:54,generate,both,256,818.4,local,True,True
+pilot-19,2,2,28,2026-11-07 03:24:16,teacher_forced,start,27,17.2,local,True,True
+pilot-19,3,3,37,2026-11-07 03:29:18,teacher_forced,edited,17,21.0,local,True,True
+pilot-19,4,4,43,2026-11-07 03:31:43,generate,edited,1000,1002.6,local,True,True
+pilot-19,5,5,46,2026-11-07 03:49:11,generate,both,256,307.8,local,True,True
+pilot-19,6,6,54,2026-11-07 03:56:46,teacher_forced,edited,26,7.0,local,True,True
+pilot-19,7,7,57,2026-11-07 03:58:12,teacher_forced,edited,26,5.1,local,True,True
+pilot-19,8,8,67,2026-11-07 04:02:47,generate,both,88,330.9,local,True,True
+pilot-19,9,9,70,2026-11-07 04:09:23,generate,edited,1000,1002.6,local,True,True
+pilot-19,10,10,76,2026-11-07 04:28:10,generate,both,26,250.9,local,True,True
+pilot-19,11,11,81,2026-11-07 04:34:00,generate,both,256,248.9,local,True,True
+pilot-19,12,12,85,2026-11-07 04:39:43,teacher_forced,edited,60,6.1,local,True,True
+pilot-19,13,13,90,2026-11-07 04:41:08,generate,both,256,238.8,local,True,True
+pilot-19,14,14,94,2026-11-07 04:46:12,generate,both,128,339.2,local,True,True
+pilot-19,15,15,97,2026-11-07 04:52:38,generate,both,256,264.4,local,True,True
+pilot-19,16,16,101,2026-11-07 04:59:10,generate,both,128,763.7,local,True,True
+pilot-19,17,17,105,2026-11-07 05:13:56,generate,both,256,255.9,local,True,True
+pilot-19,18,18,110,2026-11-07 05:35:39,generate,both,256,860.5,local,True,True
+pilot-19,19,19,113,2026-11-07 05:50:50,generate,both,256,1054.2,local,True,True
+pilot-19,20,20,118,2026-11-07 06:09:29,generate,both,256,1034.9,local,True,True
+pilot-19,21,21,121,2026-11-07 06:27:37,generate,edited,250,256.8,local,True,True
+pilot-19,22,,,2026-11-07 06:32:53,generate,both,256,,local,False,True

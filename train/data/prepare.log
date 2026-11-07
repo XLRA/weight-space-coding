@@ -1,0 +1,253 @@
+{
+ "seed": 20261107,
+ "ngram": 13,
+ "boilerplate_min_docs": 10,
+ "ignored_13grams": 505,
+ "practice": {
+  "mbpp": 319,
+  "apps": 1400
+ },
+ "held_out_problems": {
+  "mbpp+ and humaneval+": 542,
+  "livecodebench": 175,
+  "panel code": 250
+ },
+ "apps_val_quotas": {
+  "interview": 154,
+  "competition": 41,
+  "introductory": 5
+ },
+ "dropped": [
+  "mbpp/516",
+  "mbpp/521",
+  "mbpp/536",
+  "mbpp/538",
+  "mbpp/542",
+  "mbpp/549",
+  "mbpp/574",
+  "mbpp/625",
+  "mbpp/634",
+  "mbpp/649",
+  "mbpp/653",
+  "mbpp/657",
+  "mbpp/658",
+  "mbpp/666",
+  "mbpp/676",
+  "mbpp/677",
+  "mbpp/683",
+  "mbpp/704",
+  "mbpp/715",
+  "mbpp/719",
+  "mbpp/768",
+  "mbpp/779",
+  "mbpp/824",
+  "mbpp/836",
+  "mbpp/837",
+  "mbpp/841",
+  "mbpp/845",
+  "mbpp/849",
+  "mbpp/852",
+  "mbpp/858",
+  "mbpp/872",
+  "mbpp/879",
+  "mbpp/884",
+  "mbpp/893",
+  "mbpp/896",
+  "mbpp/903",
+  "mbpp/917",
+  "mbpp/922",
+  "mbpp/924",
+  "mbpp/928",
+  "mbpp/933",
+  "mbpp/945",
+  "mbpp/947",
+  "mbpp/952",
+  "mbpp/962",
+  "mbpp/964",
+  "mbpp/965",
+  "mbpp/966",
+  "mbpp/970"
+ ],
+ "val": {
+  "mbpp": 52,
+  "apps": 200
+ },
+ "train": {
+  "mbpp": 218,
+  "apps": 1200
+ }
+}
+hit mbpp/625 ~ mbpp+/591 (task sentence, same function; ratio 0.0, jaccard 1.0)
+    Write a python function to interchange first and last elements in a given list.
+    Write a python function to interchange the first and last elements in a list.
+hit mbpp/634 ~ mbpp+/271 (same function; ratio 0.0, jaccard 0.54)
+    Write a python function to find the sum of fourth power of first n even natural numbers.
+    Write a python function that takes in an integer n and finds the sum of the first n even natural numbers that are raised
+hit mbpp/634 ~ mbpp+/770 (task sentence; ratio 0.07, jaccard 0.78)
+    Write a python function to find the sum of fourth power of first n even natural numbers.
+    Write a python function to find the sum of fourth power of first n odd natural numbers.
+hit mbpp/634 ~ panel/code/mbpp-212 (task sentence; ratio 0.0, jaccard 0.75)
+    Write a python function to find the sum of fourth power of first n even natural numbers.
+    Write a python function to find the sum of fourth power of n natural numbers.
+hit mbpp/649 ~ mbpp+/170 (13-grams, same function; ratio 0.3, jaccard 0.6)
+    Write a python function to calculate the sum of the numbers in a list between the indices of a specified range.
+    Write a function to find the sum of numbers in a list within a range specified by two indices.
+hit mbpp/653 ~ panel/code/mbpp-174 (13-grams, task sentence; ratio 0.34, jaccard 0.78)
+    Write a function to group a sequence of key-value pairs into a dictionary of lists using collections module.
+    Write a function to group a sequence of key-value pairs into a dictionary of lists.
+hit mbpp/657 ~ mbpp+/479 (task sentence, same function; ratio 0.04, jaccard 0.75)
+    Write a python function to find the first digit in factorial of a given number.
+    Write a python function to find the first digit of a given number.
+hit mbpp/658 ~ mbpp+/130 (13-grams, same function; ratio 0.5, jaccard 0.6)
+    Write a function to find the item with maximum occurrences in a given list.
+    Write a function to find the item with maximum frequency in a given list.
+hit mbpp/658 ~ panel/code/mbpp-362 (13-grams, task sentence, same function; ratio 0.5, jaccard 1.0)
+    Write a function to find the item with maximum occurrences in a given list.
+    Write a python function to find the item with maximum occurrences in a given list.
+hit mbpp/666 ~ panel/code/mbpp-204 (task sentence; ratio 0.0, jaccard 1.0)
+    Write a function to count occurrence of a character in a string.
+    Write a python function to count the occurrence of a given character in a string.
+hit mbpp/676 ~ panel/code/mbpp-173 (task sentence; ratio 0.0, jaccard 0.86)
+    Write a function to remove everything except alphanumeric characters from the given string by using regex.
+    Write a function to remove everything except alphanumeric characters from a string.
+hit mbpp/677 ~ panel/code/mbpp-334 (task sentence; ratio 0.0, jaccard 0.75)
+    Write a function to check if the triangle is valid or not.
+    Write a python function to check whether the triangle is valid or not if sides are given.
+hit mbpp/683 ~ mbpp+/72 (task sentence; ratio 0.03, jaccard 0.75)
+    Write a python function to check whether the given number can be represented by sum of two squares or not.
+    Write a python function to check whether the given number can be represented as the difference of two squares or not.
+hit mbpp/683 ~ panel/code/mbpp-188 (task sentence; ratio 0.07, jaccard 0.75)
+    Write a python function to check whether the given number can be represented by sum of two squares or not.
+    Write a python function to check whether the given number can be represented by product of two squares or not.
+hit mbpp/704 ~ panel/code/mbpp-248 (13-grams, task sentence, same function; ratio 0.35, jaccard 1.0)
+    Write a function to calculate the harmonic sum of n-1.
+    Write a function to calculate the harmonic sum of n-1.
+hit mbpp/715 ~ mbpp+/132 (task sentence; ratio 0.0, jaccard 0.75)
+    Write a function to convert the given string of integers into a tuple.
+    Write a function to convert a tuple to a string.
+hit mbpp/719 ~ panel/code/mbpp-434 (task sentence; ratio 0.06, jaccard 0.78)
+    Write a function that matches a string that has an a followed by zero or more b's.
+    Write a function that matches a string that has an a followed by one or more b's.
+hit mbpp/768 ~ mbpp+/406 (task sentence; ratio 0.0, jaccard 1.0)
+    Write a python function to check for odd parity of a given number.
+    Write a python function to find whether the parity of a given number is odd.
+hit mbpp/779 ~ mbpp+/758 (13-grams; ratio 0.37, jaccard 0.33)
+    Write a function to count the number of unique lists within a list.
+    Write a function to count lists within a list. The function should return a dictionary where every list is converted to 
+hit mbpp/824 ~ mbpp+/629 (task sentence; ratio 0.0, jaccard 0.75)
+    Write a python function to remove even numbers from a given list.
+    Write a python function to find even numbers from a list of numbers.
+hit mbpp/836 ~ mbpp+/559 (13-grams; ratio 0.25, jaccard 0.11)
+    Write a function to find length of the subarray having maximum sum.
+    Write a function to find the sum of the largest contiguous sublist in the given list.
+hit mbpp/837 ~ mbpp+/420 (task sentence, same function; ratio 0.0, jaccard 0.75)
+    Write a python function to find the cube sum of first n odd natural numbers.
+    Write a python function to find the cube sum of first n even natural numbers.
+hit mbpp/837 ~ panel/code/mbpp-504 (task sentence; ratio 0.0, jaccard 0.86)
+    Write a python function to find the cube sum of first n odd natural numbers.
+    Write a python function to find the cube sum of first n natural numbers.
+hit mbpp/841 ~ mbpp+/296 (13-grams, task sentence, same function; ratio 0.33, jaccard 0.75)
+    Write a function to count the number of inversions in the given array.
+    Write a python function to count inversions in an array.
+hit mbpp/845 ~ panel/code/mbpp-365 (task sentence; ratio 0.0, jaccard 0.75)
+    Write a python function to count the number of digits in factorial of a given number.
+    Write a python function to count the number of digits of a given number.
+hit mbpp/849 ~ panel/code/mbpp-295 (task sentence; ratio 0.0, jaccard 0.75)
+    Write a python function to find sum of all prime divisors of a given number.
+    Write a function to return the sum of all divisors of a number.
+hit mbpp/852 ~ mbpp+/436 (task sentence; ratio 0.0, jaccard 0.75)
+    Write a python function to remove negative numbers from a list.
+    Write a python function to return the negative numbers in a list.
+hit mbpp/858 ~ mbpp+/792 (same function; ratio 0.0, jaccard 0.6)
+    Write a function to count number of lists in a given list of lists and square the count.
+    Write a python function to count the number of lists in a given number of lists.
+hit mbpp/872 ~ panel/code/mbpp-216 (13-grams, task sentence; ratio 0.57, jaccard 1.0)
+    Write a function to check if a nested list is a subset of another nested list.
+    Write a function to check if a nested list is a subset of another nested list.
+hit mbpp/879 ~ mbpp+/794 (task sentence; ratio 0.18, jaccard 0.88)
+    Write a function that matches a string that has an 'a' followed by anything, ending in 'b' by using regex.
+    Write a function that matches a string that has an 'a' followed by anything, ending in 'b'.
+hit mbpp/884 ~ panel/code/mbpp-228 (same function; ratio 0.18, jaccard 0.6)
+    Write a python function to check whether all the bits are within a given range or not.
+    Write a python function to check whether all the bits are unset in the given range or not.
+hit mbpp/893 ~ mbpp+/460 (13-grams, same function; ratio 0.35, jaccard 0.6)
+    Write a python function to get the last element of each sublist.
+    Write a python function to get the first element of each sublist.
+hit mbpp/896 ~ panel/code/mbpp-487 (task sentence; ratio 0.0, jaccard 0.8)
+    Write a function to sort a list in increasing order by the last element in each tuple from a given list of non-empty tup
+    Write a function to sort a list of tuples in increasing order by the last element in each tuple.
+hit mbpp/903 ~ panel/code/mbpp-331 (13-grams; ratio 0.48, jaccard 0.43)
+    Write a python function to count the total unset bits from 1 to n.
+    Write a python function to count unset bits of a given number.
+hit mbpp/917 ~ panel/code/mbpp-482 (task sentence; ratio 0.0, jaccard 0.8)
+    Write a function to find the sequences of one upper case letter followed by lower case letters.
+    Write a function to find sequences of one upper case letter followed by lower case letters in the given string by using 
+hit mbpp/922 ~ mbpp+/415 (13-grams, task sentence, same function; ratio 0.62, jaccard 1.0)
+    Write a function to find a pair with the highest product from a given array of integers.
+    Write a python function to find a pair with highest product from a given array of integers.
+hit mbpp/924 ~ mbpp+/309 (task sentence; ratio 0.0, jaccard 1.0)
+    Write a function to find maximum of two numbers.
+    Write a python function to find the maximum of two numbers.
+hit mbpp/928 ~ mbpp+/427 (13-grams, task sentence, same function; ratio 1.0, jaccard 1.0)
+    Write a function to convert a date of yyyy-mm-dd format to dd-mm-yyyy format.
+    Write a function to convert a date of yyyy-mm-dd format to dd-mm-yyyy format.
+hit mbpp/933 ~ mbpp+/102 (task sentence; ratio 0.0, jaccard 0.83)
+    Write a function to convert camel case string to snake case string by using regex.
+    Write a function to convert a snake case string to camel case string.
+hit mbpp/933 ~ panel/code/mbpp-411 (task sentence; ratio 0.0, jaccard 1.0)
+    Write a function to convert camel case string to snake case string by using regex.
+    Write a function to convert the given snake case string to camel case string by using regex.
+hit mbpp/945 ~ panel/code/mbpp-341 (task sentence; ratio 0.0, jaccard 0.75)
+    Write a function to convert the given tuples into set.
+    Write a function to convert the given set into ordered tuples.
+hit mbpp/947 ~ mbpp+/90 (same function; ratio 0.0, jaccard 0.5)
+    Write a python function to find the length of the shortest word.
+    Write a python function to find the length of the longest word.
+hit mbpp/952 ~ panel/code/mbpp-402 (task sentence; ratio 0.14, jaccard 0.8)
+    Write a function to compute the value of ncr mod p.
+    Write a function to compute the value of ncr%p.
+hit mbpp/962 ~ mbpp+/797 (task sentence; ratio 0.13, jaccard 0.78)
+    Write a python function to find the sum of all even natural numbers within the range l and r.
+    Write a python function to find the sum of all odd natural numbers within the range l and r.
+hit mbpp/964 ~ mbpp+/79 (same function; ratio 0.04, jaccard 0.6)
+    Write a python function to check whether the length of the word is even or not.
+    Write a python function to check whether the length of the word is odd or not.
+hit mbpp/965 ~ mbpp+/102 (task sentence; ratio 0.0, jaccard 1.0)
+    Write a function to convert camel case string to snake case string.
+    Write a function to convert a snake case string to camel case string.
+hit mbpp/965 ~ panel/code/mbpp-411 (task sentence; ratio 0.0, jaccard 0.83)
+    Write a function to convert camel case string to snake case string.
+    Write a function to convert the given snake case string to camel case string by using regex.
+hit mbpp/966 ~ panel/code/mbpp-361 (same function; ratio 0.0, jaccard 0.5)
+    Write a function to remove an empty tuple from a list of tuples.
+    Write a function to remove empty lists from a given list of lists.
+hit mbpp/970 ~ mbpp+/404 (task sentence; ratio 0.0, jaccard 1.0)
+    Write a function to find minimum of two numbers.
+    Write a python function to find the minimum of two numbers.
+hit mbpp/516 ~ mbpp+/71 (task sentence; ratio 0.06, jaccard 0.75)
+    Write a function to sort a list of elements using radix sort.
+    Write a function to sort a list of elements.
+hit mbpp/516 ~ mbpp+/141 (task sentence; ratio 0.06, jaccard 0.75)
+    Write a function to sort a list of elements using radix sort.
+    Write a function to sort a list of elements.
+hit mbpp/521 ~ panel/code/mbpp-327 (same function; ratio 0.08, jaccard 0.6)
+    Write a function to print check if the triangle is scalene or not.
+    Write a function to print check if the triangle is isosceles or not.
+hit mbpp/536 ~ mbpp+/426 (13-grams; ratio 0.29, jaccard 0.0)
+    Write a function to select the nth items of a list.
+    Write a function to filter odd numbers.
+hit mbpp/538 ~ mbpp+/132 (task sentence; ratio 0.0, jaccard 0.75)
+    Write a python function to convert a given string list to a tuple.
+    Write a function to convert a tuple to a string.
+hit mbpp/538 ~ mbpp+/587 (task sentence; ratio 0.0, jaccard 0.75)
+    Write a python function to convert a given string list to a tuple.
+    Write a function to convert a list to a tuple.
+hit mbpp/542 ~ mbpp+/732 (task sentence; ratio 0.09, jaccard 0.75)
+    Write a function to replace all occurrences of spaces, commas, or dots with a colon in the given string by using regex.
+    Write a function to replace all occurrences of spaces, commas, or dots with a colon.
+hit mbpp/549 ~ mbpp+/770 (task sentence, same function; ratio 0.18, jaccard 0.78)
+    Write a python function to find the sum of fifth power of first n odd natural numbers.
+    Write a python function to find the sum of fourth power of first n odd natural numbers.
+hit mbpp/574 ~ mbpp+/233 (task sentence; ratio 0.0, jaccard 0.75)
+    Write a function to find the surface area of a cylinder.
+    Write a function to find the lateral surface area of a cylinder.

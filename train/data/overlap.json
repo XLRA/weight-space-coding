@@ -1,0 +1,894 @@
+{
+ "seed": 20261107,
+ "ngram": 13,
+ "boilerplate_min_docs": 10,
+ "ignored_13grams": 505,
+ "practice": {
+  "mbpp": 319,
+  "apps": 1400
+ },
+ "held_out_problems": {
+  "mbpp+ and humaneval+": 542,
+  "livecodebench": 175,
+  "panel code": 250
+ },
+ "apps_val_quotas": {
+  "interview": 154,
+  "competition": 41,
+  "introductory": 5
+ },
+ "hits": {
+  "mbpp/625": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/591",
+    "why": [
+     "task sentence",
+     "same function"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 1.0,
+    "practice_task": "Write a python function to interchange first and last elements in a given list.",
+    "held_out_task": "Write a python function to interchange the first and last elements in a list."
+   }
+  ],
+  "mbpp/634": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/271",
+    "why": [
+     "same function"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 0.54,
+    "practice_task": "Write a python function to find the sum of fourth power of first n even natural numbers.",
+    "held_out_task": "Write a python function that takes in an integer n and finds the sum of the first n even natural numbers that are raised"
+   },
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/770",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 2,
+    "ratio": 0.07,
+    "jaccard": 0.78,
+    "practice_task": "Write a python function to find the sum of fourth power of first n even natural numbers.",
+    "held_out_task": "Write a python function to find the sum of fourth power of first n odd natural numbers."
+   },
+   {
+    "corpus": "panel code",
+    "id": "panel/code/mbpp-212",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 0.75,
+    "practice_task": "Write a python function to find the sum of fourth power of first n even natural numbers.",
+    "held_out_task": "Write a python function to find the sum of fourth power of n natural numbers."
+   }
+  ],
+  "mbpp/649": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/170",
+    "why": [
+     "13-grams",
+     "same function"
+    ],
+    "shared_13grams": 8,
+    "ratio": 0.3,
+    "jaccard": 0.6,
+    "practice_task": "Write a python function to calculate the sum of the numbers in a list between the indices of a specified range.",
+    "held_out_task": "Write a function to find the sum of numbers in a list within a range specified by two indices."
+   }
+  ],
+  "mbpp/653": [
+   {
+    "corpus": "panel code",
+    "id": "panel/code/mbpp-174",
+    "why": [
+     "13-grams",
+     "task sentence"
+    ],
+    "shared_13grams": 11,
+    "ratio": 0.34,
+    "jaccard": 0.78,
+    "practice_task": "Write a function to group a sequence of key-value pairs into a dictionary of lists using collections module.",
+    "held_out_task": "Write a function to group a sequence of key-value pairs into a dictionary of lists."
+   }
+  ],
+  "mbpp/657": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/479",
+    "why": [
+     "task sentence",
+     "same function"
+    ],
+    "shared_13grams": 1,
+    "ratio": 0.04,
+    "jaccard": 0.75,
+    "practice_task": "Write a python function to find the first digit in factorial of a given number.",
+    "held_out_task": "Write a python function to find the first digit of a given number."
+   }
+  ],
+  "mbpp/658": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/130",
+    "why": [
+     "13-grams",
+     "same function"
+    ],
+    "shared_13grams": 10,
+    "ratio": 0.5,
+    "jaccard": 0.6,
+    "practice_task": "Write a function to find the item with maximum occurrences in a given list.",
+    "held_out_task": "Write a function to find the item with maximum frequency in a given list."
+   },
+   {
+    "corpus": "panel code",
+    "id": "panel/code/mbpp-362",
+    "why": [
+     "13-grams",
+     "task sentence",
+     "same function"
+    ],
+    "shared_13grams": 10,
+    "ratio": 0.5,
+    "jaccard": 1.0,
+    "practice_task": "Write a function to find the item with maximum occurrences in a given list.",
+    "held_out_task": "Write a python function to find the item with maximum occurrences in a given list."
+   }
+  ],
+  "mbpp/666": [
+   {
+    "corpus": "panel code",
+    "id": "panel/code/mbpp-204",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 1.0,
+    "practice_task": "Write a function to count occurrence of a character in a string.",
+    "held_out_task": "Write a python function to count the occurrence of a given character in a string."
+   }
+  ],
+  "mbpp/676": [
+   {
+    "corpus": "panel code",
+    "id": "panel/code/mbpp-173",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 0.86,
+    "practice_task": "Write a function to remove everything except alphanumeric characters from the given string by using regex.",
+    "held_out_task": "Write a function to remove everything except alphanumeric characters from a string."
+   }
+  ],
+  "mbpp/677": [
+   {
+    "corpus": "panel code",
+    "id": "panel/code/mbpp-334",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 0.75,
+    "practice_task": "Write a function to check if the triangle is valid or not.",
+    "held_out_task": "Write a python function to check whether the triangle is valid or not if sides are given."
+   }
+  ],
+  "mbpp/683": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/72",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 1,
+    "ratio": 0.03,
+    "jaccard": 0.75,
+    "practice_task": "Write a python function to check whether the given number can be represented by sum of two squares or not.",
+    "held_out_task": "Write a python function to check whether the given number can be represented as the difference of two squares or not."
+   },
+   {
+    "corpus": "panel code",
+    "id": "panel/code/mbpp-188",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 2,
+    "ratio": 0.07,
+    "jaccard": 0.75,
+    "practice_task": "Write a python function to check whether the given number can be represented by sum of two squares or not.",
+    "held_out_task": "Write a python function to check whether the given number can be represented by product of two squares or not."
+   }
+  ],
+  "mbpp/704": [
+   {
+    "corpus": "panel code",
+    "id": "panel/code/mbpp-248",
+    "why": [
+     "13-grams",
+     "task sentence",
+     "same function"
+    ],
+    "shared_13grams": 8,
+    "ratio": 0.35,
+    "jaccard": 1.0,
+    "practice_task": "Write a function to calculate the harmonic sum of n-1.",
+    "held_out_task": "Write a function to calculate the harmonic sum of n-1."
+   }
+  ],
+  "mbpp/715": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/132",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 0.75,
+    "practice_task": "Write a function to convert the given string of integers into a tuple.",
+    "held_out_task": "Write a function to convert a tuple to a string."
+   }
+  ],
+  "mbpp/719": [
+   {
+    "corpus": "panel code",
+    "id": "panel/code/mbpp-434",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 2,
+    "ratio": 0.06,
+    "jaccard": 0.78,
+    "practice_task": "Write a function that matches a string that has an a followed by zero or more b's.",
+    "held_out_task": "Write a function that matches a string that has an a followed by one or more b's."
+   }
+  ],
+  "mbpp/768": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/406",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 1.0,
+    "practice_task": "Write a python function to check for odd parity of a given number.",
+    "held_out_task": "Write a python function to find whether the parity of a given number is odd."
+   }
+  ],
+  "mbpp/779": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/758",
+    "why": [
+     "13-grams"
+    ],
+    "shared_13grams": 7,
+    "ratio": 0.37,
+    "jaccard": 0.33,
+    "practice_task": "Write a function to count the number of unique lists within a list.",
+    "held_out_task": "Write a function to count lists within a list. The function should return a dictionary where every list is converted to "
+   }
+  ],
+  "mbpp/824": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/629",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 0.75,
+    "practice_task": "Write a python function to remove even numbers from a given list.",
+    "held_out_task": "Write a python function to find even numbers from a list of numbers."
+   }
+  ],
+  "mbpp/836": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/559",
+    "why": [
+     "13-grams"
+    ],
+    "shared_13grams": 5,
+    "ratio": 0.25,
+    "jaccard": 0.11,
+    "practice_task": "Write a function to find length of the subarray having maximum sum.",
+    "held_out_task": "Write a function to find the sum of the largest contiguous sublist in the given list."
+   }
+  ],
+  "mbpp/837": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/420",
+    "why": [
+     "task sentence",
+     "same function"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 0.75,
+    "practice_task": "Write a python function to find the cube sum of first n odd natural numbers.",
+    "held_out_task": "Write a python function to find the cube sum of first n even natural numbers."
+   },
+   {
+    "corpus": "panel code",
+    "id": "panel/code/mbpp-504",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 0.86,
+    "practice_task": "Write a python function to find the cube sum of first n odd natural numbers.",
+    "held_out_task": "Write a python function to find the cube sum of first n natural numbers."
+   }
+  ],
+  "mbpp/841": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/296",
+    "why": [
+     "13-grams",
+     "task sentence",
+     "same function"
+    ],
+    "shared_13grams": 6,
+    "ratio": 0.33,
+    "jaccard": 0.75,
+    "practice_task": "Write a function to count the number of inversions in the given array.",
+    "held_out_task": "Write a python function to count inversions in an array."
+   }
+  ],
+  "mbpp/845": [
+   {
+    "corpus": "panel code",
+    "id": "panel/code/mbpp-365",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 0.75,
+    "practice_task": "Write a python function to count the number of digits in factorial of a given number.",
+    "held_out_task": "Write a python function to count the number of digits of a given number."
+   }
+  ],
+  "mbpp/849": [
+   {
+    "corpus": "panel code",
+    "id": "panel/code/mbpp-295",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 0.75,
+    "practice_task": "Write a python function to find sum of all prime divisors of a given number.",
+    "held_out_task": "Write a function to return the sum of all divisors of a number."
+   }
+  ],
+  "mbpp/852": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/436",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 0.75,
+    "practice_task": "Write a python function to remove negative numbers from a list.",
+    "held_out_task": "Write a python function to return the negative numbers in a list."
+   }
+  ],
+  "mbpp/858": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/792",
+    "why": [
+     "same function"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 0.6,
+    "practice_task": "Write a function to count number of lists in a given list of lists and square the count.",
+    "held_out_task": "Write a python function to count the number of lists in a given number of lists."
+   }
+  ],
+  "mbpp/872": [
+   {
+    "corpus": "panel code",
+    "id": "panel/code/mbpp-216",
+    "why": [
+     "13-grams",
+     "task sentence"
+    ],
+    "shared_13grams": 13,
+    "ratio": 0.57,
+    "jaccard": 1.0,
+    "practice_task": "Write a function to check if a nested list is a subset of another nested list.",
+    "held_out_task": "Write a function to check if a nested list is a subset of another nested list."
+   }
+  ],
+  "mbpp/879": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/794",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 5,
+    "ratio": 0.18,
+    "jaccard": 0.88,
+    "practice_task": "Write a function that matches a string that has an 'a' followed by anything, ending in 'b' by using regex.",
+    "held_out_task": "Write a function that matches a string that has an 'a' followed by anything, ending in 'b'."
+   }
+  ],
+  "mbpp/884": [
+   {
+    "corpus": "panel code",
+    "id": "panel/code/mbpp-228",
+    "why": [
+     "same function"
+    ],
+    "shared_13grams": 6,
+    "ratio": 0.18,
+    "jaccard": 0.6,
+    "practice_task": "Write a python function to check whether all the bits are within a given range or not.",
+    "held_out_task": "Write a python function to check whether all the bits are unset in the given range or not."
+   }
+  ],
+  "mbpp/893": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/460",
+    "why": [
+     "13-grams",
+     "same function"
+    ],
+    "shared_13grams": 6,
+    "ratio": 0.35,
+    "jaccard": 0.6,
+    "practice_task": "Write a python function to get the last element of each sublist.",
+    "held_out_task": "Write a python function to get the first element of each sublist."
+   }
+  ],
+  "mbpp/896": [
+   {
+    "corpus": "panel code",
+    "id": "panel/code/mbpp-487",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 0.8,
+    "practice_task": "Write a function to sort a list in increasing order by the last element in each tuple from a given list of non-empty tup",
+    "held_out_task": "Write a function to sort a list of tuples in increasing order by the last element in each tuple."
+   }
+  ],
+  "mbpp/903": [
+   {
+    "corpus": "panel code",
+    "id": "panel/code/mbpp-331",
+    "why": [
+     "13-grams"
+    ],
+    "shared_13grams": 11,
+    "ratio": 0.48,
+    "jaccard": 0.43,
+    "practice_task": "Write a python function to count the total unset bits from 1 to n.",
+    "held_out_task": "Write a python function to count unset bits of a given number."
+   }
+  ],
+  "mbpp/917": [
+   {
+    "corpus": "panel code",
+    "id": "panel/code/mbpp-482",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 0.8,
+    "practice_task": "Write a function to find the sequences of one upper case letter followed by lower case letters.",
+    "held_out_task": "Write a function to find sequences of one upper case letter followed by lower case letters in the given string by using "
+   }
+  ],
+  "mbpp/922": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/415",
+    "why": [
+     "13-grams",
+     "task sentence",
+     "same function"
+    ],
+    "shared_13grams": 15,
+    "ratio": 0.62,
+    "jaccard": 1.0,
+    "practice_task": "Write a function to find a pair with the highest product from a given array of integers.",
+    "held_out_task": "Write a python function to find a pair with highest product from a given array of integers."
+   }
+  ],
+  "mbpp/924": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/309",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 1.0,
+    "practice_task": "Write a function to find maximum of two numbers.",
+    "held_out_task": "Write a python function to find the maximum of two numbers."
+   }
+  ],
+  "mbpp/928": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/427",
+    "why": [
+     "13-grams",
+     "task sentence",
+     "same function"
+    ],
+    "shared_13grams": 26,
+    "ratio": 1.0,
+    "jaccard": 1.0,
+    "practice_task": "Write a function to convert a date of yyyy-mm-dd format to dd-mm-yyyy format.",
+    "held_out_task": "Write a function to convert a date of yyyy-mm-dd format to dd-mm-yyyy format."
+   }
+  ],
+  "mbpp/933": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/102",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 0.83,
+    "practice_task": "Write a function to convert camel case string to snake case string by using regex.",
+    "held_out_task": "Write a function to convert a snake case string to camel case string."
+   },
+   {
+    "corpus": "panel code",
+    "id": "panel/code/mbpp-411",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 1.0,
+    "practice_task": "Write a function to convert camel case string to snake case string by using regex.",
+    "held_out_task": "Write a function to convert the given snake case string to camel case string by using regex."
+   }
+  ],
+  "mbpp/945": [
+   {
+    "corpus": "panel code",
+    "id": "panel/code/mbpp-341",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 0.75,
+    "practice_task": "Write a function to convert the given tuples into set.",
+    "held_out_task": "Write a function to convert the given set into ordered tuples."
+   }
+  ],
+  "mbpp/947": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/90",
+    "why": [
+     "same function"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 0.5,
+    "practice_task": "Write a python function to find the length of the shortest word.",
+    "held_out_task": "Write a python function to find the length of the longest word."
+   }
+  ],
+  "mbpp/952": [
+   {
+    "corpus": "panel code",
+    "id": "panel/code/mbpp-402",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 3,
+    "ratio": 0.14,
+    "jaccard": 0.8,
+    "practice_task": "Write a function to compute the value of ncr mod p.",
+    "held_out_task": "Write a function to compute the value of ncr%p."
+   }
+  ],
+  "mbpp/962": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/797",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 4,
+    "ratio": 0.13,
+    "jaccard": 0.78,
+    "practice_task": "Write a python function to find the sum of all even natural numbers within the range l and r.",
+    "held_out_task": "Write a python function to find the sum of all odd natural numbers within the range l and r."
+   }
+  ],
+  "mbpp/964": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/79",
+    "why": [
+     "same function"
+    ],
+    "shared_13grams": 1,
+    "ratio": 0.04,
+    "jaccard": 0.6,
+    "practice_task": "Write a python function to check whether the length of the word is even or not.",
+    "held_out_task": "Write a python function to check whether the length of the word is odd or not."
+   }
+  ],
+  "mbpp/965": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/102",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 1.0,
+    "practice_task": "Write a function to convert camel case string to snake case string.",
+    "held_out_task": "Write a function to convert a snake case string to camel case string."
+   },
+   {
+    "corpus": "panel code",
+    "id": "panel/code/mbpp-411",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 0.83,
+    "practice_task": "Write a function to convert camel case string to snake case string.",
+    "held_out_task": "Write a function to convert the given snake case string to camel case string by using regex."
+   }
+  ],
+  "mbpp/966": [
+   {
+    "corpus": "panel code",
+    "id": "panel/code/mbpp-361",
+    "why": [
+     "same function"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 0.5,
+    "practice_task": "Write a function to remove an empty tuple from a list of tuples.",
+    "held_out_task": "Write a function to remove empty lists from a given list of lists."
+   }
+  ],
+  "mbpp/970": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/404",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 1.0,
+    "practice_task": "Write a function to find minimum of two numbers.",
+    "held_out_task": "Write a python function to find the minimum of two numbers."
+   }
+  ],
+  "mbpp/516": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/71",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 1,
+    "ratio": 0.06,
+    "jaccard": 0.75,
+    "practice_task": "Write a function to sort a list of elements using radix sort.",
+    "held_out_task": "Write a function to sort a list of elements."
+   },
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/141",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 1,
+    "ratio": 0.06,
+    "jaccard": 0.75,
+    "practice_task": "Write a function to sort a list of elements using radix sort.",
+    "held_out_task": "Write a function to sort a list of elements."
+   }
+  ],
+  "mbpp/521": [
+   {
+    "corpus": "panel code",
+    "id": "panel/code/mbpp-327",
+    "why": [
+     "same function"
+    ],
+    "shared_13grams": 2,
+    "ratio": 0.08,
+    "jaccard": 0.6,
+    "practice_task": "Write a function to print check if the triangle is scalene or not.",
+    "held_out_task": "Write a function to print check if the triangle is isosceles or not."
+   }
+  ],
+  "mbpp/536": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/426",
+    "why": [
+     "13-grams"
+    ],
+    "shared_13grams": 4,
+    "ratio": 0.29,
+    "jaccard": 0.0,
+    "practice_task": "Write a function to select the nth items of a list.",
+    "held_out_task": "Write a function to filter odd numbers."
+   }
+  ],
+  "mbpp/538": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/132",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 0.75,
+    "practice_task": "Write a python function to convert a given string list to a tuple.",
+    "held_out_task": "Write a function to convert a tuple to a string."
+   },
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/587",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 0.75,
+    "practice_task": "Write a python function to convert a given string list to a tuple.",
+    "held_out_task": "Write a function to convert a list to a tuple."
+   }
+  ],
+  "mbpp/542": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/732",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 3,
+    "ratio": 0.09,
+    "jaccard": 0.75,
+    "practice_task": "Write a function to replace all occurrences of spaces, commas, or dots with a colon in the given string by using regex.",
+    "held_out_task": "Write a function to replace all occurrences of spaces, commas, or dots with a colon."
+   }
+  ],
+  "mbpp/549": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/770",
+    "why": [
+     "task sentence",
+     "same function"
+    ],
+    "shared_13grams": 5,
+    "ratio": 0.18,
+    "jaccard": 0.78,
+    "practice_task": "Write a python function to find the sum of fifth power of first n odd natural numbers.",
+    "held_out_task": "Write a python function to find the sum of fourth power of first n odd natural numbers."
+   }
+  ],
+  "mbpp/574": [
+   {
+    "corpus": "mbpp+ and humaneval+",
+    "id": "mbpp+/233",
+    "why": [
+     "task sentence"
+    ],
+    "shared_13grams": 0,
+    "ratio": 0.0,
+    "jaccard": 0.75,
+    "practice_task": "Write a function to find the surface area of a cylinder.",
+    "held_out_task": "Write a function to find the lateral surface area of a cylinder."
+   }
+  ]
+ },
+ "dropped": [
+  "mbpp/516",
+  "mbpp/521",
+  "mbpp/536",
+  "mbpp/538",
+  "mbpp/542",
+  "mbpp/549",
+  "mbpp/574",
+  "mbpp/625",
+  "mbpp/634",
+  "mbpp/649",
+  "mbpp/653",
+  "mbpp/657",
+  "mbpp/658",
+  "mbpp/666",
+  "mbpp/676",
+  "mbpp/677",
+  "mbpp/683",
+  "mbpp/704",
+  "mbpp/715",
+  "mbpp/719",
+  "mbpp/768",
+  "mbpp/779",
+  "mbpp/824",
+  "mbpp/836",
+  "mbpp/837",
+  "mbpp/841",
+  "mbpp/845",
+  "mbpp/849",
+  "mbpp/852",
+  "mbpp/858",
+  "mbpp/872",
+  "mbpp/879",
+  "mbpp/884",
+  "mbpp/893",
+  "mbpp/896",
+  "mbpp/903",
+  "mbpp/917",
+  "mbpp/922",
+  "mbpp/924",
+  "mbpp/928",
+  "mbpp/933",
+  "mbpp/945",
+  "mbpp/947",
+  "mbpp/952",
+  "mbpp/962",
+  "mbpp/964",
+  "mbpp/965",
+  "mbpp/966",
+  "mbpp/970"
+ ],
+ "val": {
+  "mbpp": 52,
+  "apps": 200
+ },
+ "train": {
+  "mbpp": 218,
+  "apps": 1200
+ }
+}

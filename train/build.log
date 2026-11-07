@@ -1,0 +1,164 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.70kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/wsp-runtime:1
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/2] FROM docker.io/library/wsp-runtime:1@sha256:f66ea311db38c5382bdd00fa9460531bcc48ebb6d5e430c1cb7a4fde05a33f4f
+#4 resolve docker.io/library/wsp-runtime:1@sha256:f66ea311db38c5382bdd00fa9460531bcc48ebb6d5e430c1cb7a4fde05a33f4f done
+#4 CACHED
+
+#5 [2/2] RUN pip list --format=freeze | grep -i -E "^(torch|torchvision|torchaudio|transformers|vllm|triton|numpy|tokenizers|safetensors|flashinfer[a-z_-]*|xformers)==" > /opt/base-constraints.txt  && cat /opt/base-constraints.txt  && pip install -c /opt/base-constraints.txt trl liger-kernel flash-linear-attention  && pip list --format=freeze > /opt/train-freeze.txt  && python3 -c "import trl, fla, liger_kernel, torch, transformers, vllm; print('trl', trl.__version__, 'fla', fla.__version__, 'torch', torch.__version__, 'transformers', transformers.__version__, 'vllm', vllm.__version__)"
+#5 0.253 flashinfer-cubin==0.7.0.post1
+#5 0.253 flashinfer-jit-cache==0.7.0.post1+cu130
+#5 0.253 flashinfer-python==0.7.0.post1
+#5 0.253 numpy==2.2.6
+#5 0.253 safetensors==0.8.0
+#5 0.253 tokenizers==0.23.3
+#5 0.253 torch==2.13.0+cu130
+#5 0.253 torchaudio==2.11.0+cu130
+#5 0.253 torchvision==0.28.0+cu130
+#5 0.253 transformers==5.19.0
+#5 0.253 triton==3.7.1
+#5 0.253 vllm==0.32.0
+#5 0.712 Collecting trl
+#5 0.864   Downloading trl-1.17.1-py3-none-any.whl.metadata (13 kB)
+#5 0.911 Collecting liger-kernel
+#5 0.952   Downloading liger_kernel-0.8.5-py3-none-any.whl.metadata (40 kB)
+#5 1.040 Collecting flash-linear-attention
+#5 1.078   Downloading flash_linear_attention-0.6.0-py3-none-any.whl.metadata (44 kB)
+#5 1.091 Requirement already satisfied: accelerate>=1.11.0 in /usr/local/lib/python3.12/dist-packages (from trl) (1.15.0)
+#5 1.144 Collecting datasets>=4.7.0 (from trl)
+#5 1.181   Downloading datasets-5.1.0-py3-none-any.whl.metadata (24 kB)
+#5 1.194 Requirement already satisfied: huggingface_hub>=0.34.0 in /usr/local/lib/python3.12/dist-packages (from trl) (2.2.0)
+#5 1.194 Requirement already satisfied: jinja2 in /usr/local/lib/python3.12/dist-packages (from trl) (3.1.6)
+#5 1.195 Requirement already satisfied: numpy>=1.26.0 in /usr/local/lib/python3.12/dist-packages (from trl) (2.2.6)
+#5 1.195 Requirement already satisfied: packaging>20.0 in /usr/local/lib/python3.12/dist-packages (from trl) (26.3)
+#5 1.195 Requirement already satisfied: pandas>=2.1.1 in /usr/local/lib/python3.12/dist-packages (from trl) (3.1.0)
+#5 1.195 Requirement already satisfied: psutil>=5.9.4 in /usr/local/lib/python3.12/dist-packages (from trl) (7.2.2)
+#5 1.328 Collecting pyarrow>=21.0.0 (from trl)
+#5 1.365   Downloading pyarrow-26.0.1-cp312-cp312-manylinux_2_28_x86_64.whl.metadata (3.0 kB)
+#5 1.366 Requirement already satisfied: pyyaml>=6.0.1 in /usr/local/lib/python3.12/dist-packages (from trl) (6.0.3)
+#5 1.366 Requirement already satisfied: torch>=2.6.0 in /usr/local/lib/python3.12/dist-packages (from trl) (2.13.0+cu130)
+#5 1.366 Requirement already satisfied: transformers>=4.56.2 in /usr/local/lib/python3.12/dist-packages (from trl) (5.19.0)
+#5 1.367 Requirement already satisfied: triton>=2.3.1 in /usr/local/lib/python3.12/dist-packages (from liger-kernel) (3.7.1)
+#5 1.406 Collecting fla-core==0.6.0 (from flash-linear-attention)
+#5 1.446   Downloading fla_core-0.6.0-py3-none-any.whl.metadata (44 kB)
+#5 1.457 Requirement already satisfied: einops in /usr/local/lib/python3.12/dist-packages (from fla-core==0.6.0->flash-linear-attention) (0.8.2)
+#5 1.458 Requirement already satisfied: regex>=2025.10.22 in /usr/local/lib/python3.12/dist-packages (from transformers>=4.56.2->trl) (2026.9.29)
+#5 1.458 Requirement already satisfied: tokenizers<0.24.0,>=0.23.1 in /usr/local/lib/python3.12/dist-packages (from transformers>=4.56.2->trl) (0.23.3)
+#5 1.458 Requirement already satisfied: typer in /usr/local/lib/python3.12/dist-packages (from transformers>=4.56.2->trl) (0.27.3)
+#5 1.458 Requirement already satisfied: safetensors>=0.8.0 in /usr/local/lib/python3.12/dist-packages (from transformers>=4.56.2->trl) (0.8.0)
+#5 1.458 Requirement already satisfied: tqdm>=4.60 in /usr/local/lib/python3.12/dist-packages (from transformers>=4.56.2->trl) (4.70.1)
+#5 1.463 Requirement already satisfied: click<9.0.0,>=8.4.2 in /usr/local/lib/python3.12/dist-packages (from huggingface_hub>=0.34.0->trl) (8.5.0)
+#5 1.463 Requirement already satisfied: filelock>=3.10.0 in /usr/local/lib/python3.12/dist-packages (from huggingface_hub>=0.34.0->trl) (4.2.1)
+#5 1.463 Requirement already satisfied: fsspec>=2023.5.0 in /usr/local/lib/python3.12/dist-packages (from huggingface_hub>=0.34.0->trl) (2026.9.0)
+#5 1.464 Requirement already satisfied: hf-xet<2.0.0,>=1.6.0 in /usr/local/lib/python3.12/dist-packages (from huggingface_hub>=0.34.0->trl) (1.7.0)
+#5 1.464 Requirement already satisfied: httpx2<3,>=2.0.0 in /usr/local/lib/python3.12/dist-packages (from huggingface_hub>=0.34.0->trl) (2.13.1)
+#5 1.464 Requirement already satisfied: typing-extensions>=4.1.0 in /usr/local/lib/python3.12/dist-packages (from huggingface_hub>=0.34.0->trl) (4.16.0)
+#5 1.467 Requirement already satisfied: anyio>=4.10 in /usr/local/lib/python3.12/dist-packages (from httpx2<3,>=2.0.0->huggingface_hub>=0.34.0->trl) (4.15.1)
+#5 1.467 Requirement already satisfied: httpcore2==2.13.1 in /usr/local/lib/python3.12/dist-packages (from httpx2<3,>=2.0.0->huggingface_hub>=0.34.0->trl) (2.13.1)
+#5 1.467 Requirement already satisfied: idna>=3.18 in /usr/local/lib/python3.12/dist-packages (from httpx2<3,>=2.0.0->huggingface_hub>=0.34.0->trl) (3.20)
+#5 1.467 Requirement already satisfied: truststore>=0.10 in /usr/local/lib/python3.12/dist-packages (from httpx2<3,>=2.0.0->huggingface_hub>=0.34.0->trl) (0.10.5)
+#5 1.468 Requirement already satisfied: h11>=0.16 in /usr/local/lib/python3.12/dist-packages (from httpcore2==2.13.1->httpx2<3,>=2.0.0->huggingface_hub>=0.34.0->trl) (0.16.0)
+#5 1.472 Requirement already satisfied: dill<0.4.2,>=0.3.0 in /usr/local/lib/python3.12/dist-packages (from datasets>=4.7.0->trl) (0.4.1)
+#5 1.651 Collecting xxhash (from datasets>=4.7.0->trl)
+#5 1.685   Downloading xxhash-4.0.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (17 kB)
+#5 1.733 Collecting multiprocess<0.70.20 (from datasets>=4.7.0->trl)
+#5 1.773   Downloading multiprocess-0.70.19-py312-none-any.whl.metadata (7.5 kB)
+#5 1.818 Collecting fsspec>=2023.5.0 (from huggingface_hub>=0.34.0->trl)
+#5 1.865   Downloading fsspec-2026.7.0-py3-none-any.whl.metadata (10 kB)
+#5 1.874 Requirement already satisfied: aiohttp!=4.0.0a0,!=4.0.0a1 in /usr/local/lib/python3.12/dist-packages (from fsspec[http]<=2026.7.0,>=2023.1.0->datasets>=4.7.0->trl) (3.14.5)
+#5 1.875 Requirement already satisfied: aiohappyeyeballs>=2.5.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.7.0,>=2023.1.0->datasets>=4.7.0->trl) (2.7.1)
+#5 1.875 Requirement already satisfied: aiosignal>=1.4.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.7.0,>=2023.1.0->datasets>=4.7.0->trl) (1.4.0)
+#5 1.876 Requirement already satisfied: attrs>=17.3.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.7.0,>=2023.1.0->datasets>=4.7.0->trl) (26.1.0)
+#5 1.876 Requirement already satisfied: frozenlist>=1.1.1 in /usr/local/lib/python3.12/dist-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.7.0,>=2023.1.0->datasets>=4.7.0->trl) (1.8.0)
+#5 1.876 Requirement already satisfied: multidict<8.0,>=4.5 in /usr/local/lib/python3.12/dist-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.7.0,>=2023.1.0->datasets>=4.7.0->trl) (7.1.0)
+#5 1.876 Requirement already satisfied: propcache>=0.2.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.7.0,>=2023.1.0->datasets>=4.7.0->trl) (0.5.4)
+#5 1.876 Requirement already satisfied: yarl<2.0,>=1.25.1 in /usr/local/lib/python3.12/dist-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]<=2026.7.0,>=2023.1.0->datasets>=4.7.0->trl) (1.25.1)
+#5 1.883 Requirement already satisfied: python-dateutil>=2.9.0 in /usr/local/lib/python3.12/dist-packages (from pandas>=2.1.1->trl) (2.9.0.post0)
+#5 1.887 Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.12/dist-packages (from python-dateutil>=2.9.0->pandas>=2.1.1->trl) (1.17.0)
+#5 1.890 Requirement already satisfied: setuptools>=77.0.3 in /usr/local/lib/python3.12/dist-packages (from torch>=2.6.0->trl) (80.10.2)
+#5 1.890 Requirement already satisfied: sympy>=1.13.3 in /usr/local/lib/python3.12/dist-packages (from torch>=2.6.0->trl) (1.14.0)
+#5 1.890 Requirement already satisfied: networkx>=2.5.1 in /usr/local/lib/python3.12/dist-packages (from torch>=2.6.0->trl) (3.7)
+#5 1.891 Requirement already satisfied: cuda-toolkit==13.0.3 in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.6.0->trl) (13.0.3.0)
+#5 1.891 Requirement already satisfied: cuda-bindings<14,>=13.0.3 in /usr/local/lib/python3.12/dist-packages (from torch>=2.6.0->trl) (13.4.4)
+#5 1.892 Requirement already satisfied: nvidia-cudnn-cu13==9.20.0.48 in /usr/local/lib/python3.12/dist-packages (from torch>=2.6.0->trl) (9.20.0.48)
+#5 1.892 Requirement already satisfied: nvidia-cusparselt-cu13==0.8.1 in /usr/local/lib/python3.12/dist-packages (from torch>=2.6.0->trl) (0.8.1)
+#5 1.930 Collecting nvidia-nccl-cu13==2.29.7 (from torch>=2.6.0->trl)
+#5 1.973   Downloading nvidia_nccl_cu13-2.29.7-py3-none-manylinux_2_18_x86_64.whl.metadata (2.1 kB)
+#5 1.974 Requirement already satisfied: nvidia-nvshmem-cu13==3.4.5 in /usr/local/lib/python3.12/dist-packages (from torch>=2.6.0->trl) (3.4.5)
+#5 1.980 Requirement already satisfied: nvidia-cublas==13.1.1.3.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.6.0->trl) (13.1.1.3)
+#5 1.981 Requirement already satisfied: nvidia-cuda-nvrtc==13.0.88.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.6.0->trl) (13.0.88)
+#5 1.981 Requirement already satisfied: nvidia-cuda-runtime==13.0.96.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.6.0->trl) (13.0.96)
+#5 1.982 Requirement already satisfied: nvidia-cufft==12.0.0.61.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.6.0->trl) (12.0.0.61)
+#5 1.982 Requirement already satisfied: nvidia-nvjitlink<14,>=13.0.88 in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.6.0->trl) (13.4.92)
+#5 1.982 Requirement already satisfied: nvidia-cufile==1.15.1.6.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.6.0->trl) (1.15.1.6)
+#5 1.983 Requirement already satisfied: nvidia-cuda-cupti==13.0.85.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.6.0->trl) (13.0.85)
+#5 1.983 Requirement already satisfied: nvidia-curand==10.4.0.35.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.6.0->trl) (10.4.0.35)
+#5 1.984 Requirement already satisfied: nvidia-cusolver==12.0.4.66.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.6.0->trl) (12.0.4.66)
+#5 1.984 Requirement already satisfied: nvidia-cusparse==12.6.3.3.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.6.0->trl) (12.6.3.3)
+#5 1.986 Requirement already satisfied: nvidia-nvtx==13.0.85.* in /usr/local/lib/python3.12/dist-packages (from cuda-toolkit[cublas,cudart,cufft,cufile,cupti,curand,cusolver,cusparse,nvjitlink,nvrtc,nvtx]==13.0.3; platform_system == "Linux"->torch>=2.6.0->trl) (13.0.85)
+#5 1.989 Requirement already satisfied: cuda-pathfinder>=1.4.2 in /usr/local/lib/python3.12/dist-packages (from cuda-bindings<14,>=13.0.3->torch>=2.6.0->trl) (1.8.3)
+#5 1.998 Requirement already satisfied: mpmath<1.4,>=1.1.0 in /usr/local/lib/python3.12/dist-packages (from sympy>=1.13.3->torch>=2.6.0->trl) (1.3.0)
+#5 2.002 Requirement already satisfied: MarkupSafe>=2.0 in /usr/local/lib/python3.12/dist-packages (from jinja2->trl) (3.0.4)
+#5 2.003 Requirement already satisfied: shellingham>=1.3.0 in /usr/local/lib/python3.12/dist-packages (from typer->transformers>=4.56.2->trl) (1.5.4)
+#5 2.003 Requirement already satisfied: rich>=13.8.0 in /usr/local/lib/python3.12/dist-packages (from typer->transformers>=4.56.2->trl) (15.0.0)
+#5 2.004 Requirement already satisfied: annotated-doc>=0.0.2 in /usr/local/lib/python3.12/dist-packages (from typer->transformers>=4.56.2->trl) (0.0.5)
+#5 2.005 Requirement already satisfied: markdown-it-py>=2.2.0 in /usr/local/lib/python3.12/dist-packages (from rich>=13.8.0->typer->transformers>=4.56.2->trl) (4.2.0)
+#5 2.005 Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /usr/local/lib/python3.12/dist-packages (from rich>=13.8.0->typer->transformers>=4.56.2->trl) (2.21.0)
+#5 2.006 Requirement already satisfied: mdurl~=0.1 in /usr/local/lib/python3.12/dist-packages (from markdown-it-py>=2.2.0->rich>=13.8.0->typer->transformers>=4.56.2->trl) (0.1.2)
+#5 2.045 Downloading trl-1.17.1-py3-none-any.whl (996 kB)
+#5 2.198    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 996.6/996.6 kB 10.6 MB/s  0:00:00
+#5 2.236 Downloading liger_kernel-0.8.5-py3-none-any.whl (910 kB)
+#5 2.278    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 910.1/910.1 kB 18.0 MB/s  0:00:00
+#5 2.317 Downloading flash_linear_attention-0.6.0-py3-none-any.whl (403 kB)
+#5 2.363 Downloading fla_core-0.6.0-py3-none-any.whl (1.1 MB)
+#5 2.377    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.1/1.1 MB 76.2 MB/s  0:00:00
+#5 2.421 Downloading datasets-5.1.0-py3-none-any.whl (604 kB)
+#5 2.427    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 604.4/604.4 kB 116.9 MB/s  0:00:00
+#5 2.461 Downloading fsspec-2026.7.0-py3-none-any.whl (206 kB)
+#5 2.506 Downloading multiprocess-0.70.19-py312-none-any.whl (150 kB)
+#5 2.545 Downloading pyarrow-26.0.1-cp312-cp312-manylinux_2_28_x86_64.whl (55.0 MB)
+#5 3.184    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 55.0/55.0 MB 86.1 MB/s  0:00:00
+#5 3.218 Downloading nvidia_nccl_cu13-2.29.7-py3-none-manylinux_2_18_x86_64.whl (206.0 MB)
+#5 5.619    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 206.0/206.0 MB 85.8 MB/s  0:00:02
+#5 5.654 Downloading xxhash-4.0.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (261 kB)
+#5 5.907 Installing collected packages: xxhash, pyarrow, nvidia-nccl-cu13, multiprocess, fsspec, fla-core, datasets, liger-kernel, trl, flash-linear-attention
+#5 6.581   Attempting uninstall: nvidia-nccl-cu13
+#5 6.585     Found existing installation: nvidia-nccl-cu13 2.30.7
+#5 6.587     Uninstalling nvidia-nccl-cu13-2.30.7:
+#5 6.781       Successfully uninstalled nvidia-nccl-cu13-2.30.7
+#5 7.112   Attempting uninstall: fsspec
+#5 7.116     Found existing installation: fsspec 2026.9.0
+#5 7.118     Uninstalling fsspec-2026.9.0:
+#5 7.143       Successfully uninstalled fsspec-2026.9.0
+#5 8.458 
+#5 8.466 Successfully installed datasets-5.1.0 fla-core-0.6.0 flash-linear-attention-0.6.0 fsspec-2026.7.0 liger-kernel-0.8.5 multiprocess-0.70.19 nvidia-nccl-cu13-2.29.7 pyarrow-26.0.1 trl-1.17.1 xxhash-4.0.2
+#5 8.466 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#5 8.467 
+#5 8.467 [notice] A new release of pip is available: 26.2.1 -> 26.3
+#5 8.467 [notice] To update, run: python3.12 -m pip install --upgrade pip
+#5 9.974 /usr/local/lib/python3.12/dist-packages/fla/utils/hardware.py:62: UserWarning: Triton is not supported on current platform, roll back to CPU.
+#5 9.974   _cpu_device_warning()
+#5 14.21 trl 1.17.1 fla 0.6.0 torch 2.13.0+cu130 transformers 5.19.0 vllm 0.32.0
+#5 DONE 15.3s
+
+#6 exporting to image
+#6 exporting layers
+#6 exporting layers 7.2s done
+#6 exporting manifest sha256:0c866388f2895c49c34ab6d7864405a1153827c7c615aab55bac85b09df550eb done
+#6 exporting config sha256:874da2d4ff3e4dafe7787ba389786e160d7c2754b299ccb98dbca1a8901e209f done
+#6 exporting attestation manifest sha256:70837440334679710853c7be2ccde58fa8c38bad0686cb6c3a321ad9fbd2c15a done
+#6 exporting manifest list sha256:bbe728b745530ffb5208385162f86e732c281db0927cf987e8d61326f0229823 done
+#6 naming to docker.io/library/wsp-train:1 done
+#6 unpacking to docker.io/library/wsp-train:1
+#6 unpacking to docker.io/library/wsp-train:1 1.1s done
+#6 DONE 8.3s
