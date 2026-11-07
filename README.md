@@ -70,13 +70,13 @@ On 728 practice-candidate problems, one answer each, presence penalty 0:
 
 Every edit is scored against the unedited model at presence penalty 1.5. Later edits are also paired against their starting edit.
 
-| Suite | Unedited | pilot-10 | pilot-12 | pilot-13 | combo-12-13 | pilot-14 | pilot-16 | pilot-17 |
-|---|---|---|---|---|---|---|---|---|
-| MBPP+ and HumanEval+ | 19.0% | 27.6% | 27.7% | 31.5% | **32.6%** | 32.3% | 31.4% | 31.5% |
-| MMLU-Pro | 40.5% | 42.9% | 43.8% | 43.2% | 42.9% | **45.2%** | 40.6% | 44.2% |
-| IFEval, prompt-level | 22.3% | 56.6% | 59.4% | 56.7% | 60.8% | 58.2% | 60.3% | **61.0%** |
-| LiveCodeBench | 1.6% | **7.6%** | **7.6%** | 6.6% | 7.4% | 7.0% | 6.4% | 7.4% |
-| MATH-500 | 6.8% | 51.0% | 55.4% | 51.0% | 54.1% | **56.9%** | 56.0% | 56.0% |
+| Suite | Unedited | pilot-10 | pilot-12 | pilot-13 | combo-12-13 | pilot-14 | pilot-16 | pilot-17 | pilot-18 | pilot-19 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| MBPP+ and HumanEval+ | 19.0% | 27.6% | 27.7% | 31.5% | 32.6% | 32.3% | 31.4% | 31.5% | 31.8% | **33.0%** |
+| MMLU-Pro | 40.5% | 42.9% | 43.8% | 43.2% | 42.9% | **45.2%** | 40.6% | 44.2% | 43.1% | 43.4% |
+| IFEval, prompt-level | 22.3% | 56.6% | 59.4% | 56.7% | 60.8% | 58.2% | 60.3% | **61.0%** | 59.2% | 56.3% |
+| LiveCodeBench | 1.6% | **7.6%** | **7.6%** | 6.6% | 7.4% | 7.0% | 6.4% | 7.4% | 7.0% | 7.3% |
+| MATH-500 | 6.8% | 51.0% | 55.4% | 51.0% | 54.1% | **56.9%** | 56.0% | 56.0% | 55.5% | 56.0% |
 
 For comparison, the paper's 50-pass math edit gained +5.2 (MMLU-Pro), +41.3 (IFEval) and +40.2 (MATH-500).
 
@@ -196,17 +196,52 @@ From round 5 on, the agent can ask for a **panel pass**: 1,000 fixed questions t
   - **So only differences beyond about two standard errors count:** about 5 points on one suite, 2.5 on the mean.
 - **Built by** `eval/prepare_panel.py`. The reference answers are checked with the same graders; `paper/data/panel.csv` lists the questions by id.
 
-### Round 5 (running): `pilot-19` consolidates round 4
+### Round 5: `pilot-19` consolidates round 4
 
 - **Starts from** `pilot-14`, with 24 passes and the panel.
 - **Candidates in its working directory:** the changes of `pilot-16`, `pilot-17` and `pilot-18`, each on its own and summed. The three touch disjoint tensors (layer 23's MLP, attention in layers 11 and 15, layer 22's MLP), so the sum keeps each change unaltered.
 - **What its brief gives:** the held-out results of `pilot-16` and `pilot-17`, `pilot-18`'s own practice numbers, and the panel's two noise checks.
 - **The goal:** one edit that does best on the five held-out suites together, with none clearly worse than `pilot-14`. It keeps or narrows changes, and adds no new mechanisms.
 - **It is the last pilot.** The rule set before round 5 was one more code pilot only if `pilot-18` gained more than about 2 points of code beyond two standard errors, and it did not.
+- **What it kept:** `pilot-17`'s copy change and `pilot-18`'s identifier pair (13 tensors in all). It dropped `pilot-16`'s stopper because of its held-out MMLU-Pro loss. On the panel its final edit was +0.3 (1.3) against `pilot-14`'s.
+- **Held out, paired against `pilot-14`** (SE in brackets):
 
-### Next: the training phase
+  | Suite | `pilot-14` | `pilot-19` | Paired |
+  |---|---|---|---|
+  | MBPP+ and HumanEval+ | 32.3% | 33.0% | +0.65 (0.97) |
+  | HumanEval+ only | 26.4% | 30.3% | +3.96 (1.74) |
+  | MMLU-Pro | 45.2% | 43.4% | −1.80 (1.39) |
+  | IFEval | 58.2% | 56.3% | −1.94 (1.65) |
+  | LiveCodeBench | 7.0% | 7.3% | +0.29 (0.70) |
+  | MATH-500 | 56.9% | 56.0% | −0.90 (0.96) |
 
-The final edit (E) and the original model (O) will be trained on the same practice problems, with rejection-sampling fine-tuning (RFT) and with GRPO on test pass/fail, under one fixed recipe. The questions are whether training improves coding beyond what the edits did, whether starting from E helps training, and whether the edits survive it. The plan, with its recipe, checkpoint rule and data hygiene, is [`plans/training-phase.md`](plans/training-phase.md). The training code is in `train/`.
+  - **The copy change's IFEval gain did not survive the combination:** +2.8 (1.6) alone, −1.9 (1.7) here.
+  - **Over the five suites:** −0.74 (0.53), so `pilot-19` is not at least level with `pilot-14`, and **the final edit E is `pilot-14`'s** by the rule fixed in the training plan.
+
+### The training phase (started 2026-11-07)
+
+E (`pilot-14`'s edit) and the original model (O) are trained on the same practice problems, with rejection-sampling fine-tuning (RFT) and with GRPO on test pass/fail, under one fixed recipe.
+- **The questions:** whether training improves coding beyond what the edits did, whether starting from E helps training, and whether the edits survive it.
+- **The plan,** with its recipe, checkpoint rule and data hygiene, is [`plans/training-phase.md`](plans/training-phase.md). The training code is in `train/`.
+- **Checks before training, passed:**
+  - The trainer's log-probs match vLLM's to 0.015 per token on average, with a 99th percentile of 0.12.
+  - After a training step, vLLM holds the trainer's new weights.
+- **Running:** the two RFT arms, R-O and R-E. Every checkpoint is checked on the panel and on held-back validation problems, against its arm's starting model.
+- **The starting models' checks so far:** O passes 5.2% of the validation answers and runs 76% of them to the 32k cap. Its panel mean is 26.7%.
+- **R-O's first round:** 4.2% of its 11,344 practice answers passed, and 79% ran to the 16k cap. Its 305 kept passing answers average 2,400 tokens, against 13,400 for all answers.
+- **R-O's first checkpoint, paired against O** (SE in brackets):
+
+  | | O | R-O round 1 | Paired |
+  |---|---|---|---|
+  | Panel: choice | 43.6% | 36.4% | −7.2 (3.0) |
+  | Panel: math | 8.8% | 23.2% | +14.4 (2.6) |
+  | Panel: instructions | 46.0% | 58.4% | +12.4 (3.3) |
+  | Panel: code | 8.4% | 14.0% | +5.6 (2.3) |
+  | Panel mean | 26.7% | 33.0% | +6.3 (1.4) |
+  | Validation | 5.2% | 10.3% | +5.2 (1.2) |
+
+  - **One round on its own passing answers doubled the validation pass rate:** 51 of the 252 problems passed at least once, against 27.
+  - **Like the edits, it learned to finish, at a cost to multiple choice.** 33% of its validation answers ran to the 32k cap, against 76%. Most of the answers it now finishes are still wrong: wrong answers rose from 56 to 314 of 1,008, and passes from 52 to 104.
 
 ## What we've learned so far
 
@@ -217,6 +252,7 @@ The final edit (E) and the original model (O) will be trained on the same practi
 - **Targeted edits are small and interpretable.** They are a few neurons or rank-1 gates, each with a mechanism the agent can state, and they compose when they touch disjoint tensors.
 - **The agent's own checks overstate held-out gains on suites they don't resemble.** IFEval, for example, rose +18 on its own prompts but +2.9 held out.
 - **Later rounds trade between suites rather than lifting all of them.**
+- **A combination of edits needs its own evaluation.** `pilot-19` joined the copy change, IFEval +2.8 (1.6) on its own, with the identifier pair, on disjoint tensors. IFEval came out at −1.9 (1.7).
 - **Fixed seeds don't make two models' answers comparable one by one.** With thinking on, changing a single weight by one rounding step re-samples nearly every answer, so a paired comparison removes the problems' difficulty but not the sampling noise. Its standard error is the honest yardstick, and single-suite differences of a few points are noise.
 - **A narrow edit can pass every check the agent runs and still cost a suite it never looks at.** `pilot-16` fixed its target and lost 4.6 points on MMLU-Pro, which is why later runs get the panel.
 
@@ -229,7 +265,7 @@ The final edit (E) and the original model (O) will be trained on the same practi
 | `scripts/` | Practice-set preparation and the baseline |
 | `baseline/` | Baseline results and the rendered evaluation prompt |
 | `runs/<run>/` | Each run's brief, config, final report, the agent's explanations, its log and its submitted-edit manifest |
-| `paper/` | `collect.py` and `data/`: per-run, per-pass, per-evaluation, per-panel-pass and per-tensor tables, the panel's question list, plus the full agent transcripts, for a write-up |
+| `paper/` | `collect.py` and `data/`: per-run, per-pass, per-evaluation, per-panel-pass and per-tensor tables, the panel's question list, the full agent transcripts, and per-arm, per-round, per-step and per-checkpoint training tables, for a write-up |
 | `plans/` | The training phase's plan |
 | `train/` | The training phase: its image, the practice split and overlap check, the GRPO and RFT trainers, the pre-training checks and the checkpoint checks |
 | `scratch/` | One-off analysis scripts |

@@ -1,3 +1,4 @@
 2026-11-07 16:42:36 waiting for the 5090
 2026-11-07 16:42:36 stopping llama-swap to free the 5090
 2026-11-07 16:44:26 vLLM now holds /start (9 tensors)
+2026-11-07 16:58:18 round 1: sampled problems 1-256 of 1418: 9154451 tokens in 832s (11008 tok/s)

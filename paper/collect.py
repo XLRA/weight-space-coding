@@ -306,8 +306,11 @@ def training_rows():
                 ckpt = os.path.exists(f"{rd}checkpoint/manifest.json")
                 row["rounds_done"] += ckpt
                 src = s.get("pass_rate_by_source") or {}
+                # rft.py records "start" or "round_<n>"; a round still sampling has no summary yet.
+                sf = s.get("sampled_from") or ""
+                sf = "" if not s else f"{arm}/{sf}" if re.fullmatch(r"round_\d+", sf) else label_of(sf, start)
                 rounds.append({
-                    "arm": arm, "round": r, "sampled_from": label_of(s.get("sampled_from"), start),
+                    "arm": arm, "round": r, "sampled_from": sf,
                     "problems": s.get("problems", ""), "answers": s.get("answers", ""),
                     "pass_rate": s.get("pass_rate", ""), "pass_rate_mbpp": src.get("mbpp", ""),
                     "pass_rate_apps": src.get("apps", ""), "problems_with_a_pass": s.get("problems_with_a_pass", ""),
