@@ -114,11 +114,13 @@
    - **Speed:** a forward and backward pass on the 5080 takes 0.5 s at 4k tokens, 1.1 s at 8k and 2.5 s at 16k, with a peak of 6.5 GB. The first input of 8k and 16k tokens compiles once, taking 7 s and 14 s; new lengths after that do not recompile.
 4. **Grading:** the evaluation's sandbox (unprivileged, 2 GB memory, time limits), run as a pool on the server's 16 cores.
    - **Which grader:** the practice grader the agent used, `harness/grade.py`, which the panel's code suite also uses. The older copy in `scripts/` lacks its 2026-11-06 fixes: one BLAS thread per solution (otherwise a dozen solutions importing numpy at once fail with ImportError), and null bytes and deeply nested code graded instead of raising.
-   - **Where it differs from the held-out suites** (found 2026-11-07 in start-E's check; the recipe is unchanged):
-     - **The rules:** the practice grader takes the last code block after the first `</think>`. The held-out suites read the text after the last `</think>`.
-     - **Same on O:** the two extract the same code from every validation answer of start-O and R-O round 1, none of which has a second `</think>`.
-     - **Not on E:** 608 of E's 965 finished answers reopen their reasoning after `</think>`, with draft code blocks, and the rules extract different code from 365. 133 answers that fail to parse under the practice rule parse under the held-out one, and 28 the other way.
-     - **So:** the reward is the stricter grader on E's format, and what it rewards, one clean final answer, both graders accept.
+   - **Reading answers that reopen their reasoning** (found 2026-11-07 in start-E's check; the recipe is unchanged):
+     - **The rules:** every code grader here takes the last code block after the first `</think>`: the practice grader, which is the reward, and the held-out code suites (MBPP+ and HumanEval+ through `harness/grade_run.py`, LiveCodeBench through `eval/grade_suites.py`). The held-out MMLU-Pro, MATH-500 and IFEval read the text after the last `</think>`.
+     - **Corrected:** a first version of this note said the held-out code suites read after the last `</think>`. They read after the first, like the reward.
+     - **Same on O:** the two readings extract the same code from every validation answer of start-O and R-O round 1, none of which has a second `</think>`.
+     - **Not on E:** 608 of E's 965 finished answers reopen their reasoning after `</think>`, with draft code blocks, and the readings extract different code from 365.
+     - **What it costs E** (`train/grader_rules.py`, `train/checks/grader-rules.json`): reading its code after the last `</think>` adds 9 passes, all on APPS. Validation goes from 10.0% to 10.9%, +0.89 (0.29) paired over the 252 problems. Of the 384 answers that fail to parse, 163 have no code after the last `</think>` and 111 are wrong answers.
+     - **So:** the format costs E little, and the reward and the held-out code suites read it the same way.
 5. **Memory on the 5090:**
    - The trainable weights (the 24 blocks, 498M parameters) with fp32 master copies, gradients and AdamW state take about 10 GB.
    - vLLM's weights and cache get about 10 GB.

@@ -231,7 +231,10 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
 - **The starting models' checks:**
   - **O** passes 5.2% of the validation answers and runs 76% of them to the 32k cap. Its panel mean is 26.7%.
   - **E** passes 10.0% and runs 4% to the cap. Its panel mean is 51.1%: choice 45.6%, math 61.6%, instructions 77.6%, code 19.6%.
-  - **E reopens its reasoning:** 608 of its 965 finished validation answers have a second `</think>`, with more reasoning and draft code after the first, against none of O's. So 38% of its answers do not parse under the practice grader, which reads after the first `</think>`. The held-out suites read after the last one, which is more lenient here, so the training reward is the stricter of the two on E's format.
+  - **E reopens its reasoning:** 608 of its 965 finished validation answers have a second `</think>`, with more reasoning and draft code after the first, against none of O's.
+    - **Grading:** every code grader here, the training reward and the held-out code suites alike, takes the last code block after the first `</think>`, which for E is often a draft. So 38% of E's validation answers fail to parse.
+    - **What it costs:** reading E's code after the last `</think>` instead adds only 9 passes of 1,008 (+0.9 points, SE 0.3). Most of these answers end without working code either way.
+    - **Corrected:** a first version of this note said the held-out suites read after the last `</think>`. Only MMLU-Pro, MATH-500 and IFEval do.
 - **R-O's first round:** 4.2% of its 11,344 practice answers passed, and 79% ran to the 16k cap. Its 305 kept passing answers average 2,400 tokens, against 13,400 for all answers.
 - **R-O's first checkpoint, paired against O** (SE in brackets):
 
