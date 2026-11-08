@@ -12,6 +12,11 @@ train/run-ckpt.sh in wsp-train:1 with no GPU and no network, after the panel has
    - Validation: the pass rate over all answers and by source; the paired difference over problems (each problem's
      pass rate over its 4 answers), with its SE.
    - panel_within_2_5: whether the panel mean is no more than 2.5 points below the base (the choice rule).
+3. Once train/data2/val.jsonl exists (train/build_tests.py, 2026-11-08), it also grades the answers on data2's tests,
+   which add tests the APPS statements do not show: val2.jsonl, each row marked with its problem's "usable". The
+   summary's val2 (and vs_base.val2, when the base has a val2.jsonl too) is the same as val over the usable problems
+   only. It is the validation that the choice rule and G-O's step-50 rule read from 2026-11-08 (plans/training-phase.md,
+   "Deviations"): printing an example's output cannot pass a usable problem.
 """
 import gzip
 import json
@@ -26,19 +31,32 @@ import common  # noqa: E402
 import grade  # noqa: E402
 
 SUITES = ("choice", "math", "instructions", "code")
+VAL, VAL2 = "/train/data/val.jsonl", "/train/data2/val.jsonl"
 
 
-def grade_val(d):
-    probs = {p["id"]: p for p in common.load_problems("/train/data/val.jsonl")}
+def grade_val(d, path=VAL, out="val.jsonl"):
+    probs = {p["id"]: p for p in common.load_problems(path)}
     raw = [json.loads(line) for line in gzip.open(f"{d}/val.raw.jsonl.gz", "rt")]
     with ThreadPoolExecutor(12) as ex:
         graded = list(ex.map(lambda r: grade.grade(probs[r["id"]], r), raw))
-    with open(f"{d}/val.jsonl.tmp", "w") as f:
+    with open(f"{d}/{out}.tmp", "w") as f:
         for r, g in zip(raw, graded):
-            f.write(json.dumps({"id": r["id"], "sample": r["sample"], "source": g["source"],
-                                "difficulty": g["difficulty"], "n_tokens": r["n_tokens"],
-                                "finish_reason": r["finish_reason"], "loop": g["loop"], "status": g["status"]}) + "\n")
-    os.replace(f"{d}/val.jsonl.tmp", f"{d}/val.jsonl")
+            row = {"id": r["id"], "sample": r["sample"], "source": g["source"], "difficulty": g["difficulty"],
+                   "n_tokens": r["n_tokens"], "finish_reason": r["finish_reason"], "loop": g["loop"],
+                   "status": g["status"]}
+            if "usable" in probs[r["id"]]:
+                row["usable"] = probs[r["id"]]["usable"]
+            f.write(json.dumps(row) + "\n")
+    os.replace(f"{d}/{out}.tmp", f"{d}/{out}")
+
+
+def val_block(val):
+    src = Counter(r["source"] for r in val)
+    return {"problems": len({r["id"] for r in val}), "answers": len(val),
+            "pass": pct(sum(r["status"] == "pass" for r in val) / len(val)),
+            "by_source": {k: pct(sum(r["status"] == "pass" for r in val if r["source"] == k) / n) for k, n in src.items()},
+            "problems_with_a_pass": sum(v > 0 for v in by_problem(val).values()),
+            "status": dict(Counter(r["status"] for r in val))}
 
 
 def rows(path):
@@ -99,7 +117,16 @@ def summarize(d, base):
         out["vs_base"] = {"base": os.path.relpath(base, "/train/evals"), "panel": vs,
                           "panel_mean": {"diff": mean_diff, "se": mean_se},
                           "val": {"diff": vm, "se": vse}, "panel_within_2_5": mean_diff >= -2.5}
-    json.dump(out, open(f"{d}/summary.json", "w"), indent=1)
+    if os.path.exists(f"{d}/val2.jsonl"):
+        v2 = [r for r in rows(f"{d}/val2.jsonl") if r.get("usable")]
+        out["val2"] = {"tests": "train/data2/val.jsonl, its usable problems only", **val_block(v2)}
+        if base and os.path.exists(f"{base}/val2.jsonl"):
+            ve, vb = by_problem(v2), by_problem([r for r in rows(f"{base}/val2.jsonl") if r.get("usable")])
+            ids = sorted(ve)
+            vm, vse = paired([ve[i] for i in ids], [vb[i] for i in ids])
+            out["vs_base"]["val2"] = {"diff": vm, "se": vse}
+    json.dump(out, open(f"{d}/summary.json.tmp", "w"), indent=1)
+    os.replace(f"{d}/summary.json.tmp", f"{d}/summary.json")
     return out
 
 
@@ -108,13 +135,19 @@ def main():
     base = f"/train/evals/{sys.argv[2]}" if len(sys.argv) > 2 else None
     if not os.path.exists(f"{d}/val.jsonl"):
         grade_val(d)
+    if os.path.exists(VAL2) and not os.path.exists(f"{d}/val2.jsonl"):
+        grade_val(d, VAL2, "val2.jsonl")
     out = summarize(d, base)
     p = ", ".join(f"{s} {out['panel'][s]['pass']}" for s in SUITES)
     line = f"{out['name']}: panel mean {out['panel_mean']} ({p}); validation {out['val']['pass']}"
+    if "val2" in out:
+        line += f", on the new tests {out['val2']['pass']} ({out['val2']['problems']} usable problems)"
     if base:
         v = out["vs_base"]
         line += (f"; against {v['base']}: panel mean {v['panel_mean']['diff']:+} (SE {v['panel_mean']['se']}), "
                  f"validation {v['val']['diff']:+} (SE {v['val']['se']})")
+        if "val2" in v:
+            line += f", on the new tests {v['val2']['diff']:+} (SE {v['val2']['se']})"
     print(line, flush=True)
 
 

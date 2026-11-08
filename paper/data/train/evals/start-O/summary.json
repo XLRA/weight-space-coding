@@ -46,5 +46,25 @@
    "timeout": 2
   }
  },
- "panel_mean": 26.7
+ "panel_mean": 26.7,
+ "val2": {
+  "tests": "train/data2/val.jsonl, its usable problems only",
+  "problems": 220,
+  "answers": 880,
+  "pass": 4.77,
+  "by_source": {
+   "mbpp": 12.98,
+   "apps": 2.23
+  },
+  "problems_with_a_pass": 20,
+  "status": {
+   "wrong_interface": 72,
+   "cut_at_max_tokens": 651,
+   "runtime_error": 48,
+   "wrong_answer": 57,
+   "syntax_error": 8,
+   "pass": 42,
+   "timeout": 2
+  }
+ }
 }

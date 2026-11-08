@@ -39,10 +39,13 @@ Writes:
                   with its cut share and mean length, panel mean, validation pass rate (also by source), problems
                   with a pass, cut share, mean length; and paired against the arm's start: per-suite and panel-mean
                   differences with standard errors, the validation difference with its standard error, and whether
-                  the panel mean is within 2.5 points of the start's (the checkpoint rule);
+                  the panel mean is within 2.5 points of the start's (the checkpoint rule). The val2_ columns are
+                  the validation on train/data2's tests over its usable problems (2026-11-08), which the rules read
+                  from then on;
 - train/          the small training records: each arm's config, launches, log (timestamped lines and errors), round
                   summaries and fine-tuning steps or GRPO steps, checkpoint manifests; each check's summary and
-                  generation record; the step-1 checks (log-prob agreement, weight push). The sampled answers stay in
+                  generation record; the step-1 checks (log-prob agreement, weight push); data2/build.json, the
+                  new tests' counts and md5s. The sampled answers stay in
                   /opt/wsp/train/runs and the checks' answers in /opt/wsp/train/evals (too large to copy);
 - /opt/wsp/paper/code/<time>/  the harness, evaluation, training and paper code, copied whenever it changed.
 Edits kept by driver.py at each request (snapshot_edit) are in /opt/wsp/paper/edits/<md5>.npy, listed per run in
@@ -370,6 +373,13 @@ def checkpoint_rows():
         row.update({"panel_mean_diff": pm.get("diff", ""), "panel_mean_se": pm.get("se", ""),
                     "val_diff": vv.get("diff", ""), "val_se": vv.get("se", ""),
                     "panel_within_2_5": vb.get("panel_within_2_5", "")})
+        # val2: on train/data2's tests, over its usable problems (2026-11-08); the rules read it from then on
+        v2, vv2 = s.get("val2") or {}, vb.get("val2") or {}
+        src2 = v2.get("by_source") or {}
+        row.update({"val2_problems": v2.get("problems", ""), "val2_pass": v2.get("pass", ""),
+                    "val2_pass_mbpp": src2.get("mbpp", ""), "val2_pass_apps": src2.get("apps", ""),
+                    "val2_problems_with_a_pass": v2.get("problems_with_a_pass", ""),
+                    "val2_diff": vv2.get("diff", ""), "val2_se": vv2.get("se", "")})
         out.append(row)
     return out
 
@@ -404,6 +414,7 @@ def copy_training_texts():
             put(f"{d}/{fn}", f"evals/{name}/{fn}")
     for p in glob.glob(f"{TRAIN}/checks/*.json"):
         put(p, f"checks/{os.path.basename(p)}")
+    put(f"{TRAIN}/data2/build.json", "data2/build.json")  # the new tests' counts and md5s (train/build_tests.py)
 
 
 def write_csv(path, rows):

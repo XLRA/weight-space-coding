@@ -75,6 +75,30 @@
    "diff": 12.9,
    "se": 1.79
   },
-  "panel_within_2_5": true
+  "panel_within_2_5": true,
+  "val2": {
+   "diff": 1.7,
+   "se": 1.06
+  }
+ },
+ "val2": {
+  "tests": "train/data2/val.jsonl, its usable problems only",
+  "problems": 220,
+  "answers": 880,
+  "pass": 11.14,
+  "by_source": {
+   "mbpp": 27.4,
+   "apps": 6.1
+  },
+  "problems_with_a_pass": 36,
+  "status": {
+   "runtime_error": 78,
+   "wrong_answer": 497,
+   "pass": 98,
+   "wrong_interface": 8,
+   "cut_at_max_tokens": 22,
+   "syntax_error": 174,
+   "no_code": 3
+  }
  }
 }

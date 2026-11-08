@@ -115,3 +115,46 @@
 2026-11-08 16:24:35 step 109: pass 0.674, kept 9/64 groups, cut 0.00, mean 2627 tokens, loss 0.00043575046584010124, gen 91s grade 48s train 20s total 161s, 20.0 GiB free before waking vLLM
 2026-11-08 16:27:36 step 110: pass 0.760, kept 9/64 groups, cut 0.00, mean 2921 tokens, loss 0.009651670174207538, gen 109s grade 49s train 23s total 181s, 20.0 GiB free before waking vLLM
 2026-11-08 16:30:39 step 111: pass 0.725, kept 13/64 groups, cut 0.00, mean 2805 tokens, loss 0.036949405912309885, gen 96s grade 52s train 34s total 182s, 20.0 GiB free before waking vLLM
+2026-11-08 16:33:44 step 112: pass 0.592, kept 8/64 groups, cut 0.00, mean 2995 tokens, loss 0.10699575347825885, gen 104s grade 56s train 25s total 185s, 20.0 GiB free before waking vLLM
+2026-11-08 16:36:34 step 113: pass 0.670, kept 10/64 groups, cut 0.00, mean 2710 tokens, loss 0.10737639234866947, gen 93s grade 51s train 26s total 170s, 20.8 GiB free before waking vLLM
+2026-11-08 16:39:15 step 114: pass 0.613, kept 7/64 groups, cut 0.00, mean 2428 tokens, loss 0.022099124267697334, gen 100s grade 50s train 10s total 161s, 20.8 GiB free before waking vLLM
+2026-11-08 16:42:30 step 115: pass 0.686, kept 11/64 groups, cut 0.00, mean 3000 tokens, loss 0.0480924061848782, gen 114s grade 52s train 28s total 195s, 20.3 GiB free before waking vLLM
+2026-11-08 16:45:33 step 116: pass 0.703, kept 9/64 groups, cut 0.00, mean 2952 tokens, loss 0.18394272099249065, gen 115s grade 50s train 17s total 183s, 20.8 GiB free before waking vLLM
+2026-11-08 16:48:47 step 117: pass 0.639, kept 10/64 groups, cut 0.00, mean 3399 tokens, loss 0.039128514617914334, gen 119s grade 52s train 22s total 194s, 20.8 GiB free before waking vLLM
+2026-11-08 16:51:39 step 118: pass 0.721, kept 3/64 groups, cut 0.00, mean 3435 tokens, loss 0.07021945839126904, gen 117s grade 50s train 3s total 171s, 20.8 GiB free before waking vLLM
+2026-11-08 16:55:19 step 119: pass 0.719, kept 9/64 groups, cut 0.00, mean 3817 tokens, loss 0.010474433365743607, gen 150s grade 49s train 21s total 220s, 20.8 GiB free before waking vLLM
+2026-11-08 16:58:36 step 120: pass 0.742, kept 6/64 groups, cut 0.00, mean 3643 tokens, loss 0.06003598286770284, gen 134s grade 49s train 14s total 197s, 20.8 GiB free before waking vLLM
+2026-11-08 17:02:10 step 121: pass 0.740, kept 6/64 groups, cut 0.00, mean 4050 tokens, loss 0.10121853603050113, gen 147s grade 49s train 17s total 213s, 20.3 GiB free before waking vLLM
+2026-11-08 17:05:49 step 122: pass 0.623, kept 10/64 groups, cut 0.00, mean 3789 tokens, loss -0.03149760147789493, gen 141s grade 51s train 27s total 219s, 20.8 GiB free before waking vLLM
+2026-11-08 17:09:41 step 123: pass 0.662, kept 10/64 groups, cut 0.00, mean 4146 tokens, loss 0.00309616734739393, gen 152s grade 51s train 28s total 231s, 20.3 GiB free before waking vLLM
+2026-11-08 17:13:18 step 124: pass 0.777, kept 2/64 groups, cut 0.00, mean 4407 tokens, loss 0.07633001450449228, gen 160s grade 50s train 6s total 217s, 20.8 GiB free before waking vLLM
+2026-11-08 17:17:20 step 125: pass 0.701, kept 2/64 groups, cut 0.00, mean 4702 tokens, loss 0.14100144989788532, gen 180s grade 53s train 8s total 241s, 20.8 GiB free before waking vLLM
+2026-11-08 17:17:22 checkpoint step 125
+2026-11-08 17:22:00 step 126: pass 0.746, kept 7/64 groups, cut 0.00, mean 4999 tokens, loss 0.0505740501685068, gen 199s grade 51s train 28s total 277s, 20.0 GiB free before waking vLLM
+2026-11-08 17:26:54 step 127: pass 0.771, kept 5/64 groups, cut 0.00, mean 5291 tokens, loss 0.0013495390303432941, gen 219s grade 52s train 22s total 293s, 20.8 GiB free before waking vLLM
+2026-11-08 17:32:26 step 128: pass 0.711, kept 8/64 groups, cut 0.00, mean 5630 tokens, loss -0.015499354572966695, gen 240s grade 52s train 39s total 332s, 20.8 GiB free before waking vLLM
+2026-11-08 17:37:19 step 129: pass 0.750, kept 9/64 groups, cut 0.00, mean 5056 tokens, loss 0.0343924101034645, gen 201s grade 53s train 37s total 293s, 20.8 GiB free before waking vLLM
+2026-11-08 17:42:25 step 130: pass 0.717, kept 12/64 groups, cut 0.01, mean 5167 tokens, loss -0.05986496005789377, gen 214s grade 50s train 41s total 305s, 20.8 GiB free before waking vLLM
+2026-11-08 17:48:08 step 131: pass 0.742, kept 10/64 groups, cut 0.00, mean 5709 tokens, loss 0.0397398432251066, gen 242s grade 54s train 46s total 343s, 20.8 GiB free before waking vLLM
+2026-11-08 17:53:55 step 132: pass 0.662, kept 7/64 groups, cut 0.01, mean 6092 tokens, loss -0.004718343261629343, gen 262s grade 54s train 29s total 346s, 20.8 GiB free before waking vLLM
+2026-11-08 18:01:10 step 133: pass 0.711, kept 9/64 groups, cut 0.01, mean 7125 tokens, loss 0.07367424783296883, gen 320s grade 56s train 58s total 435s, 20.8 GiB free before waking vLLM
+2026-11-08 18:07:10 step 134: pass 0.752, kept 8/64 groups, cut 0.00, mean 6085 tokens, loss 0.052820269600488245, gen 257s grade 55s train 46s total 359s, 20.3 GiB free before waking vLLM
+2026-11-08 18:12:43 step 135: pass 0.691, kept 8/64 groups, cut 0.02, mean 5685 tokens, loss 0.0264101269422099, gen 247s grade 52s train 33s total 333s, 20.8 GiB free before waking vLLM
+2026-11-08 18:17:27 step 136: pass 0.746, kept 8/64 groups, cut 0.00, mean 4975 tokens, loss 0.14544023503549397, gen 196s grade 54s train 33s total 284s, 20.8 GiB free before waking vLLM
+2026-11-08 18:21:48 step 137: pass 0.695, kept 7/64 groups, cut 0.00, mean 4584 tokens, loss 0.07912129489704967, gen 175s grade 53s train 31s total 260s, 20.8 GiB free before waking vLLM
+2026-11-08 18:26:10 step 138: pass 0.645, kept 8/64 groups, cut 0.00, mean 4498 tokens, loss 0.0412127235904336, gen 171s grade 59s train 31s total 262s, 20.3 GiB free before waking vLLM
+2026-11-08 18:30:19 step 139: pass 0.793, kept 7/64 groups, cut 0.00, mean 4571 tokens, loss 0.04251931537874043, gen 166s grade 54s train 28s total 248s, 20.3 GiB free before waking vLLM
+2026-11-08 18:34:26 step 140: pass 0.756, kept 9/64 groups, cut 0.00, mean 4556 tokens, loss 0.05677989427931607, gen 167s grade 51s train 28s total 247s, 20.8 GiB free before waking vLLM
+2026-11-08 18:39:01 step 141: pass 0.676, kept 6/64 groups, cut 0.00, mean 5194 tokens, loss 0.13029020885005593, gen 205s grade 52s train 17s total 275s, 20.8 GiB free before waking vLLM
+2026-11-08 18:43:18 step 142: pass 0.680, kept 5/64 groups, cut 0.00, mean 4784 tokens, loss 0.03582589793950319, gen 185s grade 55s train 16s total 257s, 20.8 GiB free before waking vLLM
+2026-11-08 18:47:36 step 143: pass 0.732, kept 11/64 groups, cut 0.00, mean 4447 tokens, loss 0.008510580635629594, gen 166s grade 52s train 39s total 257s, 20.3 GiB free before waking vLLM
+2026-11-08 18:52:50 step 144: pass 0.693, kept 15/64 groups, cut 0.00, mean 5070 tokens, loss 0.03376791311893612, gen 194s grade 51s train 67s total 313s, 20.3 GiB free before waking vLLM
+2026-11-08 18:57:56 step 145: pass 0.598, kept 11/64 groups, cut 0.00, mean 5293 tokens, loss 0.021141799516044557, gen 206s grade 53s train 47s total 306s, 20.8 GiB free before waking vLLM
+2026-11-08 19:02:46 step 146: pass 0.600, kept 6/64 groups, cut 0.00, mean 5137 tokens, loss 0.012501388788223267, gen 199s grade 57s train 34s total 290s, 20.3 GiB free before waking vLLM
+2026-11-08 19:07:32 step 147: pass 0.766, kept 9/64 groups, cut 0.00, mean 5068 tokens, loss 0.06328562996350229, gen 191s grade 55s train 39s total 285s, 20.3 GiB free before waking vLLM
+2026-11-08 19:12:47 step 148: pass 0.740, kept 5/64 groups, cut 0.00, mean 5663 tokens, loss -0.023084026062861085, gen 232s grade 57s train 25s total 315s, 20.8 GiB free before waking vLLM
+2026-11-08 19:19:11 step 149: pass 0.674, kept 14/64 groups, cut 0.00, mean 6041 tokens, loss 0.05858460674062371, gen 252s grade 59s train 71s total 383s, 20.3 GiB free before waking vLLM
+2026-11-08 19:25:13 step 150: pass 0.705, kept 6/64 groups, cut 0.01, mean 6500 tokens, loss 0.26058441400527954, gen 279s grade 57s train 25s total 362s, 20.8 GiB free before waking vLLM
+2026-11-08 19:25:15 checkpoint step 150
+2026-11-08 19:25:15 done
+2026-11-08 19:25:24 llama-swap started again

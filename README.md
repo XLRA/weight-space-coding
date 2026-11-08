@@ -227,8 +227,10 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
   - The trainer's log-probs match vLLM's to 0.015 per token on average, with a 99th percentile of 0.12.
   - After a training step, vLLM holds the trainer's new weights.
 - **Done:** the two RFT arms, R-E and R-O, two rounds each. Every checkpoint is checked on the panel and on held-back validation problems, against its arm's starting model.
-- **GRPO from E (G-E)** is running its 150 steps, but it learned to game its reward (below). **GRPO from O (G-O) is on hold** until the reward is fixed.
-- **Next:** R-O's round 2 checkpoint gets the held-out evaluation, as the plan's rule picks. Neither of R-E's checkpoints qualifies.
+- **GRPO from E (G-E)** ran its 150 steps, but it learned to game its reward (below).
+- **The reward is fixed** with new tests that the problem statements don't show (below).
+- **Running:** R-O round 2's held-out evaluation, as the plan's rule picks. Neither of R-E's checkpoints qualifies.
+- **Next:** GRPO from O (G-O), then GRPO from E again (G-E2), both on the new tests, from about 01:30 UTC on 2026-11-09.
 - **The starting models' checks:**
   - **O** passes 5.2% of the validation answers and runs 76% of them to the 32k cap. Its panel mean is 26.7%.
   - **E** passes 10.0% and runs 4% to the cap. Its panel mean is 51.1%: choice 45.6%, math 61.6%, instructions 77.6%, code 19.6%.
@@ -296,7 +298,37 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
 
   - **From step 100 the copying answers read the input first** and print the example anyway, so only the 96 problems measure the copying (`train/copy_check.py`).
   - **The RFT arms don't copy.** None of their passing APPS answers skips the input. RFT trains only on answers the model already writes, and few of those copied: 14 of the 1,256 answers R-E kept, and 2 of R-O's 982.
-  - **The fix needs tests the model can't see.** The practice set has them for 288 of its 1,400 APPS problems, but 263 of those are competition problems that every model here fails. G-O waits for a reward with such tests.
+  - **The fix needs tests the model can't see.** The practice set has them for 288 of its 1,400 APPS problems, but 263 of those are competition problems that every model here fails.
+  - **G-E's end:** at step 125 its validation pass rate was 68.0%, and +7.3 (2.6) on the 96 problems. At step 150 those were 66.2% and +3.4 (2.8), and its panel mean fell 4.3 points below E's.
+- **The fix: new tests from APPS's own human solutions** (2026-11-08, `train/make_tests.py`, recorded in the plan's Deviations):
+  - **New inputs:** each example input is mutated. Numbers are nudged or redrawn within the range their line uses, and letters are swapped for others the input uses. Counts, query types and the input's shape stay fixed.
+  - **New tests:** an input becomes a test when 8 of the problem's human solutions in APPS agree on its output. All 8 must also pass the problem's examples.
+  - **No model involved:** the expected outputs come from human solutions. TACO's extra tests were ruled out, since GPT-4 wrote their inputs.
+  - **How often a new test is wrong:** the solutions beyond the first 8 are held out, and 96.6% of them pass every new test of their problem.
+  - **Usable problems:** a problem counts as usable when it has at least 3 unseen tests with at least 2 different outputs, so no fixed answer passes it.
+    - **Count:** 999 of the 1,200 APPS training problems and 168 of the 200 validation ones are usable.
+    - **The rest** mostly have one human solution, or several right answers, so their solutions disagree. They leave GRPO's training set.
+  - **Not in this repository:** the problem files with the new tests, like the practice set itself, since they are dataset content. `train/make-tests.sh` rebuilds them from APPS, and `train/data2/build.json` has their counts and md5s.
+  - **The new validation** is the pass rate over the 220 usable validation problems (52 MBPP, 168 APPS) on the new tests. The checkpoint rule and G-O's step-50 rule read it, and every check so far was regraded:
+
+  | Check | Validation, old tests | New tests | MBPP | APPS | New tests, paired against its start |
+  |---|---|---|---|---|---|
+  | O | 5.2% | 4.8% | 13.0% | 2.2% | |
+  | R-O round 1 | 10.3% | 10.1% | 22.6% | 6.2% | +5.3 (1.3) |
+  | R-O round 2 | 15.8% | 13.4% | 31.2% | 7.9% | +8.6 (1.4) |
+  | E | 10.0% | 9.4% | 25.0% | 4.6% | |
+  | R-E round 1 | 11.6% | 11.1% | 26.0% | 6.5% | +1.7 (0.9) |
+  | R-E round 2 | 13.0% | 11.7% | 21.6% | 8.6% | +2.3 (1.1) |
+  | G-E step 25 | 22.9% | 11.1% | 27.4% | 6.1% | +1.7 (1.1) |
+  | G-E step 50 | 61.9% | 9.3% | 26.4% | 4.0% | −0.1 (1.3) |
+  | G-E step 75 | 64.2% | 8.4% | 26.9% | 2.7% | −1.0 (1.2) |
+  | G-E step 100 | 67.7% | 8.5% | 31.7% | 1.3% | −0.9 (1.3) |
+  | G-E step 125 | 68.0% | 9.8% | 36.5% | 1.5% | +0.3 (1.3) |
+  | G-E step 150 | 66.2% | 6.9% | 29.3% | 0.0% | −2.5 (1.6) |
+
+  - **R-O round 2 is still the pick:** it is also the better checkpoint on the new tests, 13.4% against 10.1%. Its held-out evaluation, started before the fix, runs on the checkpoint the corrected rule picks.
+  - **G-E's copying displaced its solving:** on the new tests its APPS pass rate fell from E's 4.6% to 0.0% by step 150, while MBPP rose. Overall it moved −2.5 to +1.7, within 2 SE throughout.
+  - **G-E2,** GRPO from E on the new tests, replaces G-E as the arm from E.
 
 ## What we've learned so far
 
@@ -310,7 +342,13 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
 - **A combination of edits needs its own evaluation.** `pilot-19` joined the copy change, IFEval +2.8 (1.6) on its own, with the identifier pair, on disjoint tensors. IFEval came out at −1.9 (1.7).
 - **Fixed seeds don't make two models' answers comparable one by one.** With thinking on, changing a single weight by one rounding step re-samples nearly every answer, so a paired comparison removes the problems' difficulty but not the sampling noise. Its standard error is the honest yardstick, and single-suite differences of a few points are noise.
 - **A narrow edit can pass every check the agent runs and still cost a suite it never looks at.** `pilot-16` fixed its target and lost 4.6 points on MMLU-Pro, which is why later runs get the panel.
-- **A reward that only tests the examples a problem shows gets gamed, and fast.** GRPO from E learned within 50 steps to print the example output. That lifted its validation pass rate from 10% to 62%, while on the problems with unseen tests it moved +1.8 (2.5). RFT on the same data didn't copy, and RFT from O gained +10.7 (2.2) on those problems.
+- **A reward that only tests the examples a problem shows gets gamed, and fast.** GRPO from E learned within 50 steps to print the example output, which lifted its validation pass rate from 10% to 62%.
+  - **On tests it couldn't see,** its APPS pass rate fell from 4.6% to 0% by step 150: copying displaced solving.
+  - **RFT on the same data didn't copy.** RFT from O gained +8.6 (1.4) on the new tests.
+  - **Fresh tests needed no other model:** mutated example inputs, kept where 8 of APPS's human solutions agree on the output. 96.6% of held-out human solutions pass them.
+  - **What they catch** on the usable validation problems:
+    - 94–100% of G-E's old APPS passes from step 50 on fail them.
+    - So do 24–29% of the honest models' old APPS passes. Those programs got the example right but not the problem.
 
 ## Repository
 

@@ -1071,9 +1071,10 @@ def ckpt_detail(name, args, j, now):
     s = json_or(f"{d}/summary.json")
     if j["state"] == "failed" or not s:
         return red(clip(failure(tail_text(f"{d}/log")), 70))
-    out = f"panel mean {s['panel_mean']:.1f}% · validation {s['val']['pass']:.1f}%"
+    key = "val2" if "val2" in s else "val"  # val2: on train/data2's tests, which the rules read from 2026-11-08
+    out = f"panel mean {s['panel_mean']:.1f}% · validation {s[key]['pass']:.1f}%" + (" (new tests)" if key == "val2" else "")
     if v := s.get("vs_base"):
-        pm, vv = v["panel_mean"], v["val"]
+        pm, vv = v["panel_mean"], v.get(key, v["val"])
         out += (f" · against {v['base']}: panel {pm['diff']:+.1f} (SE {pm['se']:.1f}), "
                 f"validation {vv['diff']:+.1f} (SE {vv['se']:.1f})")
     return out

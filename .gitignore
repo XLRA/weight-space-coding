@@ -8,6 +8,7 @@
 /train/runs/
 /train/evals/
 /train/checks/*.log
+/train/tests/work/
 
 !/harness/
 __pycache__/

@@ -1,0 +1,36 @@
+{
+ "rule": "usable: >= 3 unseen tests, >= 2 different outputs among them, and an unseen output that no shown test has",
+ "stats": {
+  "train": {
+   "mbpp": 218,
+   "apps": 1200,
+   "apps_with_new_tests": 1032,
+   "apps_usable": 999,
+   "new_tests": 9577,
+   "held_out_solutions": 4768,
+   "held_out_solutions_passing": 4606,
+   "problems_with_under_2_solutions_kept": 141,
+   "written": 1217,
+   "usable": 1217
+  },
+  "val": {
+   "mbpp": 52,
+   "apps": 200,
+   "apps_with_new_tests": 175,
+   "apps_usable": 168,
+   "new_tests": 1597,
+   "held_out_solutions": 833,
+   "held_out_solutions_passing": 802,
+   "problems_with_under_2_solutions_kept": 22,
+   "written": 252,
+   "usable": 220
+  }
+ },
+ "md5": {
+  "make_tests.py": "a2c9cefd0206ce00cf0c4e228d004d98",
+  "data/train.jsonl": "389463a1aad8d28ed4135dfba36ff16a",
+  "data/val.jsonl": "641379009b622322b75289b43476c846",
+  "practice/raw/apps_train.jsonl": "e42ebf8f453ca89fa539dabd5e29250b",
+  "tests/work/out.jsonl": "9b2660dc71e753d6be3be6f1156faf2c"
+ }
+}

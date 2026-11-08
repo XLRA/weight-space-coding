@@ -235,6 +235,32 @@
     "diff": 4.69,
     "se": 2.35
    }
+  },
+  "G-E/step_125": {
+   "all": 67.96,
+   "kept": 20.83,
+   "kept_mbpp": 36.54,
+   "kept_apps": 2.27,
+   "apps_passes": 609,
+   "apps_passes_reading_no_input": 50,
+   "kept_vs_start": {
+    "base": "start-E",
+    "diff": 7.29,
+    "se": 2.59
+   }
+  },
+  "G-E/step_150": {
+   "all": 66.17,
+   "kept": 16.93,
+   "kept_mbpp": 29.33,
+   "kept_apps": 2.27,
+   "apps_passes": 606,
+   "apps_passes_reading_no_input": 308,
+   "kept_vs_start": {
+    "base": "start-E",
+    "diff": 3.39,
+    "se": 2.81
+   }
   }
  }
 }

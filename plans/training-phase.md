@@ -181,4 +181,37 @@
 
 ## Deviations
 
-None yet.
+- **2026-11-08 16:24 UTC, G-O held**, before any trained arm's held-out evaluation:
+  - **What G-E learned:** its checks showed it printing the example output from APPS statements. 956 of the 1,200 APPS training problems and 156 of the 200 APPS validation problems are tested only on the examples their statement shows. So the reward and the validation pass rate both count such an answer as a pass.
+  - **What it's worth:** on the 96 validation problems where copying can't pass, G-E moved +1.8 (2.5) at step 50, while its validation pass rate moved +51.9 (3.1) (`train/copy_check.py`).
+  - **The hold:** G-O would train on the same reward, so `train/runs/G-O/stopped` holds it until the reward is fixed.
+  - **G-E** runs to its end for the record. Its checks' validation pass rate counts the copying, so the checkpoint rule as written can't choose a G-E checkpoint.
+- **2026-11-08 20:30 UTC, the reward fixed with tests the statements don't show; G-O and G-E2 queued.** This was done on the user's go-ahead, before any GRPO arm's held-out evaluation.
+  - **The tests** (`train/make_tests.py` in the grading sandbox; `train/make-tests.sh` builds them):
+    - **New inputs:** each APPS example input is mutated. Numbers are nudged or redrawn within the range their line or column uses. Letters and grid characters are swapped for others the input uses. Lines, tokens per line, counts and query types stay fixed.
+    - **New tests:** an input becomes a test when 8 of the problem's APPS human solutions all exit cleanly and print the same output. Only solutions that pass the problem's examples are used. Each problem gets up to 10 new tests.
+    - **No model involved:** the expected outputs come from human solutions. TACO's tests were considered and ruled out, since GPT-4 wrote their inputs.
+  - **How often a new test is wrong:** the solutions beyond the first 8 are held out. 96.6% of them pass every new test of their problem: 4,606 of 4,768 on training problems, 802 of 833 on validation ones.
+  - **Usable problems:**
+    - **The rule** (fixed before any check was regraded): a problem needs at least 3 unseen tests, at least 2 different outputs among them, and an unseen output that no shown test has. Then printing an example's output, or any one fixed output, fails it.
+    - **Count:** 999 of the 1,200 APPS training problems and 168 of the 200 validation ones are usable.
+    - **MBPP** is unchanged and usable, since its prompt shows only 1 of each problem's 3 tests.
+  - **Data:**
+    - `train/data2/train.jsonl` is GRPO's training set: the 218 MBPP problems and the 999 usable APPS ones, with 11.7 tests per APPS problem on average.
+    - `train/data2/val.jsonl` has all 252 validation problems with the new tests, each marked usable or not.
+    - `train/data2/build.json` has the counts and md5s.
+  - **Validation from now on:** `val2`, the pass rate on data2's tests over the 220 usable validation problems (52 MBPP, 168 APPS), from `train/ckpt_grade.py`.
+    - The checkpoint rule and G-O's step-50 rule read `val2`.
+    - Every earlier check was regraded on it by `train/regrade-val2.sh`.
+  - **R-O:** its held-out evaluation started at 19:25 on round 2, which the old validation had chosen. On `val2`, round 2 is also the better checkpoint: 13.4% against 10.1%. So the corrected rule picks the same one.
+  - **R-E** still gets no evaluation. The panel part of the rule is unchanged.
+  - **G-E:** by the corrected rule its checkpoint would be step 25, at +1.7 (1.1) on `val2`. G-E2 replaces it as the GRPO arm from E, so G-E gets no held-out evaluation.
+  - **The runs** (`train/grpo-queue-2026-11-08.sh`):
+    - **What runs:** G-O, then G-E2 (G-E again, from E), each with `--data /train/data2/train.jsonl`. The recipe is otherwise unchanged.
+    - **When:** they start once `grpo-queue-2026-11-07.sh` has run the RFT arms' held-out evaluations.
+    - **Why G-O first:** it has not run at all, and T needs it.
+    - **G-E** stays in the record as the run on the reward that could be gamed.
+  - **The pilot** (50 examples-only problems, before the build):
+    - 42 got new tests.
+    - Of G-E's answers that passed the sample's 20 validation problems, 238 of 247 fail the new tests.
+    - A first version also mutated counts and query types. 8% of held-out human solutions failed its tests, so counts and query types are now kept fixed.
