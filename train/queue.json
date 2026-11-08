@@ -1,1 +1,1 @@
-[{"name": "G-E", "kind": "grpo", "gpu": "5090", "after": "the RFT runs", "args": " --start /opt/wsp/runs/pilot-14/submission --gpu-memory 0.60"},{"name": "G-O", "kind": "grpo", "gpu": "5090", "after": "G-E", "args": " --gpu-memory 0.60"}]
+[{"name": "G-O", "kind": "grpo", "gpu": "5090", "after": "G-E", "args": " --gpu-memory 0.60"}]

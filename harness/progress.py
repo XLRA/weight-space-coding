@@ -1,4 +1,4 @@
-"""Live view of agent runs: python3 progress.py <run> [<run> ...] [--watch SECONDS]
+"""Live view of agent runs and the training phase: python3 progress.py [<run> ...] [--watch [SECONDS]]
 
 For each run:
 - what it works on (runs/<run>/label.txt, if there is one), its status and age, GPU, model and settings;
@@ -28,10 +28,15 @@ Below the runs:
 - both GPUs (temperature, power, use, memory, the jobs running on each now and how many wait for it, llama-swap);
 - the temperature logger's warnings (gpu_temps.py).
 
---watch redraws every SECONDS in place, on the terminal's alternate screen, fitted to the window (the
-explanation is shortened first when the window is small, then the runs' last lines, so the GPUs stay in view).
-Ctrl-C stops watching; the runs go on.
-With one run it shows more of the explanation and the last lines of driver.log.
+--watch [SECONDS] in a terminal, with rich installed: the live dashboard of progress_ui.py (a panel per GPU with live
+bars and estimates, the queue, the checkpoint checks, the evaluations, and the runs named here; the jobs are read every
+SECONDS, 5 by default, and the GPUs every second). q or Ctrl-C stops watching; the runs go on.
+Without rich, with WSP_PLAIN=1, or when the output is not a terminal, --watch redraws this plain view every SECONDS in
+place, on the terminal's alternate screen, fitted to the window (the explanation is shortened first when the window is
+small, then the runs' last lines, so the GPUs stay in view). With one run it shows more of the explanation and the last
+lines of driver.log.
+The runs are optional. --snapshot FILE.svg [--width N] [--height N] draws one screen of the dashboard to a file (.txt
+for plain text), for tests.
 """
 import calendar
 import glob
@@ -972,7 +977,9 @@ def grpo_detail(name, args, j, now):
                  f"{cfg.get('group') or arg(args, '--group', 8)} answers, at most "
                  f"{int(cfg.get('max_new') or arg(args, '--max-new', 16384)):,} tokens")
         if j["state"] == "queued":  # what it waits for first: lines are cut at 130 columns
-            return (f"after {j['after']} · " if j.get("after") else "") + dim(shape)
+            held = f"{d}/stopped"  # put there before the run started: it is on hold, and the file says why
+            what = yellow(clip(open(held).read().strip(), 100)) if os.path.exists(held) else dim(shape)
+            return (f"after {j['after']} · " if j.get("after") else "") + what
         return shape + (dim(" · loading vLLM and the trainer, then step 1") if j["state"] == "running" else "")
     r, last = rows[-1], rows[-5:]
     per = sum(x["seconds"]["total"] for x in last) / len(last)
@@ -995,6 +1002,9 @@ def rft_detail(name, args, j, now):
     lines = tail_text(f"{d}/train.log")
     if j["state"] == "failed":
         return red(clip(failure(lines), 70))
+    if j["state"] == "queued":  # e.g. a run resuming at a later round (queue.json's "note" says so)
+        return ((f"after {j['after']} · " if j.get("after") else "") + (j.get("note") or f"{rounds} rounds")
+                + "".join(f" · {p}" for p in parts))
     if j["state"] == "waiting":
         n = cfg.get("problems") or arg(args, "--problems", "all")
         return f"{rounds} rounds · {n} problems × {cfg.get('samples') or arg(args, '--samples', 8)} answers"
@@ -1098,19 +1108,25 @@ def train_jobs(now, keep=24 * 3600):
         else:
             j["state"] = "waiting"
         jobs.append(j)
+    qt = mtime(f"{TRAIN}/queue.json") or 0
     for q in json_or(f"{TRAIN}/queue.json", []) or []:  # queued by a chain (train/grpo-queue-*.sh), not started yet
         if isinstance(q, dict) and q.get("kind") in TRAIN_DETAIL and (q["kind"], q.get("name")) not in live:
+            if (mtime(f"{TRAIN}/runs/{q['name']}/train.log") or 0) > qt:  # it has run since it was queued
+                continue
             after = q.get("after", "")  # a hook run before it (train/queue/after-<after>.sh) names itself in "# shows:"
             shows = next((l[8:].strip() for l in tail_text(f"{TRAIN}/queue/after-{after}.sh")[:5]
                           if l.startswith("# shows:")), "") if after else ""
+            held = os.path.exists(f"{TRAIN}/runs/{q['name']}/stopped")  # the chain skips it when its turn comes
             jobs.append({"name": q["name"], "kind": q["kind"], "gpu": q.get("gpu", "?"), "t": now, "state": "queued",
-                         "args": q.get("args", ""), "after": f"{after} and {shows}" if shows else after})
+                         "args": q.get("args", ""), "after": f"{after} and {shows}" if shows else after,
+                         "note": "(on hold)" if held else q.get("note", "")})
+    queued = {j["name"] for j in jobs if j["state"] == "queued"}  # an earlier attempt of these is not their end
     ended = []
     for log in glob.glob(f"{TRAIN}/runs/*/train.log"):
         name, t = os.path.basename(os.path.dirname(log)), mtime(log)
         cfg = json_or(f"{os.path.dirname(log)}/config.json", {})
         kind = "rft" if "rounds" in cfg or os.path.isdir(f"{os.path.dirname(log)}/round_1") else "grpo"
-        if any(n == name for k_, n in live if k_ in ("grpo", "rft")) or not t or now - t > keep:
+        if any(n == name for k_, n in live if k_ in ("grpo", "rft")) or name in queued or not t or now - t > keep:
             continue
         lines = tail_text(log)
         ok = any(STAMPED.match(l) and l[20:] == "done" for l in lines[-50:])
@@ -1299,13 +1315,31 @@ def frame(names, cols, rows, every):
 
 def main():
     args = sys.argv[1:]
-    every = 0
+    every, opts = 0, {}
     if "--watch" in args:
         i = args.index("--watch")
-        every = int(args[i + 1])
-        del args[i:i + 2]
-    if not args:
+        n = args[i + 1] if i + 1 < len(args) and args[i + 1].isdigit() else None
+        every = int(n) if n else 5
+        del args[i:i + (2 if n else 1)]
+    for flag in ("--snapshot", "--width", "--height"):
+        if flag in args:
+            i = args.index(flag)
+            opts[flag] = args[i + 1]
+            del args[i:i + 2]
+    if any(a.startswith("-") for a in args):
         sys.exit(__doc__)
+    try:
+        import progress_ui as ui  # the live dashboard (rich); without rich, the plain view below
+    except ImportError:
+        ui = None
+    if "--snapshot" in opts:
+        if not ui:
+            sys.exit("--snapshot needs rich: /opt/wsp/venv/bin/python -m pip install rich")
+        ui.snapshot(args, opts["--snapshot"], int(opts.get("--width", 130)), int(opts.get("--height", 50)))
+        return
+    if every and ui and sys.stdout.isatty() and not os.environ.get("WSP_PLAIN"):
+        ui.watch(args, every)
+        return
     if not every:
         print("\n".join(frame(args, shutil.get_terminal_size((120, 40)).columns, None, 0)))
         return

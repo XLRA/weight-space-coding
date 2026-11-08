@@ -16,3 +16,26 @@ CUDA Error: out of memory at /workspace/csrc/cumem_allocator.cpp:163
 (EngineCore pid=257) ERROR 11-07 14:22:39 [core.py:1750] RuntimeError: CUDA Error: out of memory at /workspace/csrc/cumem_allocator.cpp:163
 Exception: Call to wake_up method failed: CUDA Error: out of memory at /workspace/csrc/cumem_allocator.cpp:163
 2026-11-07 14:22:41 llama-swap started again
+2026-11-07 22:45:02 waiting for the 5090
+2026-11-07 22:45:02 stopping llama-swap to free the 5090
+2026-11-07 22:46:50 round 1: already done
+2026-11-07 22:46:50 vLLM now holds /train/runs/R-O/round_1/checkpoint (318 tensors)
+2026-11-07 22:58:45 round 2: sampled problems 1-256 of 1418: 6814456 tokens in 715s (9537 tok/s)
+2026-11-07 23:30:49 round 2: sampled problems 257-512 of 1418: 16013513 tokens in 1924s (8323 tok/s)
+2026-11-08 00:00:20 round 2: sampled problems 513-768 of 1418: 14656626 tokens in 1727s (8484 tok/s)
+2026-11-08 00:29:08 round 2: sampled problems 769-1024 of 1418: 14139121 tokens in 1654s (8547 tok/s)
+2026-11-08 00:59:59 round 2: sampled problems 1025-1280 of 1418: 15477227 tokens in 1851s (8362 tok/s)
+2026-11-08 01:20:08 round 2: sampled problems 1281-1418 of 1418: 9494841 tokens in 1129s (8413 tok/s)
+2026-11-08 01:20:50 round 2: pass rate 0.117, 408 of 1418 problems with a pass, 677 answers kept, cut 0.354, mean 6752 tokens
+2026-11-08 01:20:52 round 2: fine-tuning on 677 answers, 1054465 tokens (stop token appended to 0)
+2026-11-08 01:21:40 round 2: step 1/43, nll 0.4156, grad norm 8.397, lr 2.00e-06, 50632 tokens in 48.4s
+2026-11-08 01:22:36 round 2: step 10/43, nll 0.2990, grad norm 3.536, lr 9.60e-06, 45502 tokens in 4.4s
+2026-11-08 01:23:37 round 2: step 20/43, nll 0.2988, grad norm 3.112, lr 6.77e-06, 40698 tokens in 4.0s
+2026-11-08 01:24:32 round 2: step 30/43, nll 0.2160, grad norm 2.462, lr 2.86e-06, 50579 tokens in 4.8s
+2026-11-08 01:25:18 round 2: step 40/43, nll 0.1953, grad norm 2.280, lr 2.57e-07, 49818 tokens in 4.7s
+2026-11-08 01:25:30 round 2: step 43/43, nll 0.1990, grad norm 4.578, lr 1.62e-08, 10525 tokens in 1.2s
+2026-11-08 01:25:30 round 2: checkpoint saved
+2026-11-08 01:25:31 round 2: trainer freed, 3.81 GiB still reserved by PyTorch
+2026-11-08 01:25:31 done
+CUDA Error: invalid argument at /workspace/csrc/cumem_allocator.cpp:249
+2026-11-08 01:25:38 llama-swap started again

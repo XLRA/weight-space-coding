@@ -1,0 +1,7 @@
+{
+ "arm": "R-O",
+ "round": 2,
+ "start": null,
+ "answers": 677,
+ "tensors": "all 24 blocks, bf16 values as fp32"
+}

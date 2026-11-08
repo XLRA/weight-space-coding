@@ -1,0 +1,240 @@
+{
+ "data": {
+  "train apps": {
+   "problems": 1200,
+   "tested_only_on_examples": 956
+  },
+  "train mbpp": {
+   "problems": 218,
+   "tested_only_on_examples": 0
+  },
+  "val apps": {
+   "problems": 200,
+   "tested_only_on_examples": 156
+  },
+  "val mbpp": {
+   "problems": 52,
+   "tested_only_on_examples": 0
+  }
+ },
+ "kept_problems": [
+  "apps/1515",
+  "apps/1604",
+  "apps/2003",
+  "apps/2004",
+  "apps/2006",
+  "apps/2008",
+  "apps/2013",
+  "apps/2025",
+  "apps/2033",
+  "apps/2045",
+  "apps/2057",
+  "apps/2067",
+  "apps/2071",
+  "apps/2081",
+  "apps/2087",
+  "apps/2088",
+  "apps/2111",
+  "apps/2129",
+  "apps/2130",
+  "apps/2136",
+  "apps/2141",
+  "apps/2148",
+  "apps/2150",
+  "apps/2166",
+  "apps/2170",
+  "apps/2172",
+  "apps/2174",
+  "apps/2198",
+  "apps/2200",
+  "apps/2206",
+  "apps/2216",
+  "apps/2225",
+  "apps/2241",
+  "apps/2266",
+  "apps/2271",
+  "apps/2277",
+  "apps/2283",
+  "apps/2286",
+  "apps/2289",
+  "apps/2317",
+  "apps/2338",
+  "apps/28",
+  "apps/59",
+  "apps/67",
+  "mbpp/513",
+  "mbpp/519",
+  "mbpp/525",
+  "mbpp/532",
+  "mbpp/539",
+  "mbpp/541",
+  "mbpp/544",
+  "mbpp/545",
+  "mbpp/546",
+  "mbpp/582",
+  "mbpp/601",
+  "mbpp/646",
+  "mbpp/648",
+  "mbpp/656",
+  "mbpp/665",
+  "mbpp/669",
+  "mbpp/675",
+  "mbpp/685",
+  "mbpp/689",
+  "mbpp/691",
+  "mbpp/693",
+  "mbpp/698",
+  "mbpp/700",
+  "mbpp/701",
+  "mbpp/713",
+  "mbpp/747",
+  "mbpp/756",
+  "mbpp/776",
+  "mbpp/814",
+  "mbpp/817",
+  "mbpp/833",
+  "mbpp/839",
+  "mbpp/846",
+  "mbpp/860",
+  "mbpp/865",
+  "mbpp/873",
+  "mbpp/875",
+  "mbpp/881",
+  "mbpp/883",
+  "mbpp/890",
+  "mbpp/891",
+  "mbpp/902",
+  "mbpp/919",
+  "mbpp/920",
+  "mbpp/921",
+  "mbpp/926",
+  "mbpp/937",
+  "mbpp/941",
+  "mbpp/948",
+  "mbpp/967",
+  "mbpp/969",
+  "mbpp/971"
+ ],
+ "checks": {
+  "start-O": {
+   "all": 5.16,
+   "kept": 7.03,
+   "kept_mbpp": 12.98,
+   "kept_apps": 0.0,
+   "apps_passes": 25,
+   "apps_passes_reading_no_input": 0
+  },
+  "R-O/round_1": {
+   "all": 10.32,
+   "kept": 12.76,
+   "kept_mbpp": 22.6,
+   "kept_apps": 1.14,
+   "apps_passes": 57,
+   "apps_passes_reading_no_input": 0,
+   "kept_vs_start": {
+    "base": "start-O",
+    "diff": 5.73,
+    "se": 2.11
+   }
+  },
+  "R-O/round_2": {
+   "all": 15.77,
+   "kept": 17.71,
+   "kept_mbpp": 31.25,
+   "kept_apps": 1.7,
+   "apps_passes": 94,
+   "apps_passes_reading_no_input": 0,
+   "kept_vs_start": {
+    "base": "start-O",
+    "diff": 10.68,
+    "se": 2.24
+   }
+  },
+  "start-E": {
+   "all": 10.02,
+   "kept": 13.54,
+   "kept_mbpp": 25.0,
+   "kept_apps": 0.0,
+   "apps_passes": 49,
+   "apps_passes_reading_no_input": 0
+  },
+  "R-E/round_1": {
+   "all": 11.61,
+   "kept": 14.58,
+   "kept_mbpp": 25.96,
+   "kept_apps": 1.14,
+   "apps_passes": 63,
+   "apps_passes_reading_no_input": 0,
+   "kept_vs_start": {
+    "base": "start-E",
+    "diff": 1.04,
+    "se": 1.52
+   }
+  },
+  "R-E/round_2": {
+   "all": 13.0,
+   "kept": 13.02,
+   "kept_mbpp": 21.63,
+   "kept_apps": 2.84,
+   "apps_passes": 86,
+   "apps_passes_reading_no_input": 0,
+   "kept_vs_start": {
+    "base": "start-E",
+    "diff": -0.52,
+    "se": 1.74
+   }
+  },
+  "G-E/step_25": {
+   "all": 22.92,
+   "kept": 15.36,
+   "kept_mbpp": 27.4,
+   "kept_apps": 1.14,
+   "apps_passes": 174,
+   "apps_passes_reading_no_input": 8,
+   "kept_vs_start": {
+    "base": "start-E",
+    "diff": 1.82,
+    "se": 1.58
+   }
+  },
+  "G-E/step_50": {
+   "all": 61.9,
+   "kept": 15.36,
+   "kept_mbpp": 26.44,
+   "kept_apps": 2.27,
+   "apps_passes": 569,
+   "apps_passes_reading_no_input": 325,
+   "kept_vs_start": {
+    "base": "start-E",
+    "diff": 1.82,
+    "se": 2.46
+   }
+  },
+  "G-E/step_75": {
+   "all": 64.19,
+   "kept": 15.62,
+   "kept_mbpp": 26.92,
+   "kept_apps": 2.27,
+   "apps_passes": 591,
+   "apps_passes_reading_no_input": 513,
+   "kept_vs_start": {
+    "base": "start-E",
+    "diff": 2.08,
+    "se": 2.58
+   }
+  },
+  "G-E/step_100": {
+   "all": 67.66,
+   "kept": 18.23,
+   "kept_mbpp": 31.73,
+   "kept_apps": 2.27,
+   "apps_passes": 616,
+   "apps_passes_reading_no_input": 120,
+   "kept_vs_start": {
+    "base": "start-E",
+    "diff": 4.69,
+    "se": 2.35
+   }
+  }
+ }
+}
