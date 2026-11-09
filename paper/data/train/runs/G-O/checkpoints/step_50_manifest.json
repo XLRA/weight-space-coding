@@ -1,0 +1,6 @@
+{
+ "arm": "G-O",
+ "step": 50,
+ "start": null,
+ "tensors": "all 24 blocks, bf16 values as fp32"
+}

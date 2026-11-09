@@ -1,0 +1,22 @@
+{
+ "name": "G-O/step_25",
+ "weights": "/opt/wsp/train/runs/G-O/checkpoints/step_25",
+ "tensors_loaded": 318,
+ "panel_questions": 1000,
+ "val_problems": 252,
+ "val_samples": 4,
+ "sampling": {
+  "temperature": 0.6,
+  "top_p": 0.95,
+  "top_k": 20,
+  "min_p": 0.0,
+  "presence_penalty": 1.5
+ },
+ "max_new": 32768,
+ "answers": 2008,
+ "tokens": 26986065,
+ "generate_seconds": 8778,
+ "tokens_per_second": 3074,
+ "gpu_memory": "0.65",
+ "finished": "2026-11-09 06:20:09"
+}

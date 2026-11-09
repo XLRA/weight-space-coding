@@ -7,6 +7,8 @@
 # 3. train/ckpt_grade.py grades the validation answers (no GPU) and writes summary.json, paired with <base name>.
 # Results and log: train/evals/<name>/. Each stage is skipped if its output exists, so a rerun resumes.
 # On the 5090, llama-swap is stopped while generating if it is running, and started again afterwards.
+# The graded code runs as user 65533, apart from the GRPO trainer's 65534: a user's process limit counts across
+# containers, and a check grading as 65534 crashed G-O's grader on 2026-11-09 (harness/grade.py, RUN_AS).
 set -e
 GPU=$1; NAME=$2; SRC=$3; BASE=$4
 G() { (cd /opt/wsp/harness && python3 -c "from gpus import GPUS; print(GPUS['$GPU']['$1'])"); }
@@ -42,7 +44,7 @@ fi
 if [ ! -s "$OUT/panel.jsonl" ]; then
   echo "$(date -u '+%F %T') grading the panel" >> "$LOG"
   docker run --rm --network none --read-only --tmpfs /tmp:rw,size=2g,mode=1777 \
-    --user 65534:65534 --cap-drop ALL --security-opt no-new-privileges \
+    --user 65533:65533 --cap-drop ALL --security-opt no-new-privileges \
     --memory 16g --pids-limit 512 --cpus 12 -w /tmp \
     -e PYTHONPATH=/harness:/evalbin -v /opt/wsp/panel/final/panel.jsonl:/panel/panel.jsonl:ro \
     -v /opt/wsp/harness:/harness:ro -v /opt/wsp/eval/suites.py:/evalbin/suites.py:ro \
@@ -54,6 +56,6 @@ fi
 
 echo "$(date -u '+%F %T') grading the validation answers" >> "$LOG"
 docker run --rm --name "wsp-ckpt-grade-$TAG" --network none --pids-limit 1024 --cpus 12 \
-  -e PYTHONPATH=/harness:/train -v /opt/wsp/models/qwen3.5-0.8b:/model:ro -v /opt/wsp/harness:/harness:ro \
+  -e PYTHONPATH=/harness:/train -e WSP_GRADE_UID=65533 -v /opt/wsp/models/qwen3.5-0.8b:/model:ro -v /opt/wsp/harness:/harness:ro \
   -v /opt/wsp/train:/train wsp-train:1 python3 /train/ckpt_grade.py "$NAME" $BASE >> "$LOG" 2>&1
 tail -1 "$LOG"

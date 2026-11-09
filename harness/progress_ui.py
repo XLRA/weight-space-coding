@@ -900,19 +900,21 @@ def checks_panel(D, now, width, limit):
               dict(header="against", no_wrap=True, style="dim", ratio=1))
     for c in cs:
         s, v = c["s"], c["s"].get("vs_base")
+        key = "val2" if "val2" in s else "val"  # val2: on train/data2's tests, which the rules read from 2026-11-08
         row = [c["name"], hhmm(c["t"], now), f"{s['panel_mean']:.1f}"]
         if wide:
             row += [f"{s['panel'][k]['pass']:.1f}" for k, _ in SUITES]
-        row.append(f"{s['val']['pass']:.1f}")
+        row.append(f"{s[key]['pass']:.1f}")
         if v:
-            row += [signed(v["panel_mean"]["diff"], v["panel_mean"]["se"]), signed(v["val"]["diff"], v["val"]["se"]),
-                    v["base"]]
+            vv = v.get(key, v["val"])
+            row += [signed(v["panel_mean"]["diff"], v["panel_mean"]["se"]), signed(vv["diff"], vv["se"]), v["base"]]
         else:
             row += [Text("—", style="faint"), Text("—", style="faint"),
                     Text("a start" if c["name"].startswith("start-") else "not paired yet", style="faint")]
         t.add_row(*row)
     return Panel(t, title=Text(" Checkpoint checks ", style="head"), title_align="left",
-                 subtitle=Text(" pass rates in %; Δ ± SE against the arm's start, coloured beyond 2 SE ", style="faint"),
+                 subtitle=Text(" pass rates in %; validation on the new tests; Δ ± SE against the arm's start, "
+                               "coloured beyond 2 SE ", style="faint"),
                  subtitle_align="right", box=box.ROUNDED, border_style="faint", padding=(0, 1))
 
 

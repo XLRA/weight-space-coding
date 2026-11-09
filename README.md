@@ -230,7 +230,7 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
 - **GRPO from E (G-E)** ran its 150 steps, but it learned to game its reward (below).
 - **The reward is fixed** with new tests that the problem statements don't show (below).
 - **R-O's held-out evaluation is done** (below): R-O matches E on code and falls far behind it elsewhere. Neither of R-E's checkpoints qualifies for one.
-- **Running:** GRPO from O (G-O) on the new tests, since 22:32 UTC on 2026-11-08. By step 33 of 150 its training pass rate had risen from 4% to 12%. GRPO from E again (G-E2) follows.
+- **Running:** GRPO from O (G-O) on the new tests, since 22:32 UTC on 2026-11-08. It passed its step-50 rule and was at step 65 of 150 at 15:00 UTC on 2026-11-09 (below). GRPO from E again (G-E2) follows.
 - **The starting models' checks:**
   - **O** passes 5.2% of the validation answers and runs 76% of them to the 32k cap. Its panel mean is 26.7%.
   - **E** passes 10.0% and runs 4% to the cap. Its panel mean is 51.1%: choice 45.6%, math 61.6%, instructions 77.6%, code 19.6%.
@@ -342,6 +342,23 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
 
   - **On code, two rounds of RFT match the edit.** R-O is level with E at presence penalty 1.5, and ahead at 0 and on LiveCodeBench, each by just over 2 SE. HumanEval+, which E left flat, gains +4.9 (2.2).
   - **Elsewhere the edit is far ahead.** R-O runs 1.8% of its code answers to the 32k cap, as E does, but still 35% of its MATH-500 answers and 15% of MMLU-Pro's, against E's 4.5% and 0.3%. Training on code taught O to finish code answers, and that carried over only partly.
+- **G-O's first checks,** paired against O:
+
+  | | O | G-O step 25 | G-O step 50 | E |
+  |---|---|---|---|---|
+  | Panel: choice | 43.6% | 48.4% | 50.0% | 45.6% |
+  | Panel: math | 8.8% | 51.6% | 56.4% | 61.6% |
+  | Panel: instructions | 46.0% | 76.8% | 77.6% | 77.6% |
+  | Panel: code | 8.4% | 27.6% | 27.6% | 19.6% |
+  | Panel mean | 26.7% | 51.1% | 52.9% | 51.1% |
+  | Panel mean, paired against O | | +24.4 (1.5) | +26.2 (1.6) | |
+  | Validation, new tests | 4.8% | 15.3% | 14.9% | 9.4% |
+  | Validation, paired against O | | +10.6 (1.6) | +10.1 (1.6) | |
+
+  - **25 steps of GRPO on code problems took O's panel to E's level,** with math +42.8 and instructions +30.8. RFT's two rounds reached 39.4%.
+  - **On the new tests** G-O passes 15.3%, against R-O round 2's 13.4% and E's 9.4%.
+  - **Its step-50 rule passed,** at +10.1 against O, beyond 2 SE, so G-O runs its 150 steps.
+  - **A crash cost 2 hours.** G-O's first attempt crashed at step 63: a checkpoint check was grading at the same moment, as the same user, and the two graders together hit that user's process limit. It resumed from step 50. The checks now run their code as a different user.
 
 ## What we've learned so far
 
@@ -354,7 +371,8 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
 - **Later rounds trade between suites rather than lifting all of them.**
 - **A combination of edits needs its own evaluation.** `pilot-19` joined the copy change, IFEval +2.8 (1.6) on its own, with the identifier pair, on disjoint tensors. IFEval came out at −1.9 (1.7).
 - **Fixed seeds don't make two models' answers comparable one by one.** With thinking on, changing a single weight by one rounding step re-samples nearly every answer, so a paired comparison removes the problems' difficulty but not the sampling noise. Its standard error is the honest yardstick, and single-suite differences of a few points are noise.
-- **Fine-tuning on code matched the edit on held-out code, but not beyond it.** Two rounds of RFT from O on its own passing practice answers came level with `pilot-14`'s edit on MBPP+ and HumanEval+, and slightly ahead on LiveCodeBench. It finished 8.6 to 21.6 points behind on MMLU-Pro, IFEval and MATH-500. The GRPO arms are still to come.
+- **GRPO on code problems lifted far more than code.** Within 25 steps G-O's panel mean rose from O's 26.7% to 51.1%, E's level, with math +42.8 and instructions +30.8. Its held-out evaluation comes after its 150 steps.
+- **RFT on code matched the edit on held-out code, but not beyond it.** Two rounds of RFT from O on its own passing practice answers came level with `pilot-14`'s edit on MBPP+ and HumanEval+, and slightly ahead on LiveCodeBench. It finished 8.6 to 21.6 points behind on MMLU-Pro, IFEval and MATH-500. The GRPO arms are still to come.
 - **A narrow edit can pass every check the agent runs and still cost a suite it never looks at.** `pilot-16` fixed its target and lost 4.6 points on MMLU-Pro, which is why later runs get the panel.
 - **A reward that only tests the examples a problem shows gets gamed, and fast.** GRPO from E learned within 50 steps to print the example output, which lifted its validation pass rate from 10% to 62%.
   - **On tests it couldn't see,** its APPS pass rate fell from 4.6% to 0% by step 150: copying displaced solving.

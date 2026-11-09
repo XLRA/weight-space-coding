@@ -23,6 +23,7 @@ import resource
 import subprocess
 import sys
 import tempfile
+import time
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 
@@ -31,6 +32,11 @@ FUNC_TIMEOUT, STDIO_TIMEOUT = 10, 6
 # One BLAS thread per solution: otherwise numpy starts a thread per core, and a dozen solutions
 # importing it at once exceed the process limit and fail with ImportError.
 ENV = {**os.environ, "OPENBLAS_NUM_THREADS": "1", "OMP_NUM_THREADS": "1", "MKL_NUM_THREADS": "1"}
+# The user the code runs as when the grader runs as root. Its limit of 64 processes counts every process and thread of
+# that user on the host, across containers, so graders running at once share it. On 2026-11-09 G-O's grader could not
+# start a program while a checkpoint check graded as the same user, and the run crashed. The checks now run their
+# code as 65533 (train/run-ckpt.sh).
+RUN_AS = int(os.environ.get("WSP_GRADE_UID", "65534"))
 
 FUNC_RUNNER = r'''
 import json, sys, traceback
@@ -59,9 +65,20 @@ def limits():
     resource.setrlimit(resource.RLIMIT_AS, (2 << 30, 2 << 30))
     resource.setrlimit(resource.RLIMIT_NPROC, (64, 64))
     os.setsid()
-    if os.getuid() == 0:  # inside the kernel container: run the code as nobody
-        os.setgid(65534)
-        os.setuid(65534)
+    if os.getuid() == 0:  # inside the kernel container: run the code as nobody (RUN_AS)
+        os.setgid(RUN_AS)
+        os.setuid(RUN_AS)
+
+
+def run(*args, **kwargs):
+    """subprocess.run, tried again while the code can't start because its user is at the process limit (EAGAIN,
+    raised as BlockingIOError). The code has not run then, so trying again changes no grade."""
+    for wait in (0.5, 1, 2, 4, 8, 15, 30):
+        try:
+            return subprocess.run(*args, **kwargs)
+        except BlockingIOError:
+            time.sleep(wait)
+    return subprocess.run(*args, **kwargs)
 
 
 def sanitize(tree):
@@ -98,8 +115,8 @@ def run_function(code, prob, tmp):
     with open(path, "w") as f:
         json.dump([code, prob["test_setup"], prob["tests"]], f)
     try:
-        r = subprocess.run([sys.executable, "-c", FUNC_RUNNER, path], capture_output=True, text=True,
-                           timeout=FUNC_TIMEOUT, cwd=tmp, preexec_fn=limits, env=ENV)
+        r = run([sys.executable, "-c", FUNC_RUNNER, path], capture_output=True, text=True,
+                timeout=FUNC_TIMEOUT, cwd=tmp, preexec_fn=limits, env=ENV)
         last = r.stdout.strip().splitlines()[-1:] or ['{"status": "runtime_error", "exc": "NoResult"}']
         return json.loads(last[0])
     except subprocess.TimeoutExpired:
@@ -114,8 +131,8 @@ def run_stdio(code, prob, tmp):
         f.write(code)
     for t in prob["tests"]:
         try:
-            r = subprocess.run([sys.executable, path], input=t["input"], capture_output=True, text=True,
-                               timeout=STDIO_TIMEOUT, cwd=tmp, preexec_fn=limits, env=ENV)
+            r = run([sys.executable, path], input=t["input"], capture_output=True, text=True,
+                    timeout=STDIO_TIMEOUT, cwd=tmp, preexec_fn=limits, env=ENV)
         except subprocess.TimeoutExpired:
             return {"status": "timeout"}
         if r.returncode != 0:

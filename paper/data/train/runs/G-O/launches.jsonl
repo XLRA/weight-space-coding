@@ -1,1 +1,2 @@
 {"time": "2026-11-08 22:31:59", "gpu": "5090", "kind": "grpo", "start": "original", "args": "--data /train/data2/train.jsonl --gpu-memory 0.60"}
+{"time": "2026-11-09 11:44:37", "gpu": "5090", "kind": "grpo", "start": "original", "args": "--data /train/data2/train.jsonl --gpu-memory 0.60"}
