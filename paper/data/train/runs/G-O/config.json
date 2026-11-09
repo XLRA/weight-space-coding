@@ -1,0 +1,21 @@
+{
+ "arm": "G-O",
+ "start": null,
+ "data": "/train/data2/train.jsonl",
+ "steps": 150,
+ "prompts": 64,
+ "group": 8,
+ "max_new": 16384,
+ "minibatches": 4,
+ "lr": 1e-06,
+ "warmup": 10,
+ "clip_low": 0.2,
+ "clip_high": 0.28,
+ "tis_cap": 2.0,
+ "grad_clip": 1.0,
+ "seed": 1,
+ "ckpt_every": 25,
+ "gpu_memory": 0.6,
+ "torch": "2.13.0+cu130",
+ "started": "2026-11-08 22:32:05"
+}

@@ -1,0 +1,158 @@
+{
+ "name": "pilot-14-code-pp0",
+ "config": {
+  "submission": "/opt/wsp/runs/pilot-14/submission",
+  "tensors": [
+   "model.language_model.layers.10.mlp.down_proj.weight.npy",
+   "model.language_model.layers.13.mlp.down_proj.weight.npy",
+   "model.language_model.layers.14.mlp.down_proj.weight.npy",
+   "model.language_model.layers.15.self_attn.q_proj.weight.npy",
+   "model.language_model.layers.19.self_attn.q_proj.weight.npy",
+   "model.language_model.layers.23.mlp.down_proj.weight.npy",
+   "model.language_model.layers.23.mlp.gate_proj.weight.npy",
+   "model.language_model.layers.23.mlp.up_proj.weight.npy",
+   "model.language_model.layers.23.self_attn.q_proj.weight.npy"
+  ],
+  "suites": {
+   "code": 4
+  },
+  "models": [
+   "original",
+   "edited"
+  ],
+  "limit_per_set": 0,
+  "presence_penalty": 0.0,
+  "gpu": "5090",
+  "original_from": "pilot-10"
+ },
+ "models": {
+  "code": {
+   "original": {
+    "all": {
+     "answers": 2168,
+     "pass@1": 12.27,
+     "cut": 58.95,
+     "loop": 58.99,
+     "mean_tokens": 19782.0,
+     "failures": {
+      "cut_at_max_tokens": 1278,
+      "wrong_interface": 342,
+      "pass": 266,
+      "wrong_answer": 186,
+      "runtime_error": 85,
+      "syntax_error": 10,
+      "timeout": 1
+     }
+    },
+    "mbpp+": {
+     "answers": 1512,
+     "pass@1": 9.99,
+     "cut": 58.8,
+     "loop": 57.61,
+     "mean_tokens": 19730.6,
+     "failures": {
+      "cut_at_max_tokens": 889,
+      "wrong_interface": 335,
+      "pass": 151,
+      "wrong_answer": 81,
+      "runtime_error": 48,
+      "syntax_error": 8
+     }
+    },
+    "humaneval+": {
+     "answers": 656,
+     "pass@1": 17.53,
+     "cut": 59.3,
+     "loop": 62.2,
+     "mean_tokens": 19900.5,
+     "failures": {
+      "cut_at_max_tokens": 389,
+      "pass": 115,
+      "wrong_answer": 105,
+      "runtime_error": 37,
+      "wrong_interface": 7,
+      "syntax_error": 2,
+      "timeout": 1
+     }
+    }
+   },
+   "edited": {
+    "all": {
+     "answers": 2168,
+     "pass@1": 28.51,
+     "cut": 5.77,
+     "loop": 11.58,
+     "mean_tokens": 4585.3,
+     "failures": {
+      "wrong_answer": 679,
+      "pass": 618,
+      "runtime_error": 280,
+      "syntax_error": 232,
+      "wrong_interface": 222,
+      "cut_at_max_tokens": 125,
+      "no_code": 8,
+      "timeout": 4
+     }
+    },
+    "mbpp+": {
+     "answers": 1512,
+     "pass@1": 29.7,
+     "cut": 5.89,
+     "loop": 10.85,
+     "mean_tokens": 4587.7,
+     "failures": {
+      "pass": 449,
+      "wrong_answer": 408,
+      "wrong_interface": 214,
+      "runtime_error": 198,
+      "syntax_error": 145,
+      "cut_at_max_tokens": 89,
+      "no_code": 8,
+      "timeout": 1
+     }
+    },
+    "humaneval+": {
+     "answers": 656,
+     "pass@1": 25.76,
+     "cut": 5.49,
+     "loop": 13.26,
+     "mean_tokens": 4579.8,
+     "failures": {
+      "wrong_answer": 271,
+      "pass": 169,
+      "syntax_error": 87,
+      "runtime_error": 82,
+      "cut_at_max_tokens": 36,
+      "wrong_interface": 8,
+      "timeout": 3
+     }
+    }
+   }
+  }
+ },
+ "paired": {
+  "code": {
+   "all": {
+    "problems": 542,
+    "diff": 16.24,
+    "se": 1.27,
+    "fail_to_pass": 451,
+    "pass_to_fail": 99
+   },
+   "mbpp+": {
+    "problems": 378,
+    "diff": 19.71,
+    "se": 1.59,
+    "fail_to_pass": 355,
+    "pass_to_fail": 57
+   },
+   "humaneval+": {
+    "problems": 164,
+    "diff": 8.23,
+    "se": 1.87,
+    "fail_to_pass": 96,
+    "pass_to_fail": 42
+   }
+  }
+ }
+}

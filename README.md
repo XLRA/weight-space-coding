@@ -229,8 +229,8 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
 - **Done:** the two RFT arms, R-E and R-O, two rounds each. Every checkpoint is checked on the panel and on held-back validation problems, against its arm's starting model.
 - **GRPO from E (G-E)** ran its 150 steps, but it learned to game its reward (below).
 - **The reward is fixed** with new tests that the problem statements don't show (below).
-- **Running:** R-O round 2's held-out evaluation, as the plan's rule picks. Neither of R-E's checkpoints qualifies.
-- **Next:** GRPO from O (G-O), then GRPO from E again (G-E2), both on the new tests, from about 01:30 UTC on 2026-11-09.
+- **R-O's held-out evaluation is done** (below): R-O matches E on code and falls far behind it elsewhere. Neither of R-E's checkpoints qualifies for one.
+- **Running:** GRPO from O (G-O) on the new tests, since 22:32 UTC on 2026-11-08. By step 33 of 150 its training pass rate had risen from 4% to 12%. GRPO from E again (G-E2) follows.
 - **The starting models' checks:**
   - **O** passes 5.2% of the validation answers and runs 76% of them to the 32k cap. Its panel mean is 26.7%.
   - **E** passes 10.0% and runs 4% to the cap. Its panel mean is 51.1%: choice 45.6%, math 61.6%, instructions 77.6%, code 19.6%.
@@ -329,6 +329,19 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
   - **R-O round 2 is still the pick:** it is also the better checkpoint on the new tests, 13.4% against 10.1%. Its held-out evaluation, started before the fix, runs on the checkpoint the corrected rule picks.
   - **G-E's copying displaced its solving:** on the new tests its APPS pass rate fell from E's 4.6% to 0.0% by step 150, while MBPP rose. Overall it moved −2.5 to +1.7, within 2 SE throughout.
   - **G-E2,** GRPO from E on the new tests, replaces G-E as the arm from E.
+- **R-O's held-out evaluation** (round 2, the checkpoint the rule picks). The last column pairs R-O with E directly, problem by problem (`eval/compare.py`):
+
+  | Suite | O | E | R-O | E against O | R-O against O | R-O against E |
+  |---|---|---|---|---|---|---|
+  | MBPP+ and HumanEval+ | 19.0% | 32.3% | 32.5% | +13.3 (1.3) | +13.4 (1.3) | +0.1 (1.3) |
+  | The same at presence penalty 0 | 12.3% | 28.5% | 31.3% | +16.2 (1.3) | +19.0 (1.4) | +2.8 (1.3) |
+  | LiveCodeBench | 1.6% | 7.0% | 9.4% | +5.4 (1.4) | +7.9 (1.9) | +2.4 (1.0) |
+  | MMLU-Pro | 40.5% | 45.2% | 36.6% | +4.7 (1.5) | −3.9 (1.5) | −8.6 (1.5) |
+  | IFEval, prompt-level | 22.3% | 58.2% | 36.6% | +36.0 (1.9) | +14.3 (1.9) | −21.6 (1.9) |
+  | MATH-500 | 6.8% | 56.9% | 42.8% | +50.1 (1.8) | +36.0 (1.7) | −14.1 (1.4) |
+
+  - **On code, two rounds of RFT match the edit.** R-O is level with E at presence penalty 1.5, and ahead at 0 and on LiveCodeBench, each by just over 2 SE. HumanEval+, which E left flat, gains +4.9 (2.2).
+  - **Elsewhere the edit is far ahead.** R-O runs 1.8% of its code answers to the 32k cap, as E does, but still 35% of its MATH-500 answers and 15% of MMLU-Pro's, against E's 4.5% and 0.3%. Training on code taught O to finish code answers, and that carried over only partly.
 
 ## What we've learned so far
 
@@ -341,6 +354,7 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
 - **Later rounds trade between suites rather than lifting all of them.**
 - **A combination of edits needs its own evaluation.** `pilot-19` joined the copy change, IFEval +2.8 (1.6) on its own, with the identifier pair, on disjoint tensors. IFEval came out at −1.9 (1.7).
 - **Fixed seeds don't make two models' answers comparable one by one.** With thinking on, changing a single weight by one rounding step re-samples nearly every answer, so a paired comparison removes the problems' difficulty but not the sampling noise. Its standard error is the honest yardstick, and single-suite differences of a few points are noise.
+- **Fine-tuning on code matched the edit on held-out code, but not beyond it.** Two rounds of RFT from O on its own passing practice answers came level with `pilot-14`'s edit on MBPP+ and HumanEval+, and slightly ahead on LiveCodeBench. It finished 8.6 to 21.6 points behind on MMLU-Pro, IFEval and MATH-500. The GRPO arms are still to come.
 - **A narrow edit can pass every check the agent runs and still cost a suite it never looks at.** `pilot-16` fixed its target and lost 4.6 points on MMLU-Pro, which is why later runs get the panel.
 - **A reward that only tests the examples a problem shows gets gamed, and fast.** GRPO from E learned within 50 steps to print the example output, which lifted its validation pass rate from 10% to 62%.
   - **On tests it couldn't see,** its APPS pass rate fell from 4.6% to 0% by step 150: copying displaced solving.
@@ -355,13 +369,13 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
 | Path | What |
 |---|---|
 | `harness/` | The agent loop (`driver.py`), the editor prompt (`prompt.txt`), the kernel and forward-pass servers, the grader, run briefs (`briefs/`) and tests |
-| `eval/` | The held-out evaluation (`evaluate.py`, `eval_gen.py`, `grade_suites.py`, `suites.py`, vendored IFEval checkers), the panel's builder (`prepare_panel.py`) and `results/<name>/report.md` |
+| `eval/` | The held-out evaluation (`evaluate.py`, `eval_gen.py`, `grade_suites.py`, `suites.py`, vendored IFEval checkers), the panel's builder (`prepare_panel.py`), `compare.py`, which pairs any two evaluated models, and `results/<name>/report.md` |
 | `scripts/` | Practice-set preparation and the baseline |
 | `baseline/` | Baseline results and the rendered evaluation prompt |
 | `runs/<run>/` | Each run's brief, config, final report, the agent's explanations, its log and its submitted-edit manifest |
 | `paper/` | `collect.py` and `data/`: per-run, per-pass, per-evaluation, per-panel-pass and per-tensor tables, the panel's question list, the full agent transcripts, and per-arm, per-round, per-step and per-checkpoint training tables, for a write-up |
 | `plans/` | The training phase's plan |
-| `train/` | The training phase: its image, the practice split and overlap check, the GRPO and RFT trainers, the pre-training checks and the checkpoint checks |
+| `train/` | The training phase: its image, the practice split and overlap check, the GRPO and RFT trainers, the pre-training checks, the checkpoint checks, the new tests' builder and the scans for gamed passes |
 | `scratch/` | One-off analysis scripts |
 
 Model weights, datasets and edit tensors are not included. `train/prepare_data.py` rebuilds the training and validation split from the public datasets. The data sources are MBPP, APPS, EvalPlus (MBPP+ and HumanEval+), MMLU-Pro, IFEval, LiveCodeBench, MATH and MATH-500, and `argilla/ifeval-like-data`, all public.
