@@ -44,8 +44,9 @@ Writes:
                   from then on;
 - train/          the small training records: each arm's config, launches, log (timestamped lines and errors), round
                   summaries and fine-tuning steps or GRPO steps, checkpoint manifests; each check's summary and
-                  generation record; the step-1 checks (log-prob agreement, weight push); data2/build.json, the
-                  new tests' counts and md5s. The sampled answers stay in
+                  generation record, and each arm's checkpoint choice (evals/<arm>/choice.json); the manifests of
+                  the models train/combine.py built (combined/: T and the removal); the step-1 checks (log-prob
+                  agreement, weight push); data2/build.json, the new tests' counts and md5s. The sampled answers stay in
                   /opt/wsp/train/runs and the checks' answers in /opt/wsp/train/evals (too large to copy);
 - /opt/wsp/paper/code/<time>/  the harness, evaluation, training and paper code, copied whenever it changed.
 Edits kept by driver.py at each request (snapshot_edit) are in /opt/wsp/paper/edits/<md5>.npy, listed per run in
@@ -248,7 +249,8 @@ def eval_rows():
 
 
 def label_of(path, start=""):
-    """A training start or a checked folder as a short label: original, pilot-14, R-O/round_1, G-E/step_25.
+    """A training start or a checked folder as a short label: original, pilot-14, R-O/round_1, G-E/step_25, and
+    T-step_100 for a model train/combine.py built (train/combined/<name>).
     Paths inside wsp-train:1 (/train/...) are mapped to the host; "start" (an RFT round's source) is the arm's start."""
     path = (path or "").rstrip("/")
     if path.startswith("/train/"):
@@ -258,7 +260,7 @@ def label_of(path, start=""):
     if path in ("start", "/start"):
         return start or "start"
     for pat in (rf"{WSP}/runs/([^/]+)/submission$", rf"{TRAIN}/runs/([^/]+)/(round_\d+)/checkpoint$",
-                rf"{TRAIN}/runs/([^/]+)/checkpoints/(step_\d+)$"):
+                rf"{TRAIN}/runs/([^/]+)/checkpoints/(step_\d+)$", rf"{TRAIN}/combined/([^/]+)$"):
         m = re.match(pat, path)
         if m:
             return "/".join(m.groups())
@@ -412,6 +414,10 @@ def copy_training_texts():
     for name, d in checks():
         for fn in ("summary.json", "gen.json"):
             put(f"{d}/{fn}", f"evals/{name}/{fn}")
+    for p in glob.glob(f"{TRAIN}/evals/*/choice.json"):  # the checkpoint rule's candidates and choice, per arm
+        put(p, f"evals/{os.path.basename(os.path.dirname(p))}/choice.json")
+    for m in glob.glob(f"{TRAIN}/combined/*/manifest.json"):  # how T and the removal were built (train/combine.py)
+        put(m, f"combined/{os.path.basename(os.path.dirname(m))}_manifest.json")
     for p in glob.glob(f"{TRAIN}/checks/*.json"):
         put(p, f"checks/{os.path.basename(p)}")
     put(f"{TRAIN}/data2/build.json", "data2/build.json")  # the new tests' counts and md5s (train/build_tests.py)

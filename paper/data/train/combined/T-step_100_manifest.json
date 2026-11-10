@@ -1,0 +1,99 @@
+{
+ "made_by": "train/combine.py",
+ "checkpoint": "/opt/wsp/train/runs/G-O/checkpoints/step_100",
+ "sign": "+",
+ "edit": "/opt/wsp/runs/pilot-14/submission",
+ "model": "/opt/wsp/models/qwen3.5-0.8b",
+ "what": "checkpoint + \u0394E, \u0394E = bf16(E) - O on E's 9 tensors; each entry is the bf16 value nearest the exact result (ties to even)",
+ "checkpoint_manifest": {
+  "arm": "G-O",
+  "step": 100,
+  "start": null,
+  "tensors": "all 24 blocks, bf16 values as fp32"
+ },
+ "tensors": "all 24 blocks, bf16 values as fp32",
+ "copied_unchanged": 309,
+ "delta_tensors": {
+  "model.language_model.layers.10.mlp.down_proj.weight": {
+   "edit_changed_entries": 2048,
+   "delta_changed_entries": 2048,
+   "edit_entries_not_bf16": 2048,
+   "delta_norm": 2.48487314836972,
+   "delta_max_abs": 0.37872314453125,
+   "checkpoint_norm": 15.241912706637864,
+   "entries_differing_from_checkpoint": 2048
+  },
+  "model.language_model.layers.13.mlp.down_proj.weight": {
+   "edit_changed_entries": 3072,
+   "delta_changed_entries": 3072,
+   "edit_entries_not_bf16": 3071,
+   "delta_norm": 3.497500348270389,
+   "delta_max_abs": 0.46624755859375,
+   "checkpoint_norm": 15.346760959090274,
+   "entries_differing_from_checkpoint": 3072
+  },
+  "model.language_model.layers.14.mlp.down_proj.weight": {
+   "edit_changed_entries": 1024,
+   "delta_changed_entries": 1024,
+   "edit_entries_not_bf16": 1024,
+   "delta_norm": 1.1937569105068893,
+   "delta_max_abs": 0.22528076171875,
+   "checkpoint_norm": 15.14207115714989,
+   "entries_differing_from_checkpoint": 1024
+  },
+  "model.language_model.layers.15.self_attn.q_proj.weight": {
+   "edit_changed_entries": 262144,
+   "delta_changed_entries": 261462,
+   "edit_entries_not_bf16": 262135,
+   "delta_norm": 10.961913926292217,
+   "delta_max_abs": 0.07973480224609375,
+   "checkpoint_norm": 32.122234251084876,
+   "entries_differing_from_checkpoint": 261462
+  },
+  "model.language_model.layers.19.self_attn.q_proj.weight": {
+   "edit_changed_entries": 1310720,
+   "delta_changed_entries": 1306762,
+   "edit_entries_not_bf16": 1310630,
+   "delta_norm": 12.140954239227105,
+   "delta_max_abs": 0.0406494140625,
+   "checkpoint_norm": 31.884684188781193,
+   "entries_differing_from_checkpoint": 1306762
+  },
+  "model.language_model.layers.23.mlp.down_proj.weight": {
+   "edit_changed_entries": 4096,
+   "delta_changed_entries": 4096,
+   "edit_entries_not_bf16": 4096,
+   "delta_norm": 5.251903558195787,
+   "delta_max_abs": 0.34176087379455566,
+   "checkpoint_norm": 16.416706694715586,
+   "entries_differing_from_checkpoint": 4096
+  },
+  "model.language_model.layers.23.mlp.gate_proj.weight": {
+   "edit_changed_entries": 4096,
+   "delta_changed_entries": 4096,
+   "edit_entries_not_bf16": 3072,
+   "delta_norm": 25.73554516425362,
+   "delta_max_abs": 5.117218017578125,
+   "checkpoint_norm": 36.177032883939205,
+   "entries_differing_from_checkpoint": 4096
+  },
+  "model.language_model.layers.23.mlp.up_proj.weight": {
+   "edit_changed_entries": 4096,
+   "delta_changed_entries": 4096,
+   "edit_entries_not_bf16": 3070,
+   "delta_norm": 0.5650799351002936,
+   "delta_max_abs": 0.0438232421875,
+   "checkpoint_norm": 21.24677330959923,
+   "entries_differing_from_checkpoint": 4096
+  },
+  "model.language_model.layers.23.self_attn.q_proj.weight": {
+   "edit_changed_entries": 524288,
+   "delta_changed_entries": 524151,
+   "edit_entries_not_bf16": 524111,
+   "delta_norm": 10.513806967006913,
+   "delta_max_abs": 0.05902099609375,
+   "checkpoint_norm": 33.58985797453921,
+   "entries_differing_from_checkpoint": 524151
+  }
+ }
+}

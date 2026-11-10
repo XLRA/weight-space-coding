@@ -1,0 +1,31 @@
+{
+ "arm": "R-O",
+ "base": "start-O",
+ "time": "2026-11-08 19:25:24",
+ "rule": "the best validation pass rate among the checkpoints whose panel mean is no more than 2.5 points below the base's; a tie goes to the earlier checkpoint (plans/training-phase.md)",
+ "candidates": [
+  {
+   "checkpoint": "round_1",
+   "folder": "/opt/wsp/train/runs/R-O/round_1/checkpoint",
+   "validation_pass": 10.32,
+   "validation_diff": 5.16,
+   "validation_se": 1.21,
+   "panel_mean": 33.0,
+   "panel_mean_diff": 6.3,
+   "panel_mean_se": 1.41,
+   "panel_within_2_5": true
+  },
+  {
+   "checkpoint": "round_2",
+   "folder": "/opt/wsp/train/runs/R-O/round_2/checkpoint",
+   "validation_pass": 15.77,
+   "validation_diff": 10.62,
+   "validation_se": 1.35,
+   "panel_mean": 39.4,
+   "panel_mean_diff": 12.7,
+   "panel_mean_se": 1.61,
+   "panel_within_2_5": true
+  }
+ ],
+ "chosen": "round_2"
+}

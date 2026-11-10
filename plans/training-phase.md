@@ -1,6 +1,9 @@
 # Training phase: plan (draft, 2026-11-07)
 
 **Status:** approved as recommended on 2026-11-07, about 05:00 UTC. Step 1 is done (results under **Infrastructure**). E was frozen at 16:30 UTC as `pilot-14`'s edit (below). R-O started at 09:05 UTC and R-E at 16:42 UTC. On the user's go-ahead, GRPO (G-E, then G-O) was queued at 17:51 UTC behind the RFT runs on the 5090 (`train/grpo-queue-2026-11-07.sh`). The RFT arms' held-out evaluations run between G-E and G-O (`train/eval-rft-arms.sh`, also on the user's go-ahead).
+- **Since 2026-11-08,** G-O and G-E2 run on tests the problem statements don't show (Deviations).
+- **G-O ended on 2026-11-10.** G-E2 should end on 2026-11-11, around 16:00–18:00 UTC.
+- **After that,** the GRPO arms' held-out evaluations, T's, and the removal's check run by themselves (`train/eval-grpo-arms.sh`; Deviations, 2026-11-10).
 
 **Changes:** any change to this recipe after a trained arm's held-out evaluation must be listed under **Deviations** at the end, with its date and reason.
 
@@ -215,3 +218,27 @@
     - 42 got new tests.
     - Of G-E's answers that passed the sample's 20 validation problems, 238 of 247 fail the new tests.
     - A first version also mutated counts and query types. 8% of held-out human solutions failed its tests, so counts and query types are now kept fixed.
+- **2026-11-10 15:50 UTC, the GRPO arms' held-out evaluations, T and the removal set up.** This was before any GRPO arm's held-out evaluation, and before T's check had finished.
+  - **G-O's checkpoint:** step 100, by the rule on `val2`.
+    - **Its scores:** `val2` 19.7%, +14.9 (1.9) against start-O. Panel mean 57.0, +30.3 (1.6).
+    - **The comparison:** every checkpoint's panel was far above start-O's, so the rule compared all six on `val2`.
+    - **The record:** `train/evals/G-O/choice.json`, written by `train/arm_choice.py`. It applies the rule as `train/eval-rft-arms.sh` did, but on `val2`.
+  - **Checks that failed:** a checkpoint whose check failed twice can't be judged, so the choice leaves it out.
+  - **ΔE is bf16(E) − O.**
+    - **Why:** E's submission holds fp32 values, but the evaluation and the trainer both round them to bf16 when they load them (`harness/gpu_server.py`, `train/common.py`). So bf16(E) is the edit the model ran with.
+    - **What rounding drops:** 4,777 of the 2,115,584 entries E changes. All are in the three q_proj tensors, where the change was under half a bf16 step.
+  - **T** = G-O/step_100 + ΔE (`train/combine.py`; the weights are in `train/combined/T-step_100`).
+    - **Its entries:** each is the bf16 value nearest the exact sum, with ties going to the even value.
+    - **The check:** a second computation in torch agrees with it. The 309 other tensors are byte-identical to the checkpoint's, and the 9 edited ones are within half a bf16 step.
+  - **"Clearly worse":** the plan didn't define it.
+    - **The definition:** T's panel mean is more than 2 standard errors below G-O/step_100's, paired over the panel's 1,000 questions (`arm_choice.py panel-ok`).
+    - **When:** fixed before T's check on the 5080 started at 15:45 UTC.
+    - **The evaluation it decides:** T's one held-out evaluation, the five suites at presence penalty 1.5 (`T-pp15`).
+  - **The removal** (question 3):
+    - **What runs:** G-E2's chosen checkpoint − ΔE, built the same way. It is checked on the 5080 and paired with that checkpoint (`train/evals/G-E2-minus-E/`).
+    - **If no G-E2 checkpoint qualifies:** the removal uses G-E2's last checked checkpoint.
+    - **The comparison:** E − ΔE is exactly O. So start-O against start-E, on the same panel, is what removing ΔE costs E.
+  - **The order:** `train/eval-grpo-arms.sh`, which `train/queue/after-G-E2.sh` runs when G-E2 ends.
+    - **On the 5090:** G-O's two evaluations (`G-O-pp15`, `G-O-code-pp0`), then G-E2's once its checks are done, then T's.
+    - **On the 5080:** the removal's check, at the same time.
+    - **The cost:** about 8–12 hours of the 5090. R-O's two evaluations took 2.7 hours, and the GRPO arms write longer answers.

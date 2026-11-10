@@ -1,0 +1,88 @@
+{
+ "arm": "G-O",
+ "base": "start-O",
+ "time": "2026-11-10 15:48:16",
+ "rule": "the best validation pass rate on train/data2's tests (val2) among the checkpoints whose panel mean is no more than 2.5 points below the base's; a tie goes to the earlier checkpoint; a checkpoint without a paired check is left out (plans/training-phase.md)",
+ "run_ended": true,
+ "candidates": [
+  {
+   "checkpoint": "step_25",
+   "folder": "/opt/wsp/train/runs/G-O/checkpoints/step_25",
+   "checked": true,
+   "val2_pass": 15.34,
+   "val2_diff": 10.57,
+   "val2_se": 1.64,
+   "val_pass_old_tests": 16.07,
+   "panel_mean": 51.1,
+   "panel_mean_diff": 24.4,
+   "panel_mean_se": 1.52,
+   "panel_within_2_5": true
+  },
+  {
+   "checkpoint": "step_50",
+   "folder": "/opt/wsp/train/runs/G-O/checkpoints/step_50",
+   "checked": true,
+   "val2_pass": 14.89,
+   "val2_diff": 10.11,
+   "val2_se": 1.65,
+   "val_pass_old_tests": 18.25,
+   "panel_mean": 52.9,
+   "panel_mean_diff": 26.2,
+   "panel_mean_se": 1.57,
+   "panel_within_2_5": true
+  },
+  {
+   "checkpoint": "step_75",
+   "folder": "/opt/wsp/train/runs/G-O/checkpoints/step_75",
+   "checked": true,
+   "val2_pass": 17.05,
+   "val2_diff": 12.27,
+   "val2_se": 1.75,
+   "val_pass_old_tests": 21.83,
+   "panel_mean": 57.1,
+   "panel_mean_diff": 30.4,
+   "panel_mean_se": 1.58,
+   "panel_within_2_5": true
+  },
+  {
+   "checkpoint": "step_100",
+   "folder": "/opt/wsp/train/runs/G-O/checkpoints/step_100",
+   "checked": true,
+   "val2_pass": 19.66,
+   "val2_diff": 14.89,
+   "val2_se": 1.9,
+   "val_pass_old_tests": 22.52,
+   "panel_mean": 57.0,
+   "panel_mean_diff": 30.3,
+   "panel_mean_se": 1.58,
+   "panel_within_2_5": true
+  },
+  {
+   "checkpoint": "step_125",
+   "folder": "/opt/wsp/train/runs/G-O/checkpoints/step_125",
+   "checked": true,
+   "val2_pass": 18.98,
+   "val2_diff": 14.2,
+   "val2_se": 1.88,
+   "val_pass_old_tests": 21.63,
+   "panel_mean": 55.7,
+   "panel_mean_diff": 29.0,
+   "panel_mean_se": 1.62,
+   "panel_within_2_5": true
+  },
+  {
+   "checkpoint": "step_150",
+   "folder": "/opt/wsp/train/runs/G-O/checkpoints/step_150",
+   "checked": true,
+   "val2_pass": 19.09,
+   "val2_diff": 14.32,
+   "val2_se": 1.95,
+   "val_pass_old_tests": 21.43,
+   "panel_mean": 56.2,
+   "panel_mean_diff": 29.5,
+   "panel_mean_se": 1.59,
+   "panel_within_2_5": true
+  }
+ ],
+ "chosen": "step_100"
+}

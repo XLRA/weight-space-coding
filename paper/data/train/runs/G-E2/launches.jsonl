@@ -1,0 +1,1 @@
+{"time": "2026-11-10 08:27:50", "gpu": "5090", "kind": "grpo", "start": "/opt/wsp/runs/pilot-14/submission", "args": "--data /train/data2/train.jsonl --gpu-memory 0.60"}
