@@ -16,6 +16,9 @@
 # 3. T = G-O's checkpoint + ΔE (train/combined/T-<step>; checked on the 5080 and paired with that checkpoint, unless
 #    already done): the five suites at 1.5 (results/T-pp15), unless its panel is clearly worse than the checkpoint's:
 #    a panel mean more than 2 SE below, paired (arm_choice.py panel-ok).
+# After the removal (or, without one, at the end), the analyses of "Do the edits survive training?" (added
+# 2026-11-10, Deviations): the activation probes on the 5080 for every model not yet probed (run-probes.sh;
+# analysis/probes/summary.md), and how far training moved the edited weights (row_moves.py; analysis/rows.md).
 # Each evaluation is tried twice (evaluate.py resumes where it stopped). --dry-run: no waiting, building, checks,
 # choice.json or evaluations; it prints the choices and the commands. WSP_TRAIN points it at another train/ folder
 # (for tests).
@@ -74,6 +77,35 @@ removal() {  # <G-E2 checkpoint folder>: the checkpoint − ΔE, checked on the 
   [ -n "$DRY" ] || log "removal: $(tail -1 "$T/evals/G-E2-minus-E/check.log")"
 }
 
+probe_models() {  # "<name> <weights>" for every model the probes cover: E, O, the combined ones, every checkpoint
+  echo "E /opt/wsp/runs/pilot-14/submission"
+  echo "O original"
+  local d arm
+  for d in "$T"/combined/*/; do [ -d "$d" ] && echo "$(basename "$d") ${d%/}"; done
+  for arm in R-O R-E; do
+    for d in "$T"/runs/$arm/round_*/checkpoint; do [ -d "$d" ] && echo "$arm/$(basename "$(dirname "$d")") $d"; done
+  done
+  for arm in G-O G-E G-E2; do
+    for d in "$T"/runs/$arm/checkpoints/step_*; do [ -d "$d" ] && echo "$arm/$(basename "$d") $d"; done
+  done
+}
+
+analysis() {  # the probes on the 5080 for every model not yet probed, their summary, and the row movements
+  [ -s "$T/analysis/probes/texts.jsonl" ] || { log "analysis: no probe texts (probes.py build), so no analysis"; return 1; }
+  local name dir n=0 failed=0
+  while read -r name dir; do
+    [ -s "$T/analysis/probes/$(echo "$name" | tr '/' '-').json" ] && continue
+    if [ -n "$DRY" ]; then log "would run: run-probes.sh 5080 $name $dir"; continue; fi
+    n=$((n + 1))
+    bash "$CODE/run-probes.sh" 5080 "$name" "$dir" >> "$T/analysis/probes/batch.log" 2>&1 < /dev/null ||
+      { failed=$((failed + 1)); log "analysis: the probes of $name failed (analysis/probes/log)"; }
+  done < <(probe_models)
+  [ -n "$DRY" ] && { log "would run: probes.py summary, row_moves.py"; return 0; }
+  WSP_TRAIN=$T $PY "$CODE/probes.py" summary > /dev/null &&
+    log "analysis: $n models probed, $failed failed (analysis/probes/summary.md)"
+  WSP_TRAIN=$T $PY "$CODE/row_moves.py" > /dev/null && log "analysis: row movements done (analysis/rows.md)"
+}
+
 log "start${DRY:+ (dry run)}"
 
 # 1. G-O
@@ -98,7 +130,7 @@ if [ -z "$DRY" ]; then
     sleep 300
   done
 fi
-RPID=""; R=""
+RPID=""; R=""; ANALYSED=""
 if ! ac ended G-E2 || [ -z "$(ac last G-E2)" ]; then
   log "G-E2: left out: its run has not ended, or it has no checkpoint"
 else
@@ -116,7 +148,8 @@ else
     fi
   fi
   if [ -n "$R" ]; then
-    if [ -n "$DRY" ]; then removal "$R"; else removal "$R" & RPID=$!; fi
+    if [ -n "$DRY" ]; then removal "$R"; analysis; else { removal "$R"; analysis; } & RPID=$!; fi
+    ANALYSED=1
   fi
   [ -n "$GE" ] && both G-E2 "$GE"
 fi
@@ -141,4 +174,5 @@ fi
 if [ -n "$RPID" ]; then
   wait $RPID
 fi
+[ -n "$ANALYSED" ] || analysis
 log "end"

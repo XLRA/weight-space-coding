@@ -11,6 +11,11 @@
 /train/combined/
 /train/checks/*.log
 /train/tests/work/
+# the probe texts hold dataset problems; the activations are about 40 MB a model (train/probes.py)
+/train/analysis/probes/texts.jsonl
+/train/analysis/probes/*.npz
+/train/analysis/probes/log
+/train/analysis/probes/batch.log
 
 !/harness/
 __pycache__/

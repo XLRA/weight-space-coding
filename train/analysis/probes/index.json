@@ -1,0 +1,69 @@
+{
+ "made": "2026-11-10 20:38:04",
+ "seed": 20261110,
+ "texts": 201,
+ "texts_md5": "578ce0c4c843345b4b58cdf9097da0cc",
+ "answer_positions": 1252319,
+ "categories": {
+  "loop": 40,
+  "prose": 21,
+  "code-E": 20,
+  "code-O": 20,
+  "math": 40,
+  "reclose": 40,
+  "choice": 20
+ },
+ "tried": {
+  "loop": 94,
+  "prose": 244,
+  "code-E": 20,
+  "code-O": 21,
+  "math": 63,
+  "reclose": 312,
+  "choice": 23
+ },
+ "pools": {
+  "loop": 764,
+  "prose": 244,
+  "code-E": 200,
+  "code-O": 94,
+  "math": 85,
+  "reclose": 896,
+  "choice": 244
+ },
+ "retokenized_length_matches": 164,
+ "retokenized_length_largest_gap": 399,
+ "labels": {
+  "rep": {
+   "target": 179579,
+   "control": 736015
+  },
+  "fence": {
+   "target": 45,
+   "control": 1250742
+  },
+  "degen": {
+   "target": 22,
+   "control": 1238786
+  },
+  "statement": {
+   "target": 324,
+   "control": 1251995
+  },
+  "name": {
+   "target": 1345,
+   "control": 1250974
+  },
+  "name-inner": {
+   "target": 612,
+   "control": 1251707
+  }
+ },
+ "statement_controls": 327,
+ "sources": {
+  "start-O/val.raw.jsonl.gz": "e5507153377617bd1de98ac325660612",
+  "start-O/panel.raw.jsonl": "b6f81440dfa19d62091a224fbe2c7899",
+  "start-E/val.raw.jsonl.gz": "8b552bd4ebb060848d69976d771a71b5",
+  "start-E/panel.raw.jsonl": "bdc00ba5664eee7d56a49246fff2dcbe"
+ }
+}

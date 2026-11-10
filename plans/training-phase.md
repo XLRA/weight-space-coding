@@ -242,3 +242,37 @@
     - **On the 5090:** G-O's two evaluations (`G-O-pp15`, `G-O-code-pp0`), then G-E2's once its checks are done, then T's.
     - **On the 5080:** the removal's check, at the same time.
     - **The cost:** about 8–12 hours of the 5090. R-O's two evaluations took 2.7 hours, and the GRPO arms write longer answers.
+- **2026-11-10 19:35 UTC, the other analyses of question 3 built: the activation probes and the row movements.** This was before G-E2's checkpoint is chosen, and before any GRPO arm's held-out evaluation.
+  - **The probes** (`train/probes.py`, run per model by `train/run-probes.sh`; results in `train/analysis/probes/`):
+    - **The texts:** 201 answers that O and E wrote at their starting checks, to validation problems and panel questions, drawn once with seed 20261110. The plan said about 200. The instruction-following answers fell short: only 21 of E's 244 repeat themselves at 40 or more positions after the thinking closed, against a quota of 40. They are re-tokenized with their prompts and teacher-forced. `index.json` has their md5 and counts; the texts themselves stay out of git, since they hold dataset problems.
+    - **The units:** the ones E changes. These are the five loop detectors and their combined drive, the answer-end neuron, the layer-23 neurons 3109 and 2664, the pair 1965 + 2621, and the name gates (eight heads in layers 15, 19 and 23).
+    - **Left out:** the plan also listed the layer-22 pair 2979/2055. That is `pilot-18`'s change, which E (`pilot-14`'s edit) doesn't have.
+    - **Where each is meant to fire,** from the agent's own reports:
+      - verbatim repetition, for the detectors and 3109;
+      - the closing fence that ends the turn, for 1420;
+      - the thinking closed at least twice, the last segment under 60 tokens, for 2664;
+      - "answer is" or "Answer:" after the thinking closed in a math answer, for the pair;
+      - a function name being written after def, for the gates.
+      `probes.py`'s docstring defines each exactly.
+    - **The measure:** for each unit, the AUROC between its labelled positions and the rest, and its mean activation there. On the labels each text counts once. That weighting was decided before any model was probed, after the build showed that 5 texts hold 65% of the degen and statement positions.
+    - **The models:** every model with weights, not only E and G-E: O, E, T, every checkpoint of R-O, R-E, G-O, G-E and G-E2, and the removal. G-E2 is the arm from E, as decided on 2026-11-08.
+  - **The row movements** (`train/row_moves.py`; `train/analysis/rows.md`), for each unit:
+    - **kept:** how much of ΔE is still there along its own direction;
+    - **moved:** training's change to the unit, against the edit's size;
+    - **cos:** the cosine of that change with ΔE;
+    - **vs_rest:** the change against the median row or column of the same tensor.
+  - **When they run:**
+    - **Now:** on the models that have weights so far, on the 5080 between G-E2's checks (`scratch/probes-2026-11-10.sh`). The row movements need no GPU.
+    - **After G-E2 ends:** `train/eval-grpo-arms.sh` probes the rest (G-E2's later checkpoints and the removal) on the 5080 after the removal's check, then writes both summaries.
+- **2026-11-10 20:40 UTC, the probes corrected after the sanity check on E.** This was before any other model's probe results were read.
+  - **What the check found:** on E, three units scored at or below chance: neuron 2664 (AUROC 0.15), the pair (0.48), and the layer-15 gate (0.57 for its detector). Their labels or their measure didn't match how the agent built them, according to `pilot-13`'s and `pilot-14`'s notes (`explanations.md`):
+    - **2664** ends the turn in a degenerate re-close cycle. In E's own answers, it fires at the last position of 17 of the 22 finished answers that end in that state, with activations of 2 to 16. Where it fires, the answer ends, so the re-closes left in the texts are where it didn't. The label had every position in the state.
+    - **The layer-15 gate** was rebuilt by `pilot-13` to open only at word-start positions inside a name, where the next piece begins with "_" or a capital letter. The layer-19 and layer-23 gates open at the def position and at word-start positions, and were fitted against mid-word positions and the name's last token. The label had every position inside the name, def included.
+    - **The four layer-23 neurons are switches:** silu of a thresholded readout. Silu dips below zero just under the threshold, so near-misses rank below positions where the neuron is off. That pulled the pair's AUROC to 0.48, though it fires at 27% of its positions and at 0.002% of the rest.
+  - **The fix:**
+    - **degen** is now the last position of a finished answer, kept whole, that ends in the degenerate state. The state's other positions are left out.
+    - **name** is now the def and word-start positions (layers 19 and 23), and **name-inner** the word-start positions only (layer 15). Mid-word positions and the name's last token are controls.
+    - **The switches' AUROC** (3109, 2664 and the pair) is now taken on the gate's pre-activation, which is monotone. Their mean activation stays, and the share of positions where each is on (activation above 0.5) is added.
+    - **The texts are the same 201,** with the same seed and selection. Only the stored labels changed (md5 578ce0c4).
+  - **E after the fix:** AUROC 0.99 for 2664, 1.00 for the pair and 0.88 for 3109; 0.99 and 0.94 for the layer-15 detector and gate; 0.99–1.00 for the other gates and detectors. The loop detectors are unchanged at 0.66–0.84 (their combined drive 0.88). They are the model's own neurons, and verbatim repetition is only a proxy for a loop.
+  - **O and T-step_100 had been probed with the first version.** Their results were deleted unread, and every model is probed again.

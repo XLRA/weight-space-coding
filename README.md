@@ -60,9 +60,10 @@ So far:
 
 - **RFT from O matched E on code, but not elsewhere.** Held out, it scored 32.5% on MBPP+ and HumanEval+ (E 32.3%) and 9.4% on LiveCodeBench (E 7.0%), but 9 to 22 points below E on MMLU-Pro, IFEval and MATH-500.
 - **RFT from E barely helped on code,** and cost 7.8 points on the panel.
-- **GRPO from E gamed its reward.** Most APPS problems are tested only on the examples their statement shows, and within 50 steps the model learned to print the example output instead of solving the problem. We built new tests from APPS's own human-written solutions, with no other model involved. GRPO from O ran on them, and GRPO from E is rerunning on them.
+- **GRPO from E gamed its reward.** Most APPS problems are tested only on the examples their statement shows, and within 50 steps the model learned to print the example output instead of solving the problem. We built new tests from APPS's own human-written solutions, with no other model involved. GRPO from O ran on them, and GRPO from E is rerunning on them: after 50 of its 150 steps, it is 6.5 points above E on held-back practice problems.
 - **GRPO from O beat both E and RFT on our own checks.** After 100 steps its pass rate on held-back practice problems was 19.7% (E 9.4%, RFT from O 13.4%), and it scored 57.0% on the panel (E 51.1%). Its held-out evaluation is next.
 - **The edit still works on a trained model.** Adding E's weight change to GRPO-trained O cut the answers that hit the token limit from 21.8% to 2.4%, at no cost on the panel. Its pass rate didn't rise.
+- **Training leaves the edit in place.** After RFT or GRPO from E, the edited weights still hold all of E's change, and most of the parts it built still fire where the agent designed them to. One doesn't: a switch that stops the model from reopening and closing its thinking over and over, which GRPO turned off within 100 steps.
 
 **Status (2026-11-10):** GRPO from E finishes on 2026-11-11. Then the held-out evaluations of both GRPO models, and of GRPO from O plus the edit, run.
 
