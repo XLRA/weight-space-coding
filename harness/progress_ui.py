@@ -715,18 +715,23 @@ def grpo_rows(j, L, now):
     return rows
 
 
+def arm_start(name):
+    """An arm's start, from its name: O for G-O, E for R-E and for G-E2 (G-E's rerun)."""
+    return name.split("-")[-1].rstrip("0123456789")
+
+
 def job_block(j, L, now):
     """A running job's rows in its GPU's panel."""
     kind = {"rft": "RFT", "grpo": "GRPO", "ckpt": "check"}.get(j["kind"], "")
     name = P.train_label(j) if j["kind"] == "check" else j["name"]
     extra, since = "", j["t"]
     if j["kind"] == "rft" and L.get("round"):
-        extra = f" · from {j['name'].split('-')[-1]} · round {L['round']} of {L['rounds']}"
+        extra = f" · from {arm_start(j['name'])} · round {L['round']} of {L['rounds']}"
         since = L.get("session") or L.get("started") or j["t"]  # since this start of the run, not its first
         if L.get("session") and L.get("started") and L["session"] - L["started"] > 600:
             extra += f" · resumed {hhmm(L['session'], now)}"
     elif j["kind"] == "grpo":
-        extra = f" · from {j['name'].split('-')[-1]}"
+        extra = f" · from {arm_start(j['name'])}"
     elif j["kind"] == "ckpt":
         extra = f" · against {L['base']}" if L.get("base") else " · unpaired"
     try:
@@ -759,6 +764,10 @@ def lane_parts(card, D, now, chart_rows):
     if not parts:
         parts.append(Text.assemble(("○ ", "faint"), ("idle", "dim")))
     nxt = [f"{j['name']} (waiting {P.minutes(now - j['t'])})" for j in tj if j["gpu"] == card and j["state"] == "waiting"]
+    shown = {j.get("after", "").split(" and ")[0] for j in tj if j["state"] == "queued"}
+    for j in holders:  # a running arm's hook (train/queue/after-<arm>.sh), unless a queued job shows it below
+        if j.get("hook") and j["name"] not in shown:
+            nxt.append(f"{j['hook']} (after {j['name']})")
     for j in tj:
         if j["gpu"] == card and j["state"] == "queued":
             if " and " in j.get("after", ""):  # a hook that runs before it

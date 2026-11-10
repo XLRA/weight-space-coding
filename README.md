@@ -368,6 +368,9 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
   - **What T is:** G-O's step-100 checkpoint plus ΔE, the edit's change to the weights.
   - **How ΔE is taken:** E minus O, as the model runs them in bf16. The edit was saved at higher precision, but every evaluation and training run rounds it to bf16.
   - **The rule for its held-out evaluation,** fixed before its panel check started: T gets one unless its panel mean is more than 2 SE below G-O step 100's.
+  - **Its check,** paired against G-O step 100: panel mean 58.4%, +1.4 (1.3), so T gets its held-out evaluation. No suite moved beyond 2 SE: math +4.4 (2.2), instructions +2.0 (2.6), choice +0.8 (2.7), code −1.6 (2.9).
+  - **The edit still ends loops after training.** T runs 2.4% of its validation answers to the 32k cap, against G-O's 21.8%, and its answers are about a quarter shorter.
+  - **Its validation pass rate didn't rise:** −1.8 (1.3) on the new tests.
 
 ## What we've learned so far
 
@@ -384,6 +387,10 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
   - **Within 25 steps** G-O's panel mean rose from O's 26.7% to 51.1%, E's level, with math +42.8 and instructions +30.8.
   - **By step 100** it reached 57.0%, 5.9 points above E's. Its validation pass rate on the new tests was twice E's.
   - **Held out:** its evaluation runs after G-E2.
+- **The edit's loop control carried over to a model trained without it.**
+  - **The test:** `pilot-14`'s weight change added to G-O after 100 steps of GRPO.
+  - **The result:** the share of validation answers cut at the cap fell from 21.8% to 2.4%, without costing the panel: +1.4 (1.3).
+  - **Still open:** whether it adds anything held out. That is T's evaluation.
 - **RFT on code matched the edit on held-out code, but not beyond it.** Two rounds of RFT from O on its own passing practice answers came level with `pilot-14`'s edit on MBPP+ and HumanEval+, and slightly ahead on LiveCodeBench. It finished 8.6 to 21.6 points behind on MMLU-Pro, IFEval and MATH-500. The GRPO arms' held-out evaluations come after G-E2.
 - **A narrow edit can pass every check the agent runs and still cost a suite it never looks at.** `pilot-16` fixed its target and lost 4.6 points on MMLU-Pro, which is why later runs get the panel.
 - **A reward that only tests the examples a problem shows gets gamed, and fast.** GRPO from E learned within 50 steps to print the example output, which lifted its validation pass rate from 10% to 62%.

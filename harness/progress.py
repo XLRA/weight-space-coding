@@ -1083,6 +1083,12 @@ def ckpt_detail(name, args, j, now):
 TRAIN_DETAIL = {"grpo": grpo_detail, "rft": rft_detail, "check": check_detail, "ckpt": ckpt_detail}
 
 
+def hook_shows(arm):
+    """What train/queue/after-<arm>.sh, which a chain runs when <arm> ends, says it runs (its "# shows:" line), or ""."""
+    return next((l[8:].strip() for l in tail_text(f"{TRAIN}/queue/after-{arm}.sh")[:5] if l.startswith("# shows:")),
+                "") if arm else ""
+
+
 def train_jobs(now, keep=24 * 3600):
     """The training phase's jobs: running, grading, or waiting for their GPU's lock, then those finished in the last
     day, newest first. [{"name", "kind", "gpu", "state", "t", "detail"}]; state is running, grading, waiting, done or
@@ -1101,6 +1107,8 @@ def train_jobs(now, keep=24 * 3600):
         box = {"check": f"wsp-train-check-{'push-' if name.startswith('push-') else ''}{gpu}",
                "ckpt": f"wsp-ckpt-{name.replace('/', '-')}"}.get(kind, f"wsp-train-{name}")
         j = {"name": name, "kind": kind, "gpu": gpu, "t": starts.get(p["pid"], now), "args": p["args"]}
+        if kind in ("grpo", "rft"):
+            j["hook"] = hook_shows(name)  # runs when this arm ends
         if box in boxes:
             j["state"] = "running"
             j["t"] = iso(sh("docker", "inspect", "-f", "{{.State.StartedAt}}", box)) or j["t"]
@@ -1115,8 +1123,7 @@ def train_jobs(now, keep=24 * 3600):
             if (mtime(f"{TRAIN}/runs/{q['name']}/train.log") or 0) > qt:  # it has run since it was queued
                 continue
             after = q.get("after", "")  # a hook run before it (train/queue/after-<after>.sh) names itself in "# shows:"
-            shows = next((l[8:].strip() for l in tail_text(f"{TRAIN}/queue/after-{after}.sh")[:5]
-                          if l.startswith("# shows:")), "") if after else ""
+            shows = hook_shows(after)
             held = os.path.exists(f"{TRAIN}/runs/{q['name']}/stopped")  # the chain skips it when its turn comes
             jobs.append({"name": q["name"], "kind": q["kind"], "gpu": q.get("gpu", "?"), "t": now, "state": "queued",
                          "args": q.get("args", ""), "after": f"{after} and {shows}" if shows else after,
