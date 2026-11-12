@@ -1,6 +1,6 @@
-# Editing after training: plan (draft, 2026-11-12)
+# Editing after training: plan (2026-11-12)
 
-**Status:** drafted on 2026-11-12 for the user's go-ahead. Nothing has run yet except the harness tests (`runs/e2e-trained` and `e2e-trained-2`, both passed).
+**Status:** approved on 2026-11-12. `pilot-20` ran from 11:51 to 18:36 UTC, and its evaluations from 18:37 to 21:52 UTC. **Result: level with G-O** ("Result", below). Before the run, the harness tests passed (`runs/e2e-trained` and `e2e-trained-2`).
 
 **Changes:** any change to this plan after `pilot-20` starts must be listed under **Deviations** at the end, with its date and reason.
 
@@ -100,6 +100,18 @@ That is the user's call once the result is in. For example:
 - **Context:** the start's 318 tensors make `edited()` long. The brief points the agent to `changed()`, and the restart message lists only the tensors it changed.
 - **The panel's G-O answers** come from the same session and GPU as its edits, so the pairing is like `pilot-19`'s.
 
+## Result (2026-11-12)
+
+- **Level with G-O.** The mean of the five suites' paired differences is +0.68 (SE 0.53), 1.3 SE above zero, and no suite is more than 2 SE below G-O. G-O stays the best model.
+  - **Per suite:** code +1.25 (0.97), MMLU-Pro +0.80 (1.35), IFEval +1.57 (1.45), LiveCodeBench −1.00 (1.12), MATH-500 +0.80 (0.91).
+  - **Code at presence penalty 0:** +0.88 (0.89).
+- **Against T:** +2.55 (0.54) over the five suites.
+- **The edit:** 8 tensors in layers 12 and 13. It is a loop exit that a "thinking has closed" flag switches off in the answer.
+- **The side measures:**
+  - LiveCodeBench answers cut at the cap fell from 32.7% to 19.0%.
+  - Finished answers that close the thinking two or more times stayed near G-O's: 0.7% on LiveCodeBench and 7.0% on MATH-500, against 1.1% and 4.6% (T: 43.3% and 10.8%).
+- **Where the details are:** RESULTS.md, "Editing after training", has the rest of the side measures and the cost.
+
 ## Deviations
 
-None yet.
+None.

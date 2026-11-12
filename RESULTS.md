@@ -1,6 +1,6 @@
 # Detailed results
 
-The full record behind the [README](README.md): the setup's rules, the evaluation, every editing session, and the training phase. Numbers in brackets are standard errors of paired differences.
+The full record behind the [README](README.md): the setup's rules, the evaluation, every editing session, the training phase, an editing session on the trained model, and a comparison with the paper's published answers. Numbers in brackets are standard errors of paired differences.
 
 The agent is Claude Opus 5.5, at maximum effort. The model it edits is Qwen3.5-0.8B with thinking on, at the revision the paper used (`2fc06364715b967f1860aea9cf38778875588b17`).
 
@@ -237,7 +237,7 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
   - the probes of every model.
 - **One grading failed and was redone.** One of G-E2's LiveCodeBench answers stopped the grader (plan, Deviations, 2026-11-12). It was a thinking loop that the grader took as code and that Python couldn't parse. It is now graded as a syntax error, as the code grader already did.
 - **The plan's runs are complete.** Its second-seed rule doesn't apply, since G-O and G-E2 ended more than 2 SE apart on code (below).
-- **Next, planned on 2026-11-12:** an editing session that starts from G-O (`pilot-20`, [`plans/edit-after-training.md`](plans/edit-after-training.md)). It waits for the user's go-ahead.
+- **Then, on 2026-11-12, an editing session started from G-O** (`pilot-20`, [`plans/edit-after-training.md`](plans/edit-after-training.md)). Held out, it is level with G-O ("Editing after training", below).
 - **The starting models' checks:**
   - **O** passes 5.2% of the validation answers and runs 76% of them to the 32k cap. Its panel mean is 26.7%.
   - **E** passes 10.0% and runs 4% to the cap. Its panel mean is 51.1%: choice 45.6%, math 61.6%, instructions 77.6%, code 19.6%.
@@ -476,9 +476,78 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
     - **Added to a trained model, the edit mostly works.** In T, the gates and the pair match E, the brake fires at 59%, and the cycle stop at 18%.
     - **Taken out again, it leaves nothing behind.** In the removal (G-E2 at step 50 minus ΔE), the switches never fire and the gates open at most 0.21 as wide as E's, as in O.
 
+## Editing after training: `pilot-20` (2026-11-12)
+
+Can the agent's editing improve on the best trained model? E was built on O, and added to G-O (T) it cost 1.86 points over the five suites. So `pilot-20` starts from G-O and works on G-O's own failures. The plan, with its evaluation and decision rule fixed before the run, is [`plans/edit-after-training.md`](plans/edit-after-training.md).
+
+- **The session:** Opus 5.5 at max effort, 24 forward passes with the panel, presence penalty 1.5, on the 5090, from 11:51 to 18:36 UTC.
+  - **Practice problems:** the 220 usable validation problems (`practice/val2`), which G-O never trained on.
+  - **The brief** (`harness/briefs/pilot-20.md`) gave G-O's held-out failure shares and what T did. Its goal: end the loops so that the thinking closes once and a complete answer follows.
+- **The edit, `v4`:** 8 tensors in layers 12 and 13, 669,696 values (`runs/pilot-20/final_answer.md`).
+  - **A "thinking has closed" flag:** layer 12's linear-attention head 7, the head with the smallest output, is rebuilt as a write-once memory. It writes only at `</think>`, never decays, and from then on adds a fixed flag to the residual stream.
+  - **A loop exit:** two quiet layer-13 neurons, 2369 and 2705. A loop probe read from the hidden states switches them on, and they push along the model's own "about to close the thinking" direction. The push, 1.5, is on the scale of the model's natural exits; E's was about 4–5, by the agent's measure. The flag switches the exit off in the answer, so the edit can't close the thinking a second time.
+  - **An eraser:** two more layer-13 neurons, 1527 and 3493, remove the flag after layer 13, so the layers that write the answer never see it.
+- **The agent's own checks against G-O,** on problems it hadn't used to choose the edit:
+  - the panel, +0.6 (1.3) over its four suites;
+  - code on 80 practice problems, two passes, +0.8 (2.1), with 7.1 points fewer answers cut;
+  - instruction following on 80 new prompts, +4.6 (2.7);
+  - its three math sets pooled, −0.7 (1.4).
+  - **It reported two side effects:** more math answers that close the thinking twice, +3.9 (1.4), and more syntax errors on APPS-style problems, +3.6 (1.2).
+
+**Held out, paired against G-O** at presence penalty 1.5 (`eval/results/pilot-20-pp15/vs-G-O.md`):
+
+| Suite | G-O | `pilot-20` | Paired (SE) |
+|---|---|---|---|
+| MBPP+ and HumanEval+ | 44.8% | 46.0% | +1.25 (0.97) |
+| MMLU-Pro | 45.6% | 46.4% | +0.80 (1.35) |
+| IFEval | 70.1% | 71.6% | +1.57 (1.45) |
+| LiveCodeBench | 14.6% | 13.6% | −1.00 (1.12) |
+| MATH-500 | 65.0% | 65.8% | +0.80 (0.91) |
+| **Mean of the five** | | | **+0.68 (0.53)** |
+
+- **By the rule fixed in advance, `pilot-20` is level with G-O.** The mean is 1.3 SE above zero, short of the 2 SE that "better" needs, and no suite is more than 2 SE below. G-O stays the best model.
+- **Code at presence penalty 0:** +0.88 (0.89) against G-O's (`eval/results/pilot-20-code-pp0/vs-G-O.md`).
+- **One subset is more than 2 SE below:** LiveCodeBench's medium problems, 1.9% against 6.7%, −4.8 (2.1). G-O solved 6 of these 52 problems more often, and `pilot-20` none.
+- **It beats T,** E's change added to G-O, by +2.55 (0.54) over the five suites, and on every suite, by 1.4 to 3.9 points.
+- **The plan's side measures** (`scratch/pilot20_measures.py`). Each cell is G-O → `pilot-20`, with T in brackets:
+
+  | Suite | Cut at 32k | Finished answers that close the thinking 2+ times | Mean length (tokens) |
+  |---|---|---|---|
+  | MBPP+ and HumanEval+ | 4.3% → 2.3% (1.1%) | 0.5% → 1.8% (7.1%) | 6,082 → 5,913 (6,446) |
+  | MMLU-Pro | 0.5% → 0.1% (0.1%) | 1.7% → 0.9% (4.8%) | 5,955 → 6,228 (6,506) |
+  | IFEval | 9.0% → 6.4% (0.8%) | 0.2% → 0.2% (6.9%) | 5,795 → 5,355 (4,347) |
+  | LiveCodeBench | 32.7% → 19.0% (0.4%) | 1.1% → 0.7% (43.3%) | 15,697 → 13,228 (11,251) |
+  | MATH-500 | 16.8% → 16.2% (10.9%) | 4.6% → 7.0% (10.8%) | 13,817 → 13,894 (13,843) |
+
+  - **The edit ends loops without T's reopening.** It cuts 13.7 points fewer LiveCodeBench answers at the cap, and its finished answers close the thinking twice about as rarely as G-O's, against 43% of T's.
+  - **The answers it frees rarely pass,** as the agent expected from its practice problems: of 46 APPS answers that G-O ran to the cap and the edit finished, none passed. LiveCodeBench's score didn't move.
+  - **It ends fewer loops than T,** whose stronger push leaves 0.4% of LiveCodeBench answers cut.
+  - **Syntax errors,** the agent's second side effect, rose on LiveCodeBench, whose programs are APPS-style: 17 of 700 answers against G-O's 7 (T: 157). On MBPP+ and HumanEval+ they fell, 34 of 2,168 against 53 (T: 162).
+- **What it cost:**
+  - **The session:** 6 h 45 min, of which the 24 forward passes took 4.99 h of the 5090: 11 paired generations, 10 teacher-forced reads, 2 panels and 1 generation of G-O alone. 233 turns in two conversations, and 0.48M Opus output tokens, with no usage-limit waits.
+  - **The evaluation:** 2 h 34 min for the five suites, and 34 min for code at presence penalty 0.
+
+## Against the paper's published answers
+
+The paper published every answer of its unedited model and of its 50-pass math edit on MMLU-Pro, IFEval and MATH-500 (`eval/raw/paper_samples/`). They cover the same questions, with the same number of samples, as our evaluation, and our graders agree with the paper's grades on 799 of the 800 answers checked ("Held-out evaluation", above). So our models can be paired with the paper's problem by problem (`scratch/paper_vs_ours.py`, 2026-11-12):
+
+| Suite | Paper: unedited | Paper: its edit | O | E | G-O |
+|---|---|---|---|---|---|
+| MMLU-Pro | 40.3% | 45.5% | 40.5% | 45.2% | 45.6% |
+| IFEval | 21.0% | 62.3% | 22.3% | 58.2% | 70.1% |
+| MATH-500 | 7.9% | 48.1% | 6.8% | 56.9% | 65.0% |
+
+- **The two evaluations agree on the same model.** O against the paper's unedited model: MMLU-Pro +0.2 (1.5), IFEval +1.3 (1.4), MATH-500 −1.1 (0.6), and +0.13 (0.73) over the three.
+- **E against the paper's edit:** MMLU-Pro −0.3 (1.4), IFEval −4.1 (1.8), MATH-500 +8.8 (1.2), and +1.48 (0.85) over the three, so level. E was chosen on code alone, the paper's edit on math.
+- **G-O against the paper's edit:** MMLU-Pro +0.1 (1.4), IFEval +7.8 (1.6), MATH-500 +16.9 (1.3), and +8.25 (0.85) over the three.
+- **The limits:**
+  - Only the paper's answers were graded here. Its edit wasn't run on our setup, so a difference in sampling settings could still favour one side.
+  - GPQA Diamond, the paper's fourth suite, isn't in our evaluation, and the paper reports no code results.
+
 ## What we've learned so far
 
 - **Weight-space programming carries over to code.** A 10-pass edit chosen only on code problems roughly doubled the held-out code pass rate at presence penalty 0, and transferred to math and instruction following.
+  - **Against the paper's own answers,** problem by problem, E is level with the paper's 50-pass math edit over the three suites both evaluated, +1.48 (0.85): 8.8 points ahead on MATH-500 and 4.1 behind on IFEval. G-O is 8.25 (0.85) ahead of it.
 - **Most of the gain is loop control,** as in the paper: the unedited 0.8B model loops in its thinking on most hard prompts.
   - **The cut rates show it.** At presence penalty 1.5 the unedited model hits the 32,768-token limit on 19% of code answers, 33% of MMLU-Pro, 73% of IFEval, 94% of MATH-500 and 98% of LiveCodeBench answers. `pilot-14`'s edit cuts 0.3–4.5%.
   - **Where finishing is not the obstacle, there is no gain.** HumanEval+ moved +0.6 (1.7), and LiveCodeBench's medium and hard problems not at all. The edits unlock what the model can already do; they do not yet show it learning to code better.
@@ -503,7 +572,7 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
   - **The likely reason:** after the edit's exit closes the thinking, the trained model often opens it again and doesn't settle.
     - 43% of T's finished LiveCodeBench answers close the thinking two or more times, against 1.1% of G-O's, and 4% of those pass.
     - G-O's own long LiveCodeBench answers are loops rather than useful reasoning: none of its passing answers is longer than 16k tokens.
-  - **Next (planned):** an editing session that starts from G-O and works on G-O's own failures ([`plans/edit-after-training.md`](plans/edit-after-training.md)).
+  - **An edit made for G-O itself didn't add to it either.** `pilot-20` started from G-O and built an exit that ends its loops without reopening the thinking. Held out, it is level with G-O, +0.68 (0.53) over the five suites, and ahead of T by +2.55 (0.54). An edit doesn't carry over to a trained model, but one rebuilt for it does no measurable harm.
 - **RFT on code matched the edit on held-out code, but not beyond it.** Two rounds of RFT from O on its own passing practice answers came level with `pilot-14`'s edit on MBPP+ and HumanEval+, and slightly ahead on LiveCodeBench. It finished 8.6 to 21.6 points behind on MMLU-Pro, IFEval and MATH-500.
 - **Training leaves the edit in place, but GRPO wears down its loop control.**
   - **The weights:** after RFT or GRPO from E, the edited weights still hold all of ΔE. Training barely touched them.
