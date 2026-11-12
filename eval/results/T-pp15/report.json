@@ -1,0 +1,742 @@
+{
+ "name": "T-pp15",
+ "config": {
+  "submission": "/opt/wsp/train/combined/T-step_100",
+  "tensors": [
+   "model.language_model.layers.0.input_layernorm.weight.npy",
+   "model.language_model.layers.0.linear_attn.A_log.npy",
+   "model.language_model.layers.0.linear_attn.conv1d.weight.npy",
+   "model.language_model.layers.0.linear_attn.dt_bias.npy",
+   "model.language_model.layers.0.linear_attn.in_proj_a.weight.npy",
+   "model.language_model.layers.0.linear_attn.in_proj_b.weight.npy",
+   "model.language_model.layers.0.linear_attn.in_proj_qkv.weight.npy",
+   "model.language_model.layers.0.linear_attn.in_proj_z.weight.npy",
+   "model.language_model.layers.0.linear_attn.norm.weight.npy",
+   "model.language_model.layers.0.linear_attn.out_proj.weight.npy",
+   "model.language_model.layers.0.mlp.down_proj.weight.npy",
+   "model.language_model.layers.0.mlp.gate_proj.weight.npy",
+   "model.language_model.layers.0.mlp.up_proj.weight.npy",
+   "model.language_model.layers.0.post_attention_layernorm.weight.npy",
+   "model.language_model.layers.1.input_layernorm.weight.npy",
+   "model.language_model.layers.1.linear_attn.A_log.npy",
+   "model.language_model.layers.1.linear_attn.conv1d.weight.npy",
+   "model.language_model.layers.1.linear_attn.dt_bias.npy",
+   "model.language_model.layers.1.linear_attn.in_proj_a.weight.npy",
+   "model.language_model.layers.1.linear_attn.in_proj_b.weight.npy",
+   "model.language_model.layers.1.linear_attn.in_proj_qkv.weight.npy",
+   "model.language_model.layers.1.linear_attn.in_proj_z.weight.npy",
+   "model.language_model.layers.1.linear_attn.norm.weight.npy",
+   "model.language_model.layers.1.linear_attn.out_proj.weight.npy",
+   "model.language_model.layers.1.mlp.down_proj.weight.npy",
+   "model.language_model.layers.1.mlp.gate_proj.weight.npy",
+   "model.language_model.layers.1.mlp.up_proj.weight.npy",
+   "model.language_model.layers.1.post_attention_layernorm.weight.npy",
+   "model.language_model.layers.10.input_layernorm.weight.npy",
+   "model.language_model.layers.10.linear_attn.A_log.npy",
+   "model.language_model.layers.10.linear_attn.conv1d.weight.npy",
+   "model.language_model.layers.10.linear_attn.dt_bias.npy",
+   "model.language_model.layers.10.linear_attn.in_proj_a.weight.npy",
+   "model.language_model.layers.10.linear_attn.in_proj_b.weight.npy",
+   "model.language_model.layers.10.linear_attn.in_proj_qkv.weight.npy",
+   "model.language_model.layers.10.linear_attn.in_proj_z.weight.npy",
+   "model.language_model.layers.10.linear_attn.norm.weight.npy",
+   "model.language_model.layers.10.linear_attn.out_proj.weight.npy",
+   "model.language_model.layers.10.mlp.down_proj.weight.npy",
+   "model.language_model.layers.10.mlp.gate_proj.weight.npy",
+   "model.language_model.layers.10.mlp.up_proj.weight.npy",
+   "model.language_model.layers.10.post_attention_layernorm.weight.npy",
+   "model.language_model.layers.11.input_layernorm.weight.npy",
+   "model.language_model.layers.11.mlp.down_proj.weight.npy",
+   "model.language_model.layers.11.mlp.gate_proj.weight.npy",
+   "model.language_model.layers.11.mlp.up_proj.weight.npy",
+   "model.language_model.layers.11.post_attention_layernorm.weight.npy",
+   "model.language_model.layers.11.self_attn.k_norm.weight.npy",
+   "model.language_model.layers.11.self_attn.k_proj.weight.npy",
+   "model.language_model.layers.11.self_attn.o_proj.weight.npy",
+   "model.language_model.layers.11.self_attn.q_norm.weight.npy",
+   "model.language_model.layers.11.self_attn.q_proj.weight.npy",
+   "model.language_model.layers.11.self_attn.v_proj.weight.npy",
+   "model.language_model.layers.12.input_layernorm.weight.npy",
+   "model.language_model.layers.12.linear_attn.A_log.npy",
+   "model.language_model.layers.12.linear_attn.conv1d.weight.npy",
+   "model.language_model.layers.12.linear_attn.dt_bias.npy",
+   "model.language_model.layers.12.linear_attn.in_proj_a.weight.npy",
+   "model.language_model.layers.12.linear_attn.in_proj_b.weight.npy",
+   "model.language_model.layers.12.linear_attn.in_proj_qkv.weight.npy",
+   "model.language_model.layers.12.linear_attn.in_proj_z.weight.npy",
+   "model.language_model.layers.12.linear_attn.norm.weight.npy",
+   "model.language_model.layers.12.linear_attn.out_proj.weight.npy",
+   "model.language_model.layers.12.mlp.down_proj.weight.npy",
+   "model.language_model.layers.12.mlp.gate_proj.weight.npy",
+   "model.language_model.layers.12.mlp.up_proj.weight.npy",
+   "model.language_model.layers.12.post_attention_layernorm.weight.npy",
+   "model.language_model.layers.13.input_layernorm.weight.npy",
+   "model.language_model.layers.13.linear_attn.A_log.npy",
+   "model.language_model.layers.13.linear_attn.conv1d.weight.npy",
+   "model.language_model.layers.13.linear_attn.dt_bias.npy",
+   "model.language_model.layers.13.linear_attn.in_proj_a.weight.npy",
+   "model.language_model.layers.13.linear_attn.in_proj_b.weight.npy",
+   "model.language_model.layers.13.linear_attn.in_proj_qkv.weight.npy",
+   "model.language_model.layers.13.linear_attn.in_proj_z.weight.npy",
+   "model.language_model.layers.13.linear_attn.norm.weight.npy",
+   "model.language_model.layers.13.linear_attn.out_proj.weight.npy",
+   "model.language_model.layers.13.mlp.down_proj.weight.npy",
+   "model.language_model.layers.13.mlp.gate_proj.weight.npy",
+   "model.language_model.layers.13.mlp.up_proj.weight.npy",
+   "model.language_model.layers.13.post_attention_layernorm.weight.npy",
+   "model.language_model.layers.14.input_layernorm.weight.npy",
+   "model.language_model.layers.14.linear_attn.A_log.npy",
+   "model.language_model.layers.14.linear_attn.conv1d.weight.npy",
+   "model.language_model.layers.14.linear_attn.dt_bias.npy",
+   "model.language_model.layers.14.linear_attn.in_proj_a.weight.npy",
+   "model.language_model.layers.14.linear_attn.in_proj_b.weight.npy",
+   "model.language_model.layers.14.linear_attn.in_proj_qkv.weight.npy",
+   "model.language_model.layers.14.linear_attn.in_proj_z.weight.npy",
+   "model.language_model.layers.14.linear_attn.norm.weight.npy",
+   "model.language_model.layers.14.linear_attn.out_proj.weight.npy",
+   "model.language_model.layers.14.mlp.down_proj.weight.npy",
+   "model.language_model.layers.14.mlp.gate_proj.weight.npy",
+   "model.language_model.layers.14.mlp.up_proj.weight.npy",
+   "model.language_model.layers.14.post_attention_layernorm.weight.npy",
+   "model.language_model.layers.15.input_layernorm.weight.npy",
+   "model.language_model.layers.15.mlp.down_proj.weight.npy",
+   "model.language_model.layers.15.mlp.gate_proj.weight.npy",
+   "model.language_model.layers.15.mlp.up_proj.weight.npy",
+   "model.language_model.layers.15.post_attention_layernorm.weight.npy",
+   "model.language_model.layers.15.self_attn.k_norm.weight.npy",
+   "model.language_model.layers.15.self_attn.k_proj.weight.npy",
+   "model.language_model.layers.15.self_attn.o_proj.weight.npy",
+   "model.language_model.layers.15.self_attn.q_norm.weight.npy",
+   "model.language_model.layers.15.self_attn.q_proj.weight.npy",
+   "model.language_model.layers.15.self_attn.v_proj.weight.npy",
+   "model.language_model.layers.16.input_layernorm.weight.npy",
+   "model.language_model.layers.16.linear_attn.A_log.npy",
+   "model.language_model.layers.16.linear_attn.conv1d.weight.npy",
+   "model.language_model.layers.16.linear_attn.dt_bias.npy",
+   "model.language_model.layers.16.linear_attn.in_proj_a.weight.npy",
+   "model.language_model.layers.16.linear_attn.in_proj_b.weight.npy",
+   "model.language_model.layers.16.linear_attn.in_proj_qkv.weight.npy",
+   "model.language_model.layers.16.linear_attn.in_proj_z.weight.npy",
+   "model.language_model.layers.16.linear_attn.norm.weight.npy",
+   "model.language_model.layers.16.linear_attn.out_proj.weight.npy",
+   "model.language_model.layers.16.mlp.down_proj.weight.npy",
+   "model.language_model.layers.16.mlp.gate_proj.weight.npy",
+   "model.language_model.layers.16.mlp.up_proj.weight.npy",
+   "model.language_model.layers.16.post_attention_layernorm.weight.npy",
+   "model.language_model.layers.17.input_layernorm.weight.npy",
+   "model.language_model.layers.17.linear_attn.A_log.npy",
+   "model.language_model.layers.17.linear_attn.conv1d.weight.npy",
+   "model.language_model.layers.17.linear_attn.dt_bias.npy",
+   "model.language_model.layers.17.linear_attn.in_proj_a.weight.npy",
+   "model.language_model.layers.17.linear_attn.in_proj_b.weight.npy",
+   "model.language_model.layers.17.linear_attn.in_proj_qkv.weight.npy",
+   "model.language_model.layers.17.linear_attn.in_proj_z.weight.npy",
+   "model.language_model.layers.17.linear_attn.norm.weight.npy",
+   "model.language_model.layers.17.linear_attn.out_proj.weight.npy",
+   "model.language_model.layers.17.mlp.down_proj.weight.npy",
+   "model.language_model.layers.17.mlp.gate_proj.weight.npy",
+   "model.language_model.layers.17.mlp.up_proj.weight.npy",
+   "model.language_model.layers.17.post_attention_layernorm.weight.npy",
+   "model.language_model.layers.18.input_layernorm.weight.npy",
+   "model.language_model.layers.18.linear_attn.A_log.npy",
+   "model.language_model.layers.18.linear_attn.conv1d.weight.npy",
+   "model.language_model.layers.18.linear_attn.dt_bias.npy",
+   "model.language_model.layers.18.linear_attn.in_proj_a.weight.npy",
+   "model.language_model.layers.18.linear_attn.in_proj_b.weight.npy",
+   "model.language_model.layers.18.linear_attn.in_proj_qkv.weight.npy",
+   "model.language_model.layers.18.linear_attn.in_proj_z.weight.npy",
+   "model.language_model.layers.18.linear_attn.norm.weight.npy",
+   "model.language_model.layers.18.linear_attn.out_proj.weight.npy",
+   "model.language_model.layers.18.mlp.down_proj.weight.npy",
+   "model.language_model.layers.18.mlp.gate_proj.weight.npy",
+   "model.language_model.layers.18.mlp.up_proj.weight.npy",
+   "model.language_model.layers.18.post_attention_layernorm.weight.npy",
+   "model.language_model.layers.19.input_layernorm.weight.npy",
+   "model.language_model.layers.19.mlp.down_proj.weight.npy",
+   "model.language_model.layers.19.mlp.gate_proj.weight.npy",
+   "model.language_model.layers.19.mlp.up_proj.weight.npy",
+   "model.language_model.layers.19.post_attention_layernorm.weight.npy",
+   "model.language_model.layers.19.self_attn.k_norm.weight.npy",
+   "model.language_model.layers.19.self_attn.k_proj.weight.npy",
+   "model.language_model.layers.19.self_attn.o_proj.weight.npy",
+   "model.language_model.layers.19.self_attn.q_norm.weight.npy",
+   "model.language_model.layers.19.self_attn.q_proj.weight.npy",
+   "model.language_model.layers.19.self_attn.v_proj.weight.npy",
+   "model.language_model.layers.2.input_layernorm.weight.npy",
+   "model.language_model.layers.2.linear_attn.A_log.npy",
+   "model.language_model.layers.2.linear_attn.conv1d.weight.npy",
+   "model.language_model.layers.2.linear_attn.dt_bias.npy",
+   "model.language_model.layers.2.linear_attn.in_proj_a.weight.npy",
+   "model.language_model.layers.2.linear_attn.in_proj_b.weight.npy",
+   "model.language_model.layers.2.linear_attn.in_proj_qkv.weight.npy",
+   "model.language_model.layers.2.linear_attn.in_proj_z.weight.npy",
+   "model.language_model.layers.2.linear_attn.norm.weight.npy",
+   "model.language_model.layers.2.linear_attn.out_proj.weight.npy",
+   "model.language_model.layers.2.mlp.down_proj.weight.npy",
+   "model.language_model.layers.2.mlp.gate_proj.weight.npy",
+   "model.language_model.layers.2.mlp.up_proj.weight.npy",
+   "model.language_model.layers.2.post_attention_layernorm.weight.npy",
+   "model.language_model.layers.20.input_layernorm.weight.npy",
+   "model.language_model.layers.20.linear_attn.A_log.npy",
+   "model.language_model.layers.20.linear_attn.conv1d.weight.npy",
+   "model.language_model.layers.20.linear_attn.dt_bias.npy",
+   "model.language_model.layers.20.linear_attn.in_proj_a.weight.npy",
+   "model.language_model.layers.20.linear_attn.in_proj_b.weight.npy",
+   "model.language_model.layers.20.linear_attn.in_proj_qkv.weight.npy",
+   "model.language_model.layers.20.linear_attn.in_proj_z.weight.npy",
+   "model.language_model.layers.20.linear_attn.norm.weight.npy",
+   "model.language_model.layers.20.linear_attn.out_proj.weight.npy",
+   "model.language_model.layers.20.mlp.down_proj.weight.npy",
+   "model.language_model.layers.20.mlp.gate_proj.weight.npy",
+   "model.language_model.layers.20.mlp.up_proj.weight.npy",
+   "model.language_model.layers.20.post_attention_layernorm.weight.npy",
+   "model.language_model.layers.21.input_layernorm.weight.npy",
+   "model.language_model.layers.21.linear_attn.A_log.npy",
+   "model.language_model.layers.21.linear_attn.conv1d.weight.npy",
+   "model.language_model.layers.21.linear_attn.dt_bias.npy",
+   "model.language_model.layers.21.linear_attn.in_proj_a.weight.npy",
+   "model.language_model.layers.21.linear_attn.in_proj_b.weight.npy",
+   "model.language_model.layers.21.linear_attn.in_proj_qkv.weight.npy",
+   "model.language_model.layers.21.linear_attn.in_proj_z.weight.npy",
+   "model.language_model.layers.21.linear_attn.norm.weight.npy",
+   "model.language_model.layers.21.linear_attn.out_proj.weight.npy",
+   "model.language_model.layers.21.mlp.down_proj.weight.npy",
+   "model.language_model.layers.21.mlp.gate_proj.weight.npy",
+   "model.language_model.layers.21.mlp.up_proj.weight.npy",
+   "model.language_model.layers.21.post_attention_layernorm.weight.npy",
+   "model.language_model.layers.22.input_layernorm.weight.npy",
+   "model.language_model.layers.22.linear_attn.A_log.npy",
+   "model.language_model.layers.22.linear_attn.conv1d.weight.npy",
+   "model.language_model.layers.22.linear_attn.dt_bias.npy",
+   "model.language_model.layers.22.linear_attn.in_proj_a.weight.npy",
+   "model.language_model.layers.22.linear_attn.in_proj_b.weight.npy",
+   "model.language_model.layers.22.linear_attn.in_proj_qkv.weight.npy",
+   "model.language_model.layers.22.linear_attn.in_proj_z.weight.npy",
+   "model.language_model.layers.22.linear_attn.norm.weight.npy",
+   "model.language_model.layers.22.linear_attn.out_proj.weight.npy",
+   "model.language_model.layers.22.mlp.down_proj.weight.npy",
+   "model.language_model.layers.22.mlp.gate_proj.weight.npy",
+   "model.language_model.layers.22.mlp.up_proj.weight.npy",
+   "model.language_model.layers.22.post_attention_layernorm.weight.npy",
+   "model.language_model.layers.23.input_layernorm.weight.npy",
+   "model.language_model.layers.23.mlp.down_proj.weight.npy",
+   "model.language_model.layers.23.mlp.gate_proj.weight.npy",
+   "model.language_model.layers.23.mlp.up_proj.weight.npy",
+   "model.language_model.layers.23.post_attention_layernorm.weight.npy",
+   "model.language_model.layers.23.self_attn.k_norm.weight.npy",
+   "model.language_model.layers.23.self_attn.k_proj.weight.npy",
+   "model.language_model.layers.23.self_attn.o_proj.weight.npy",
+   "model.language_model.layers.23.self_attn.q_norm.weight.npy",
+   "model.language_model.layers.23.self_attn.q_proj.weight.npy",
+   "model.language_model.layers.23.self_attn.v_proj.weight.npy",
+   "model.language_model.layers.3.input_layernorm.weight.npy",
+   "model.language_model.layers.3.mlp.down_proj.weight.npy",
+   "model.language_model.layers.3.mlp.gate_proj.weight.npy",
+   "model.language_model.layers.3.mlp.up_proj.weight.npy",
+   "model.language_model.layers.3.post_attention_layernorm.weight.npy",
+   "model.language_model.layers.3.self_attn.k_norm.weight.npy",
+   "model.language_model.layers.3.self_attn.k_proj.weight.npy",
+   "model.language_model.layers.3.self_attn.o_proj.weight.npy",
+   "model.language_model.layers.3.self_attn.q_norm.weight.npy",
+   "model.language_model.layers.3.self_attn.q_proj.weight.npy",
+   "model.language_model.layers.3.self_attn.v_proj.weight.npy",
+   "model.language_model.layers.4.input_layernorm.weight.npy",
+   "model.language_model.layers.4.linear_attn.A_log.npy",
+   "model.language_model.layers.4.linear_attn.conv1d.weight.npy",
+   "model.language_model.layers.4.linear_attn.dt_bias.npy",
+   "model.language_model.layers.4.linear_attn.in_proj_a.weight.npy",
+   "model.language_model.layers.4.linear_attn.in_proj_b.weight.npy",
+   "model.language_model.layers.4.linear_attn.in_proj_qkv.weight.npy",
+   "model.language_model.layers.4.linear_attn.in_proj_z.weight.npy",
+   "model.language_model.layers.4.linear_attn.norm.weight.npy",
+   "model.language_model.layers.4.linear_attn.out_proj.weight.npy",
+   "model.language_model.layers.4.mlp.down_proj.weight.npy",
+   "model.language_model.layers.4.mlp.gate_proj.weight.npy",
+   "model.language_model.layers.4.mlp.up_proj.weight.npy",
+   "model.language_model.layers.4.post_attention_layernorm.weight.npy",
+   "model.language_model.layers.5.input_layernorm.weight.npy",
+   "model.language_model.layers.5.linear_attn.A_log.npy",
+   "model.language_model.layers.5.linear_attn.conv1d.weight.npy",
+   "model.language_model.layers.5.linear_attn.dt_bias.npy",
+   "model.language_model.layers.5.linear_attn.in_proj_a.weight.npy",
+   "model.language_model.layers.5.linear_attn.in_proj_b.weight.npy",
+   "model.language_model.layers.5.linear_attn.in_proj_qkv.weight.npy",
+   "model.language_model.layers.5.linear_attn.in_proj_z.weight.npy",
+   "model.language_model.layers.5.linear_attn.norm.weight.npy",
+   "model.language_model.layers.5.linear_attn.out_proj.weight.npy",
+   "model.language_model.layers.5.mlp.down_proj.weight.npy",
+   "model.language_model.layers.5.mlp.gate_proj.weight.npy",
+   "model.language_model.layers.5.mlp.up_proj.weight.npy",
+   "model.language_model.layers.5.post_attention_layernorm.weight.npy",
+   "model.language_model.layers.6.input_layernorm.weight.npy",
+   "model.language_model.layers.6.linear_attn.A_log.npy",
+   "model.language_model.layers.6.linear_attn.conv1d.weight.npy",
+   "model.language_model.layers.6.linear_attn.dt_bias.npy",
+   "model.language_model.layers.6.linear_attn.in_proj_a.weight.npy",
+   "model.language_model.layers.6.linear_attn.in_proj_b.weight.npy",
+   "model.language_model.layers.6.linear_attn.in_proj_qkv.weight.npy",
+   "model.language_model.layers.6.linear_attn.in_proj_z.weight.npy",
+   "model.language_model.layers.6.linear_attn.norm.weight.npy",
+   "model.language_model.layers.6.linear_attn.out_proj.weight.npy",
+   "model.language_model.layers.6.mlp.down_proj.weight.npy",
+   "model.language_model.layers.6.mlp.gate_proj.weight.npy",
+   "model.language_model.layers.6.mlp.up_proj.weight.npy",
+   "model.language_model.layers.6.post_attention_layernorm.weight.npy",
+   "model.language_model.layers.7.input_layernorm.weight.npy",
+   "model.language_model.layers.7.mlp.down_proj.weight.npy",
+   "model.language_model.layers.7.mlp.gate_proj.weight.npy",
+   "model.language_model.layers.7.mlp.up_proj.weight.npy",
+   "model.language_model.layers.7.post_attention_layernorm.weight.npy",
+   "model.language_model.layers.7.self_attn.k_norm.weight.npy",
+   "model.language_model.layers.7.self_attn.k_proj.weight.npy",
+   "model.language_model.layers.7.self_attn.o_proj.weight.npy",
+   "model.language_model.layers.7.self_attn.q_norm.weight.npy",
+   "model.language_model.layers.7.self_attn.q_proj.weight.npy",
+   "model.language_model.layers.7.self_attn.v_proj.weight.npy",
+   "model.language_model.layers.8.input_layernorm.weight.npy",
+   "model.language_model.layers.8.linear_attn.A_log.npy",
+   "model.language_model.layers.8.linear_attn.conv1d.weight.npy",
+   "model.language_model.layers.8.linear_attn.dt_bias.npy",
+   "model.language_model.layers.8.linear_attn.in_proj_a.weight.npy",
+   "model.language_model.layers.8.linear_attn.in_proj_b.weight.npy",
+   "model.language_model.layers.8.linear_attn.in_proj_qkv.weight.npy",
+   "model.language_model.layers.8.linear_attn.in_proj_z.weight.npy",
+   "model.language_model.layers.8.linear_attn.norm.weight.npy",
+   "model.language_model.layers.8.linear_attn.out_proj.weight.npy",
+   "model.language_model.layers.8.mlp.down_proj.weight.npy",
+   "model.language_model.layers.8.mlp.gate_proj.weight.npy",
+   "model.language_model.layers.8.mlp.up_proj.weight.npy",
+   "model.language_model.layers.8.post_attention_layernorm.weight.npy",
+   "model.language_model.layers.9.input_layernorm.weight.npy",
+   "model.language_model.layers.9.linear_attn.A_log.npy",
+   "model.language_model.layers.9.linear_attn.conv1d.weight.npy",
+   "model.language_model.layers.9.linear_attn.dt_bias.npy",
+   "model.language_model.layers.9.linear_attn.in_proj_a.weight.npy",
+   "model.language_model.layers.9.linear_attn.in_proj_b.weight.npy",
+   "model.language_model.layers.9.linear_attn.in_proj_qkv.weight.npy",
+   "model.language_model.layers.9.linear_attn.in_proj_z.weight.npy",
+   "model.language_model.layers.9.linear_attn.norm.weight.npy",
+   "model.language_model.layers.9.linear_attn.out_proj.weight.npy",
+   "model.language_model.layers.9.mlp.down_proj.weight.npy",
+   "model.language_model.layers.9.mlp.gate_proj.weight.npy",
+   "model.language_model.layers.9.mlp.up_proj.weight.npy",
+   "model.language_model.layers.9.post_attention_layernorm.weight.npy"
+  ],
+  "suites": {
+   "code": 4,
+   "mmlupro": 1,
+   "ifeval": 2,
+   "lcb": 4,
+   "math500": 4
+  },
+  "models": [
+   "original",
+   "edited"
+  ],
+  "limit_per_set": 0,
+  "presence_penalty": 1.5,
+  "gpu": "5090",
+  "original_from": "pilot-10-pp15"
+ },
+ "models": {
+  "code": {
+   "original": {
+    "all": {
+     "answers": 2168,
+     "pass@1": 19.05,
+     "cut": 18.82,
+     "loop": 19.23,
+     "mean_tokens": 7304.7,
+     "failures": {
+      "wrong_interface": 622,
+      "wrong_answer": 475,
+      "pass": 413,
+      "cut_at_max_tokens": 408,
+      "runtime_error": 208,
+      "syntax_error": 35,
+      "timeout": 7
+     }
+    },
+    "mbpp+": {
+     "answers": 1512,
+     "pass@1": 16.14,
+     "cut": 19.78,
+     "loop": 18.98,
+     "mean_tokens": 7625.0,
+     "failures": {
+      "wrong_interface": 612,
+      "cut_at_max_tokens": 299,
+      "pass": 244,
+      "wrong_answer": 204,
+      "runtime_error": 131,
+      "syntax_error": 21,
+      "timeout": 1
+     }
+    },
+    "humaneval+": {
+     "answers": 656,
+     "pass@1": 25.76,
+     "cut": 16.62,
+     "loop": 19.82,
+     "mean_tokens": 6566.5,
+     "failures": {
+      "wrong_answer": 271,
+      "pass": 169,
+      "cut_at_max_tokens": 109,
+      "runtime_error": 77,
+      "syntax_error": 14,
+      "wrong_interface": 10,
+      "timeout": 6
+     }
+    }
+   },
+   "edited": {
+    "all": {
+     "answers": 2168,
+     "pass@1": 42.34,
+     "cut": 1.11,
+     "loop": 0.55,
+     "mean_tokens": 6446.3,
+     "failures": {
+      "pass": 918,
+      "wrong_answer": 770,
+      "runtime_error": 229,
+      "syntax_error": 162,
+      "wrong_interface": 34,
+      "cut_at_max_tokens": 24,
+      "no_code": 20,
+      "timeout": 11
+     }
+    },
+    "mbpp+": {
+     "answers": 1512,
+     "pass@1": 45.44,
+     "cut": 0.6,
+     "loop": 0.26,
+     "mean_tokens": 5530.9,
+     "failures": {
+      "pass": 687,
+      "wrong_answer": 556,
+      "runtime_error": 155,
+      "syntax_error": 67,
+      "wrong_interface": 33,
+      "cut_at_max_tokens": 9,
+      "timeout": 5
+     }
+    },
+    "humaneval+": {
+     "answers": 656,
+     "pass@1": 35.21,
+     "cut": 2.29,
+     "loop": 1.22,
+     "mean_tokens": 8556.3,
+     "failures": {
+      "pass": 231,
+      "wrong_answer": 214,
+      "syntax_error": 95,
+      "runtime_error": 74,
+      "no_code": 20,
+      "cut_at_max_tokens": 15,
+      "timeout": 6,
+      "wrong_interface": 1
+     }
+    }
+   }
+  },
+  "mmlupro": {
+   "original": {
+    "all": {
+     "answers": 1000,
+     "pass@1": 40.5,
+     "cut": 33.1,
+     "loop": 32.9,
+     "mean_tokens": 14653.1,
+     "failures": {
+      "pass": 405,
+      "wrong_answer": 327,
+      "cut_at_max_tokens": 268
+     }
+    }
+   },
+   "edited": {
+    "all": {
+     "answers": 1000,
+     "pass@1": 45.0,
+     "cut": 0.1,
+     "loop": 0.1,
+     "mean_tokens": 6505.8,
+     "failures": {
+      "wrong_answer": 549,
+      "pass": 450,
+      "no_answer": 1
+     }
+    }
+   }
+  },
+  "ifeval": {
+   "original": {
+    "all": {
+     "answers": 1082,
+     "pass@1": 22.27,
+     "cut": 72.92,
+     "loop": 74.4,
+     "mean_tokens": 24836.9,
+     "failures": {
+      "cut_at_max_tokens": 785,
+      "pass": 241,
+      "not_followed": 56
+     },
+     "instruction_level": 19.84
+    }
+   },
+   "edited": {
+    "all": {
+     "answers": 1082,
+     "pass@1": 67.74,
+     "cut": 0.83,
+     "loop": 5.73,
+     "mean_tokens": 4347.4,
+     "failures": {
+      "pass": 733,
+      "not_followed": 309,
+      "no_answer": 34,
+      "cut_at_max_tokens": 6
+     },
+     "instruction_level": 73.62
+    }
+   }
+  },
+  "lcb": {
+   "original": {
+    "all": {
+     "answers": 700,
+     "pass@1": 1.43,
+     "cut": 98.14,
+     "loop": 97.14,
+     "mean_tokens": 32274.3,
+     "failures": {
+      "cut_at_max_tokens": 687,
+      "pass": 10,
+      "runtime_error": 1,
+      "timeout": 1,
+      "wrong_answer": 1
+     }
+    },
+    "easy": {
+     "answers": 172,
+     "pass@1": 5.81,
+     "cut": 93.6,
+     "loop": 92.44,
+     "mean_tokens": 31042.7,
+     "failures": {
+      "cut_at_max_tokens": 161,
+      "pass": 10,
+      "runtime_error": 1
+     }
+    },
+    "medium": {
+     "answers": 208,
+     "pass@1": 0.0,
+     "cut": 99.04,
+     "loop": 99.04,
+     "mean_tokens": 32533.3,
+     "failures": {
+      "cut_at_max_tokens": 206,
+      "timeout": 1,
+      "wrong_answer": 1
+     }
+    },
+    "hard": {
+     "answers": 320,
+     "pass@1": 0.0,
+     "cut": 100.0,
+     "loop": 98.44,
+     "mean_tokens": 32768.0,
+     "failures": {
+      "cut_at_max_tokens": 320
+     }
+    }
+   },
+   "edited": {
+    "all": {
+     "answers": 700,
+     "pass@1": 11.71,
+     "cut": 0.43,
+     "loop": 1.43,
+     "mean_tokens": 11251.2,
+     "failures": {
+      "wrong_answer": 291,
+      "syntax_error": 157,
+      "runtime_error": 125,
+      "pass": 82,
+      "timeout": 36,
+      "no_code": 4,
+      "cut_at_max_tokens": 3,
+      "wrong_interface": 2
+     }
+    },
+    "easy": {
+     "answers": 172,
+     "pass@1": 44.19,
+     "cut": 0.0,
+     "loop": 0.0,
+     "mean_tokens": 5581.3,
+     "failures": {
+      "pass": 76,
+      "wrong_answer": 61,
+      "syntax_error": 18,
+      "runtime_error": 16,
+      "timeout": 1
+     }
+    },
+    "medium": {
+     "answers": 208,
+     "pass@1": 0.96,
+     "cut": 0.48,
+     "loop": 1.92,
+     "mean_tokens": 11626.1,
+     "failures": {
+      "wrong_answer": 98,
+      "syntax_error": 47,
+      "runtime_error": 42,
+      "timeout": 14,
+      "wrong_interface": 2,
+      "no_code": 2,
+      "pass": 2,
+      "cut_at_max_tokens": 1
+     }
+    },
+    "hard": {
+     "answers": 320,
+     "pass@1": 1.25,
+     "cut": 0.62,
+     "loop": 1.88,
+     "mean_tokens": 14055.0,
+     "failures": {
+      "wrong_answer": 132,
+      "syntax_error": 92,
+      "runtime_error": 67,
+      "timeout": 21,
+      "pass": 4,
+      "no_code": 2,
+      "cut_at_max_tokens": 2
+     }
+    }
+   }
+  },
+  "math500": {
+   "original": {
+    "all": {
+     "answers": 2000,
+     "pass@1": 6.8,
+     "cut": 93.75,
+     "loop": 90.6,
+     "mean_tokens": 31053.9,
+     "failures": {
+      "cut_at_max_tokens": 1861,
+      "pass": 136,
+      "no_answer": 2,
+      "wrong_answer": 1
+     }
+    }
+   },
+   "edited": {
+    "all": {
+     "answers": 2000,
+     "pass@1": 63.9,
+     "cut": 10.95,
+     "loop": 0.35,
+     "mean_tokens": 13842.5,
+     "failures": {
+      "pass": 1278,
+      "wrong_answer": 505,
+      "cut_at_max_tokens": 207,
+      "no_answer": 10
+     }
+    }
+   }
+  }
+ },
+ "paired": {
+  "code": {
+   "all": {
+    "problems": 542,
+    "diff": 23.29,
+    "se": 1.58,
+    "fail_to_pass": 621,
+    "pass_to_fail": 116
+   },
+   "mbpp+": {
+    "problems": 378,
+    "diff": 29.3,
+    "se": 1.86,
+    "fail_to_pass": 491,
+    "pass_to_fail": 48
+   },
+   "humaneval+": {
+    "problems": 164,
+    "diff": 9.45,
+    "se": 2.73,
+    "fail_to_pass": 130,
+    "pass_to_fail": 68
+   }
+  },
+  "mmlupro": {
+   "all": {
+    "problems": 1000,
+    "diff": 4.5,
+    "se": 1.47,
+    "fail_to_pass": 132,
+    "pass_to_fail": 87
+   }
+  },
+  "ifeval": {
+   "all": {
+    "problems": 541,
+    "diff": 45.47,
+    "se": 1.87,
+    "fail_to_pass": 533,
+    "pass_to_fail": 41
+   }
+  },
+  "lcb": {
+   "all": {
+    "problems": 175,
+    "diff": 10.29,
+    "se": 1.91,
+    "fail_to_pass": 73,
+    "pass_to_fail": 1
+   },
+   "easy": {
+    "problems": 43,
+    "diff": 38.37,
+    "se": 5.72,
+    "fail_to_pass": 67,
+    "pass_to_fail": 1
+   },
+   "medium": {
+    "problems": 52,
+    "diff": 0.96,
+    "se": 0.67,
+    "fail_to_pass": 2,
+    "pass_to_fail": 0
+   },
+   "hard": {
+    "problems": 80,
+    "diff": 1.25,
+    "se": 0.98,
+    "fail_to_pass": 4,
+    "pass_to_fail": 0
+   }
+  },
+  "math500": {
+   "all": {
+    "problems": 500,
+    "diff": 57.1,
+    "se": 1.79,
+    "fail_to_pass": 1143,
+    "pass_to_fail": 1
+   }
+  }
+ }
+}

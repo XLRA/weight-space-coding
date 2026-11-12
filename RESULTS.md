@@ -1,6 +1,6 @@
 # Detailed results
 
-The full record behind the [README](README.md): the setup's rules, the evaluation, every editing session, and the training phase's checks so far. Numbers in brackets are standard errors of paired differences.
+The full record behind the [README](README.md): the setup's rules, the evaluation, every editing session, and the training phase. Numbers in brackets are standard errors of paired differences.
 
 The agent is Claude Opus 5.5, at maximum effort. The model it edits is Qwen3.5-0.8B with thinking on, at the revision the paper used (`2fc06364715b967f1860aea9cf38778875588b17`).
 
@@ -229,8 +229,14 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
 - **The reward is fixed** with new tests that the problem statements don't show (below).
 - **R-O's held-out evaluation is done** (below): R-O matches E on code and falls far behind it elsewhere. Neither of R-E's checkpoints qualifies for one.
 - **G-O is done:** GRPO from O on the new tests ran its 150 steps, ending at 08:27 UTC on 2026-11-10. The rule picks its step-100 checkpoint (below).
-- **Running:** GRPO from E again (G-E2) on the new tests, since 08:28 UTC on 2026-11-10. It should end on 2026-11-11.
-- **Next, without anyone starting them:** after G-E2, the held-out evaluations of G-O, G-E2 and T (G-O plus the edit's delta), and the removal's check (G-E2 minus the delta). Then the probes of whether the edits survive training (below) cover the models added since.
+- **G-E2 is done:** GRPO from E on the new tests ran its 150 steps, ending at 15:09 UTC on 2026-11-11. The rule picks its step-50 checkpoint, since its later ones loop again (below).
+- **Every planned evaluation is done** (2026-11-11 15:09 to 2026-11-12 01:02 UTC):
+  - the held-out evaluations of G-O, G-E2 and T (G-O plus the edit's delta), at presence penalty 1.5;
+  - G-O's and G-E2's code suite at presence penalty 0;
+  - the removal's check (G-E2 minus the delta);
+  - the probes of every model.
+- **One grading failed and was redone.** One of G-E2's LiveCodeBench answers stopped the grader (plan, Deviations, 2026-11-12). It was a thinking loop that the grader took as code and that Python couldn't parse. It is now graded as a syntax error, as the code grader already did.
+- **The plan's runs are complete.** Its second-seed rule doesn't apply, since G-O and G-E2 ended more than 2 SE apart on code (below).
 - **The starting models' checks:**
   - **O** passes 5.2% of the validation answers and runs 76% of them to the 32k cap. Its panel mean is 26.7%.
   - **E** passes 10.0% and runs 4% to the cap. Its panel mean is 51.1%: choice 45.6%, math 61.6%, instructions 77.6%, code 19.6%.
@@ -361,9 +367,25 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
   - **Its answers grew, then shortened.** The share cut at the 16k training cap averaged 37% over steps 76–100, then 4% over steps 126–150, at about 7,500 tokens per answer.
   - **Its passes don't game the grader** (`train/scan_passes.py`). The exception is 2 of its 10,941 passing training answers: they return True only for the one input MBPP problem 900 shows, and that problem's two hidden tests both expect False.
   - **A crash cost 2 hours.** G-O's first attempt crashed at step 63: a checkpoint check was grading at the same moment, as the same user, and the two graders together hit that user's process limit. It resumed from step 50. The checks now run their code as a different user.
-  - **G-E2's checks so far,** paired against E:
-    - **Step 25:** panel mean +1.1 (1.3), validation on the new tests +4.2 (1.1).
-    - **Step 50:** panel mean 54.9%, +3.8 (1.4), with code +11.6 (2.9). Validation on the new tests 15.9%, +6.5 (1.4). G-O at step 50 had 52.9% and 14.9%.
+- **G-E2's checks** at each saved step, paired against E. Step 50 is the rule's pick: from step 100 on, the panel mean is more than 2.5 points below E's.
+
+  | | E | 25 | **50** | 75 | 100 | 125 | 150 | G-O step 100 |
+  |---|---|---|---|---|---|---|---|---|
+  | Panel: choice | 45.6% | 48.4% | 46.8% | 47.6% | 45.6% | 45.6% | 41.6% | 48.4% |
+  | Panel: math | 61.6% | 61.6% | 64.4% | 62.0% | 52.0% | 37.6% | 39.2% | 64.4% |
+  | Panel: instructions | 77.6% | 74.8% | 77.2% | 76.0% | 56.8% | 48.8% | 58.8% | 81.6% |
+  | Panel: code | 19.6% | 24.0% | 31.2% | 30.0% | 20.8% | 9.6% | 27.2% | 33.6% |
+  | Panel mean | 51.1% | 52.2% | 54.9% | 53.9% | 43.8% | 35.4% | 41.7% | 57.0% |
+  | Panel mean, paired against E | | +1.1 (1.3) | +3.8 (1.4) | +2.8 (1.5) | −7.3 (1.6) | −15.7 (1.6) | −9.4 (1.6) | |
+  | Validation, new tests | 9.4% | 13.6% | 15.9% | 15.6% | 15.2% | 8.3% | 17.1% | 19.7% |
+  | Validation, paired against E | | +4.2 (1.1) | +6.5 (1.4) | +6.1 (1.4) | +5.8 (1.4) | −1.1 (1.3) | +7.6 (1.5) | |
+  | Validation answers cut at 32k | 4.3% | 1.7% | 2.3% | 8.1% | 20.6% | 65.6% | 34.1% | 21.8% |
+
+  - **Through step 75 it improved on E.** At step 50 its panel mean was +3.8 (1.4), with code +11.6 (2.9), and its validation pass rate on the new tests +6.5 (1.4). G-O at step 50 had 52.9% and 14.9%.
+  - **From step 100 on, it loops again under the evaluation's sampling.** At step 125, 48% of its panel answers and 66% of its validation answers ran to the 32k cap, against E's 2% and 4%. Math fell 24.0 points and instructions 28.8. Step 150 won back part of it.
+  - **Training's own numbers didn't show it.** Training samples at temperature 1.0 with no presence penalty. There, the share of answers cut at the 16k cap was 10–16% over steps 76–150, below the 17–20% of steps 26–75, and the pass rate rose to 17%. The checks sample as the evaluation does, at temperature 0.6 with presence penalty 1.5.
+  - **The rule kept those checkpoints out.** Step 150 had the best validation pass rate, 17.1%, but its panel mean was 9.4 points below E's.
+  - **The probes saw the same change** (below). 2664, the switch that ends degenerate re-close cycles, fires at 23% of the cycle ends at step 50, 5% at step 75, none at steps 100 and 125, and 23% again at step 150, where the loops eased. The two move together, but that doesn't show which causes which.
 - **T, the edit added to the trained model** (does an edit carry over?):
   - **What T is:** G-O's step-100 checkpoint plus ΔE, the edit's change to the weights.
   - **How ΔE is taken:** E minus O, as the model runs them in bf16. The edit was saved at higher precision, but every evaluation and training run rounds it to bf16.
@@ -371,29 +393,78 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
   - **Its check,** paired against G-O step 100: panel mean 58.4%, +1.4 (1.3), so T gets its held-out evaluation. No suite moved beyond 2 SE: math +4.4 (2.2), instructions +2.0 (2.6), choice +0.8 (2.7), code −1.6 (2.9).
   - **The edit still ends loops after training.** T runs 2.4% of its validation answers to the 32k cap, against G-O's 21.8%, and its answers are about a quarter shorter.
   - **Its validation pass rate didn't rise:** −1.8 (1.3) on the new tests.
+- **The GRPO arms' held-out evaluations:** G-O at step 100, G-E2 at step 50 and T (`eval-grpo-arms.sh`, 2026-11-11 15:09 to 23:49 UTC; G-E2's grading finished at 01:02 on 2026-11-12). The O, E and R-O columns repeat the table above:
+
+  | Suite | O | E | R-O | G-O | G-E2 | T |
+  |---|---|---|---|---|---|---|
+  | MBPP+ and HumanEval+ | 19.0% | 32.3% | 32.5% | **44.8%** | 41.7% | 42.3% |
+  | The same at presence penalty 0 | 12.3% | 28.5% | 31.3% | **43.5%** | 38.7% | |
+  | LiveCodeBench | 1.6% | 7.0% | 9.4% | **14.6%** | 10.4% | 11.7% |
+  | MMLU-Pro | 40.5% | 45.2% | 36.6% | 45.6% | 45.6% | 45.0% |
+  | IFEval, prompt-level | 22.3% | 58.2% | 36.6% | **70.1%** | 62.3% | 67.7% |
+  | MATH-500 | 6.8% | 56.9% | 42.8% | **65.0%** | 59.2% | 63.9% |
+
+  Paired problem by problem (`eval/compare.py`), with O's answers as graded in E's evaluation:
+
+  | Suite | G-O against O | G-O against E | G-E2 against E | G-E2 against G-O | T against G-O |
+  |---|---|---|---|---|---|
+  | MBPP+ and HumanEval+ | +25.7 (1.6) | +12.5 (1.4) | +9.3 (1.2) | −3.1 (1.3) | −2.4 (1.1) |
+  | The same at presence penalty 0 | +31.3 (1.6) | +15.0 (1.4) | +10.2 (1.2) | −4.9 (1.3) | |
+  | LiveCodeBench | +13.0 (2.2) | +7.6 (1.5) | +3.4 (0.9) | −4.1 (1.3) | −2.9 (1.3) |
+  | MMLU-Pro | +5.1 (1.5) | +0.4 (1.4) | +0.4 (1.4) | 0.0 (1.4) | −0.6 (1.4) |
+  | IFEval, prompt-level | +47.8 (1.8) | +11.8 (1.6) | +4.1 (1.6) | −7.8 (1.7) | −2.3 (1.6) |
+  | MATH-500 | +58.2 (1.8) | +8.1 (1.2) | +2.4 (1.1) | −5.8 (1.1) | −1.1 (1.0) |
+
+  - **GRPO from O is the best model so far.** Against E it gains on every suite but MMLU-Pro, where the two tie.
+  - **What it cost:** G-O's 100 steps took 22.9 hours of the 5090, plus 1.9 hours redone after the crash. E's four sessions (`pilot-10`, `-12`, `-13` and `-14`) held a GPU for 16.8 hours in all and used 2.7M Opus output tokens.
+  - **Training reached what the edit couldn't.**
+    - **HumanEval+:** E left it flat. G-O gains +14.5 (2.8) on it against O.
+    - **LiveCodeBench's medium problems:** they go from none solved to 6.7% (+6.7, SE 2.9).
+    - **LiveCodeBench's easy problems:** 50.0%, against E's 28.5%.
+  - **Starting from the edit didn't help GRPO.** G-E2 is behind G-O on every suite but MMLU-Pro.
+    - **The checkpoints differ:** the rule took G-E2's from step 50, G-O's from step 100.
+    - **At the same step,** G-E2 had been slightly ahead on the checks: at step 50 its panel mean was 54.9% and its validation pass rate 15.9%, against G-O's 52.9% and 14.9%.
+    - **G-O kept improving to step 100. G-E2 did not.**
+  - **Adding the edit to G-O cost a little on every suite,** −0.6 to −2.9, though it still ends loops. T runs 0.4% of its LiveCodeBench answers to the 32k cap, against G-O's 32.7%, and 0.8% of IFEval's, against 9.0%.
+  - **The edit may cut off reasoning that G-O uses.** On LiveCodeBench's medium problems:
+    - **G-O** runs 36% of its answers to the cap and solves 6.7%.
+    - **With the edit,** T runs 0.5% to the cap and solves 1.0%, and G-E2 none and 1.9%.
+    - **How sure:** each gap is only about 2 SE (T −5.8 (2.7), G-E2 −4.8 (2.3)). This is a pattern to test, not a finding.
+  - **The second-seed rule doesn't apply.**
+    - **The gap on code:** G-E2 is 3.1 points (SE 1.3) below G-O at presence penalty 1.5, and 4.9 (1.3) at 0. That is 2.3 and 3.9 SE, both beyond the plan's 2, so the rule calls for no second seed.
+    - **What the SE leaves out:** it covers the evaluation's sampling, not the training run's own seed. With one run per arm, that variation is unmeasured.
+  - **Grading isn't perfectly repeatable.** One of O's 700 LiveCodeBench answers (`lcb/3760`, sample 3) runs close to its tests' time limit. It passed when E's evaluation graded it and timed out when G-O's did. So every pairing above uses O's answers as graded in E's evaluation.
 - **Do the edits survive training?** This is the plan's third question. Both analyses were built on 2026-11-10, before G-E2's checkpoint was chosen and before any GRPO arm's held-out evaluation.
   - **The edited weights stay put** (`train/row_moves.py`; `train/analysis/rows.md`). For each place E changed, it measures how much of ΔE is still there along its own direction, and how far training moved those weights. A place is a loop detector's output column, a layer-23 neuron's rows, or a name gate's 256 rows.
     - **In every arm from E,** RFT and GRPO alike, all of ΔE is still there: 99.95–100.06% of it, per unit. Training changed those weights by at most 0.7% of the edit's size, in directions unrelated to it: the cosine with ΔE is under 0.1.
     - **In the arms from O,** training moved the same weights toward the edit by less than 0.1% of it.
     - **Training changed E's repurposed neurons less than the rest of their layer.** In G-E, the gate rows of layer-23 neurons 2664, 1965 and 2621 moved 6–9% as much as the median row of their tensor. In G-O, the same rows moved 80–147% as much. In E's arms those neurons fire at 0.02% of ordinary positions or fewer (below), which leaves them little gradient.
+  - **Removing the edit from the trained model:** G-E2 at step 50 minus ΔE, checked on the 5080 and paired against G-E2 at step 50.
+    - **What it costs:** the panel mean falls 17.2 points (SE 1.5), to 37.7%: math −31.6, instructions −21.6, code −18.4, choice +2.8 (3.0). Validation on the new tests falls 10.1 points (1.7), to 5.8%, near O's 4.8%. Removing ΔE from E, which leaves O, costs 24.4 points of panel mean and 4.7 of validation.
+    - **It loops more than O does.** 92% of its validation answers and 74% of the panel's code answers run to the 32k cap, against O's 76% and 19%.
+    - **So GRPO from E built on the edit instead of learning loop control of its own.** After 50 steps the edit still does that job, and without it the model is far behind G-O at the same step, which reached a panel mean of 52.9% from O.
   - **What the edited units do** (`train/probes.py`; `train/analysis/probes/summary.md`):
     - **The method:** 201 answers that O and E wrote to validation problems and panel questions are teacher-forced through each model, and each of E's units is read at every answer position. Where each should fire comes from the agent's own notes. For example, the box pair should fire after "answer is" in a math answer, and neuron 2664 at the end of a degenerate re-close cycle.
     - **A sanity check on E came first.** It caught three labels that didn't match the agent's designs, and they were fixed before any other model's results were read (plan, Deviations, 20:40 UTC). After the fix, every unit E built separates its own positions from the rest at AUROC 0.88–1.00.
-    - **The results** for some of the 21 models probed. "On" is the share of a unit's positions where it fires:
+    - **The results** for some of the 26 models probed. "On" is the share of a unit's positions where it fires:
 
-      | Unit | E | T | G-E2 step 50 | G-E step 150 | R-E round 2 | G-O step 100 |
-      |---|---|---|---|---|---|---|
-      | Name gates (8 heads): how far they open at names, against E | 1.00 | 0.93–1.05 | 0.94–1.03 | 0.94–1.02 | 0.84–0.97 | −0.13 to 0.20 |
-      | Box pair (1965 + 2621): on | 47% | 49% | 50% | 54% | 22% | 0% |
-      | Cycle stop (2664): on | 77% | 18% | 23% | 0% | 5% | 0% |
-      | Brake (3109): on | 71% | 59% | 58% | 55% | 46% | 0% |
-      | Loop detectors' drive in repetition, against E | 1.00 | 0.80 | 0.76 | 0.71 | 0.46 | 1.22 |
+      | Unit | E | T | G-E2 step 50 | G-E2 step 125 | G-E step 150 | R-E round 2 | G-O step 100 |
+      |---|---|---|---|---|---|---|---|
+      | Name gates (8 heads): how far they open at names, against E | 1.00 | 0.93–1.05 | 0.94–1.03 | 0.83–0.98 | 0.94–1.02 | 0.84–0.97 | −0.13 to 0.20 |
+      | Box pair (1965 + 2621): on | 47% | 49% | 50% | 51% | 54% | 22% | 0% |
+      | Cycle stop (2664): on | 77% | 18% | 23% | 0% | 0% | 5% | 0% |
+      | Brake (3109): on | 71% | 59% | 58% | 57% | 55% | 46% | 0% |
+      | Loop detectors' drive in repetition, against E | 1.00 | 0.80 | 0.76 | 0.71 | 0.71 | 0.46 | 1.22 |
 
-    - **What survives:** in every arm from E, the gates still open at function names, 84–103% as wide as in E. The box pair fires as often as in E in the GRPO arms, and at 15–22% in the RFT ones. The two switches stay specific: they fire at 0.02% of other positions or fewer.
-    - **What fades:** the cycle stop, 2664. G-E's checkpoints fire at 64% of the cycle ends at step 25, 23% at step 50, 5% at step 75 and none from step 100. Its readout still ranks those positions first (AUROC 0.99) but no longer reaches the threshold, which `pilot-14` set close to the positives' mean. RFT's first round from E lost the readout itself (AUROC 0.50).
-    - **What weakens:** the brake, and the loop detectors that drive it. At each arm's latest checkpoint, the detectors' drive is 0.71 of E's in G-E, 0.76 in G-E2 (step 50) and 0.46 in R-E round 2. GRPO from O weakens O's own detectors too, by about a sixth.
+    - **What survives:** in every arm from E, the gates still open at function names, 78–103% as wide as in E. The box pair fires as often as in E in the GRPO arms, and at 15–22% in the RFT ones. The two switches stay specific: they fire at 0.02% of other positions or fewer.
+    - **What fades:** the cycle stop, 2664.
+      - **G-E:** it fires at 64% of the cycle ends at step 25, 23% at step 50, 5% at step 75 and none from step 100.
+      - **G-E2:** 32% at step 25, 23% at step 50, 5% at step 75, none at steps 100 and 125, and 23% at step 150.
+      - **Its readout still ranks those positions first** (AUROC 0.97–0.99), but no longer reaches the threshold, which `pilot-14` set close to the positives' mean. RFT's first round from E lost the readout itself (AUROC 0.50).
+    - **What weakens:** the brake, and the loop detectors that drive it. At each arm's last checkpoint, the detectors' drive is 0.71 of E's in G-E, 0.68 in G-E2 and 0.46 in R-E round 2. GRPO from O weakens O's own detectors too, by about a sixth.
     - **From O, training builds none of it.** In R-O and G-O the switches never fire, and the gates behave as in O.
     - **Added to a trained model, the edit mostly works.** In T, the gates and the pair match E, the brake fires at 59%, and the cycle stop at 18%.
+    - **Taken out again, it leaves nothing behind.** In the removal (G-E2 at step 50 minus ΔE), the switches never fire and the gates open at most 0.21 as wide as E's, as in O.
 
 ## What we've learned so far
 
@@ -406,19 +477,29 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
 - **Later rounds trade between suites rather than lifting all of them.**
 - **A combination of edits needs its own evaluation.** `pilot-19` joined the copy change, IFEval +2.8 (1.6) on its own, with the identifier pair, on disjoint tensors. IFEval came out at −1.9 (1.7).
 - **Fixed seeds don't make two models' answers comparable one by one.** With thinking on, changing a single weight by one rounding step re-samples nearly every answer, so a paired comparison removes the problems' difficulty but not the sampling noise. Its standard error is the honest yardstick, and single-suite differences of a few points are noise.
-- **GRPO on code problems lifted far more than code.**
+- **GRPO on code problems beat the edit, held out, on every suite but MMLU-Pro.**
   - **Within 25 steps** G-O's panel mean rose from O's 26.7% to 51.1%, E's level, with math +42.8 and instructions +30.8.
-  - **By step 100** it reached 57.0%, 5.9 points above E's. Its validation pass rate on the new tests was twice E's.
-  - **Held out:** its evaluation runs after G-E2.
-- **The edit's loop control carried over to a model trained without it.**
-  - **The test:** `pilot-14`'s weight change added to G-O after 100 steps of GRPO.
-  - **The result:** the share of validation answers cut at the cap fell from 21.8% to 2.4%, without costing the panel: +1.4 (1.3).
-  - **Still open:** whether it adds anything held out. That is T's evaluation.
-- **RFT on code matched the edit on held-out code, but not beyond it.** Two rounds of RFT from O on its own passing practice answers came level with `pilot-14`'s edit on MBPP+ and HumanEval+, and slightly ahead on LiveCodeBench. It finished 8.6 to 21.6 points behind on MMLU-Pro, IFEval and MATH-500. The GRPO arms' held-out evaluations come after G-E2.
-- **Training leaves the edit in place, and most of what it built keeps working.**
+  - **Held out, at step 100,** it beats E by:
+    - +12.5 (1.4) on MBPP+ and HumanEval+;
+    - +7.6 (1.5) on LiveCodeBench;
+    - +11.8 (1.6) on IFEval;
+    - +8.1 (1.2) on MATH-500.
+    It ties on MMLU-Pro, +0.4 (1.4).
+  - **It learned to code better, not only to finish.** HumanEval+, which no edit moved, gains +14.5 (2.8). LiveCodeBench's medium problems go from none solved to 6.7%.
+  - **What it cost:** 22.9 hours of the 5090. E's four sessions held a GPU for 16.8 hours in all and used 2.7M Opus output tokens.
+- **The edit and GRPO didn't add up.**
+  - **Training from E (G-E2)** ended behind training from O on every suite but MMLU-Pro: code −3.1 (1.3), IFEval −7.8 (1.7), MATH-500 −5.8 (1.1). After step 75 its answers looped again under the evaluation's sampling, so the rule took its step-50 checkpoint.
+  - **The edit added to G-O (T)** still ends loops: the share of answers cut at the cap fell on every suite, from 32.7% to 0.4% on LiveCodeBench. But it scored 0.6 to 2.9 points below G-O on every suite.
+  - **A possible reason:** on hard problems, some of the trained model's long reasoning is useful, and the edit's loop control may end it.
+    - **G-O,** on LiveCodeBench's medium problems, runs 36% of its answers to the cap and solves 6.7%.
+    - **T and G-E2** run almost none to the cap there, and solve 1.0% and 1.9%.
+    - **How sure:** each gap is only about 2 SE.
+- **RFT on code matched the edit on held-out code, but not beyond it.** Two rounds of RFT from O on its own passing practice answers came level with `pilot-14`'s edit on MBPP+ and HumanEval+, and slightly ahead on LiveCodeBench. It finished 8.6 to 21.6 points behind on MMLU-Pro, IFEval and MATH-500.
+- **Training leaves the edit in place, but GRPO wears down its loop control.**
   - **The weights:** after RFT or GRPO from E, the edited weights still hold all of ΔE. Training barely touched them.
   - **The units:** the name gates and the box pair still fire where E's do, and almost nowhere else.
-  - **The exception:** the switch that ends degenerate re-close cycles. GRPO from E turned it off within 100 steps, though its readout still points the right way.
+  - **The exception:** the switch that ends degenerate re-close cycles. GRPO from E turned it off within 100 steps in both runs, though its readout still points the right way. In G-E2, loops came back in the checks at the same time.
+  - **The trained model leans on the edit.** Taking ΔE back out of G-E2 at step 50 cost 17.2 points of panel mean, and the result loops more than O did.
 - **A narrow edit can pass every check the agent runs and still cost a suite it never looks at.** `pilot-16` fixed its target and lost 4.6 points on MMLU-Pro, which is why later runs get the panel.
 - **A reward that only tests the examples a problem shows gets gamed, and fast.** GRPO from E learned within 50 steps to print the example output, which lifted its validation pass rate from 10% to 62%.
   - **On tests it couldn't see,** its APPS pass rate fell from 4.6% to 0% by step 150: copying displaced solving.

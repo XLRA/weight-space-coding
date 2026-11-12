@@ -49,8 +49,10 @@ def grade_lcb(prob, row):
     code = S.LCB_PRELUDE + code
     try:
         tree = ast.parse(code)
-    except SyntaxError:
+    except (SyntaxError, ValueError):  # ValueError: a null byte in the code
         return {"status": "syntax_error"}
+    except (MemoryError, RecursionError):  # nested too deeply for Python's parser, so Python could not run it either
+        return {"status": "syntax_error"}  # (as harness/grade.py; added 2026-11-12 after it crashed G-E2-pp15's grading)
     t = lcb_tests(prob["tests_file"])
     if prob["test_format"] == "stdio":
         with tempfile.TemporaryDirectory() as tmp:

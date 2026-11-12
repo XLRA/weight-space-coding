@@ -56,16 +56,26 @@ The second phase trains the model on the same practice problems, with a recipe f
 - **RFT** (rejection-sampling fine-tuning): fine-tune on the model's own passing answers.
 - **GRPO:** reinforcement learning, rewarded when the tests pass.
 
-So far:
+Held out, on the same five benchmarks:
 
-- **RFT from O matched E on code, but not elsewhere.** Held out, it scored 32.5% on MBPP+ and HumanEval+ (E 32.3%) and 9.4% on LiveCodeBench (E 7.0%), but 9 to 22 points below E on MMLU-Pro, IFEval and MATH-500.
-- **RFT from E barely helped on code,** and cost 7.8 points on the panel.
-- **GRPO from E gamed its reward.** Most APPS problems are tested only on the examples their statement shows, and within 50 steps the model learned to print the example output instead of solving the problem. We built new tests from APPS's own human-written solutions, with no other model involved. GRPO from O ran on them, and GRPO from E is rerunning on them: after 50 of its 150 steps, it is 6.5 points above E on held-back practice problems.
-- **GRPO from O beat both E and RFT on our own checks.** After 100 steps its pass rate on held-back practice problems was 19.7% (E 9.4%, RFT from O 13.4%), and it scored 57.0% on the panel (E 51.1%). Its held-out evaluation is next.
-- **The edit still works on a trained model.** Adding E's weight change to GRPO-trained O cut the answers that hit the token limit from 21.8% to 2.4%, at no cost on the panel. Its pass rate didn't rise.
-- **Training leaves the edit in place.** After RFT or GRPO from E, the edited weights still hold all of E's change, and most of the parts it built still fire where the agent designed them to. One doesn't: a switch that stops the model from reopening and closing its thinking over and over, which GRPO turned off within 100 steps.
+| Benchmark | Edited (E) | RFT from O | GRPO from O | GRPO from E | GRPO from O, plus E's change |
+|---|---|---|---|---|---|
+| MBPP+ and HumanEval+ | 32.3% | 32.5% | **44.8%** | 41.7% | 42.3% |
+| LiveCodeBench | 7.0% | 9.4% | **14.6%** | 10.4% | 11.7% |
+| MMLU-Pro | 45.2% | 36.6% | 45.6% | 45.6% | 45.0% |
+| IFEval | 58.2% | 36.6% | **70.1%** | 62.3% | 67.7% |
+| MATH-500 | 56.9% | 42.8% | **65.0%** | 59.2% | 63.9% |
 
-**Status (2026-11-10):** GRPO from E finishes on 2026-11-11. Then the held-out evaluations of both GRPO models, and of GRPO from O plus the edit, run.
+- **GRPO from O is the best model.** Against E, it gains 12.5 points on MBPP+ and HumanEval+ (SE 1.4), 7.6 on LiveCodeBench, 11.8 on IFEval and 8.1 on MATH-500, and ties on MMLU-Pro. It took 23 hours of one GPU.
+- **Training also improved what editing couldn't.** HumanEval+, which no edit moved, rose 14.5 points over the original model, and LiveCodeBench's medium problems went from none solved to 6.7%.
+- **RFT from O matched E on code, but not elsewhere.** It finished 9 to 22 points below E on MMLU-Pro, IFEval and MATH-500.
+- **Editing and training didn't add up.**
+  - **Training from E did worse than training from O.** GRPO from E ended behind GRPO from O on every benchmark but MMLU-Pro. After 75 steps its answers began looping again, so a checkpoint from step 50 was evaluated. RFT from E lost 7.8 points on our own checks and wasn't evaluated.
+  - **E's change added to GRPO from O** still stopped loops, but lowered every score a little.
+- **Training leaves the edit in place, but wears down its loop control.** After training from E, the edited weights still hold all of E's change, and most of the parts it built still fire where the agent designed them to. One doesn't: a switch that stops the model from reopening and closing its thinking over and over. GRPO turned it off within 100 steps.
+- **A reward that tests only the examples a problem shows gets gamed.** Most APPS problems are tested only on the examples their statement shows. Our first GRPO run learned within 50 steps to print the example output instead of solving the problem. We built new tests from APPS's own human-written solutions, with no other model involved, and every GRPO result above uses them.
+
+**Status (2026-11-12):** the training phase's runs and evaluations are done.
 
 ## Repository
 

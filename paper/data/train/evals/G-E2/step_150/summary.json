@@ -1,0 +1,102 @@
+{
+ "name": "G-E2/step_150",
+ "panel": {
+  "choice": {
+   "n": 250,
+   "pass": 41.6,
+   "cut": 38.0,
+   "mean_tokens": 14771
+  },
+  "math": {
+   "n": 250,
+   "pass": 39.2,
+   "cut": 39.6,
+   "mean_tokens": 17550
+  },
+  "instructions": {
+   "n": 250,
+   "pass": 58.8,
+   "cut": 24.8,
+   "mean_tokens": 9464
+  },
+  "code": {
+   "n": 250,
+   "pass": 27.2,
+   "cut": 34.8,
+   "mean_tokens": 13197
+  }
+ },
+ "val": {
+  "answers": 1008,
+  "pass": 16.77,
+  "by_source": {
+   "mbpp": 34.13,
+   "apps": 12.25
+  },
+  "problems_with_a_pass": 75,
+  "cut": 34.13,
+  "mean_tokens": 15489,
+  "status": {
+   "runtime_error": 137,
+   "cut_at_max_tokens": 344,
+   "wrong_answer": 303,
+   "pass": 169,
+   "timeout": 16,
+   "syntax_error": 39
+  }
+ },
+ "panel_mean": 41.7,
+ "vs_base": {
+  "base": "start-E",
+  "panel": {
+   "choice": {
+    "diff": -4.0,
+    "se": 2.99
+   },
+   "math": {
+    "diff": -22.4,
+    "se": 3.29
+   },
+   "instructions": {
+    "diff": -18.8,
+    "se": 3.26
+   },
+   "code": {
+    "diff": 7.6,
+    "se": 3.09
+   }
+  },
+  "panel_mean": {
+   "diff": -9.4,
+   "se": 1.58
+  },
+  "val": {
+   "diff": 6.75,
+   "se": 1.51
+  },
+  "panel_within_2_5": false,
+  "val2": {
+   "diff": 7.61,
+   "se": 1.5
+  }
+ },
+ "val2": {
+  "tests": "train/data2/val.jsonl, its usable problems only",
+  "problems": 220,
+  "answers": 880,
+  "pass": 17.05,
+  "by_source": {
+   "mbpp": 34.13,
+   "apps": 11.76
+  },
+  "problems_with_a_pass": 64,
+  "status": {
+   "runtime_error": 122,
+   "cut_at_max_tokens": 283,
+   "wrong_answer": 276,
+   "pass": 150,
+   "timeout": 12,
+   "syntax_error": 37
+  }
+ }
+}

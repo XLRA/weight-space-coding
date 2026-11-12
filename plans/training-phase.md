@@ -276,3 +276,11 @@
     - **The texts are the same 201,** with the same seed and selection. Only the stored labels changed (md5 578ce0c4).
   - **E after the fix:** AUROC 0.99 for 2664, 1.00 for the pair and 0.88 for 3109; 0.99 and 0.94 for the layer-15 detector and gate; 0.99–1.00 for the other gates and detectors. The loop detectors are unchanged at 0.66–0.84 (their combined drive 0.88). They are the model's own neurons, and verbatim repetition is only a proxy for a loop.
   - **O and T-step_100 had been probed with the first version.** Their results were deleted unread, and every model is probed again.
+- **2026-11-12 00:50 UTC, the LiveCodeBench grader fixed after it stopped G-E2's held-out grading.** This was before any of G-E2's held-out grades had been read.
+  - **What happened:** `G-E2-pp15` generated all its answers, then failed twice while grading LiveCodeBench, at 20:50 and 20:58 UTC on 2026-11-11.
+    - **The cause:** one answer (`lcb/3714`, sample 1) is a thinking loop, "Wait, wait wait wait…", with no code block. The extractor took that text as the code. Python's parser overflowed on it, and `ast.parse` raised `MemoryError`.
+    - **The bug:** `eval/grade_suites.py` caught only `SyntaxError`, so that one answer stopped the whole grading.
+    - **What ran instead:** `eval-grpo-arms.sh` gives up on an evaluation after two failures, so it went on to G-E2's code suite at presence penalty 0 and to T.
+  - **The fix:** the LiveCodeBench grader now grades code that Python can't parse as a syntax error, as `harness/grade.py` already does. Python couldn't run that code either.
+    - **No earlier grade changes,** since this error would have stopped that grading.
+  - **The rerun:** `evaluate.py report G-E2-pp15` graded the answers already generated, with no GPU, from 00:52 UTC.
