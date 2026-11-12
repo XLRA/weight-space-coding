@@ -9,6 +9,8 @@
     [--start-from DIR]        a new run starts with DIR's edit (a submission/) in /work/edited, and keeps a
                               read-only copy in /start that "model": "start" and "baseline": "start" run
     [--brief FILE]            text added to the prompt under THIS RUN (copied to runs/<run>/brief.md)
+    [--practice DIR]          the practice problems, mounted read-only at /practice (default practice/final); an
+                              about.txt in DIR replaces the prompt's description of the two files
     [--gpu 5090|5080]         the GPU of the run's GPU server (default 5090; see gpus.py)
     [--panel]                 offer the agent the panel: {"type": "panel"} answers a fixed set of questions beyond
                               code (MMLU-Pro, MATH, IFEval-style, MBPP test tasks; none in the evaluation or the
@@ -81,7 +83,7 @@ DEFAULTS = dict(passes=50, backend="claude-code", replay=None, model="claude-opu
                 handoff_every=0, max_turns=1000, max_code_runs=300, kernel_seconds=900, kernel_memory_gb=20,
                 max_output_tokens=128000, max_context=400_000, gpu_idle_minutes=30,
                 claude_bin="/home/wspagent/.local/bin/claude", presence_penalty=0.0, start_from=None, brief=None,
-                gpu="5090", panel=False)
+                gpu="5090", panel=False, practice=PRACTICE)
 AGENT_USER = "wspagent"
 # Claude Code's replies when a subscription limit is reached, e.g. "Claude AI usage limit reached|<epoch>"
 # or "You've hit your session limit · resets 5am".
@@ -341,9 +343,11 @@ class Run:
         self.cfg.update({k: v for k, v in vars(args).items() if v is not None and k in DEFAULTS})
         if self.cfg["backend"] == "anthropic" and self.cfg["max_usd"] is None:
             raise SystemExit("pass --max-usd: the driver stops (resumably) once the estimated API spend reaches it")
-        for key in ("start_from", "brief"):
+        for key in ("start_from", "brief", "practice"):
             if self.cfg[key]:
                 self.cfg[key] = os.path.realpath(self.cfg[key])
+        if not glob.glob(f"{self.cfg['practice']}/*.jsonl"):
+            raise SystemExit(f"--practice {self.cfg['practice']} has no .jsonl problem files")
         json.dump(self.cfg, open(f"{self.dir}/config.json", "w"), indent=1)
         self.state = dict(status="new", turn=0, conv=0, conv_turns=0, passes_used=0, code_runs=0, requests=0,
                           usd=0.0, tokens={}, invalid_streak=0, refusals=0, turns_after_budget=0, context=0,
@@ -368,11 +372,18 @@ class Run:
         self.kernel_name, self.gpu_name = f"wsp-kernel-{name}", f"wsp-gpu-{name}"
         self.sock = f"{self.dir}/ctl/kernel.sock"
         self.problems = {}
-        for fn in sorted(os.listdir(PRACTICE)):
+        for fn in sorted(os.listdir(self.cfg["practice"])):
             if fn.endswith(".jsonl"):
-                for line in open(f"{PRACTICE}/{fn}"):
+                for line in open(f"{self.cfg['practice']}/{fn}"):
                     self.problems[json.loads(line)["id"]] = True
         prompt = open(f"{HARNESS}/prompt.txt").read().strip()
+        about = f"{self.cfg['practice']}/about.txt"  # another practice set describes its own files
+        if os.path.exists(about):
+            head, tail = "and reference (a solution that passes the tests): ", " Choose whichever serve your experiments."
+            i, j = prompt.find(head), prompt.find(tail)
+            assert prompt.count(head) == prompt.count(tail) == 1 and i < j, \
+                "prompt.txt changed: place the practice text by hand"
+            prompt = prompt[:i + len(head)] + open(about).read().strip() + prompt[j:]
         self.panel, self.panel_suites = [], []
         if self.cfg["panel"]:
             if not os.path.exists(PANEL):
@@ -574,7 +585,7 @@ class Run:
         sh("docker", "run", "-d", "--name", self.kernel_name, "--network", "none", "--read-only",
            "--tmpfs", "/tmp:rw,size=4g,mode=1777", "--memory", mem, "--memory-swap", mem, "--pids-limit", "1024",
            "--cpus", "12", "-e", "OMP_NUM_THREADS=12", "-e", "HOME=/tmp", "-e", "HF_HUB_OFFLINE=1",
-           "-v", f"{MODEL_DIR}:/model:ro", "-v", f"{PRACTICE}:/practice:ro", "-v", f"{self.dir}/work:/work",
+           "-v", f"{MODEL_DIR}:/model:ro", "-v", f"{self.cfg['practice']}:/practice:ro", "-v", f"{self.dir}/work:/work",
            "-v", f"{self.dir}/start:/start:ro", "-v", f"{self.dir}/ctl:/ctl", "-v", f"{HARNESS}:/harness:ro",
            IMAGE, "python3", "-W", "ignore", "/harness/kernel_server.py")
         t0 = time.time()
@@ -608,7 +619,7 @@ class Run:
            "--memory", "20g", "--device", gpu["device"], "-e", "PYTHONPATH=/harness", "-e", "HF_HUB_OFFLINE=1",
            "-e", "VLLM_NO_USAGE_STATS=1", "-e", "DO_NOT_TRACK=1", "-e", f"WSP_PRESENCE={self.cfg['presence_penalty']}",
            "-e", f"WSP_GPU_MEMORY={gpu['run_memory']}",
-           "-v", f"{MODEL_DIR}:/model:ro", "-v", f"{PRACTICE}:/practice:ro", "-v", f"{self.dir}/work:/work",
+           "-v", f"{MODEL_DIR}:/model:ro", "-v", f"{self.cfg['practice']}:/practice:ro", "-v", f"{self.dir}/work:/work",
            "-v", f"{self.dir}/start:/start:ro", "-v", f"{req}:/requests", "-v", f"{HARNESS}:/harness:ro",
            "-v", f"{CACHE}:/root/.cache",
            IMAGE, "python3", "-W", "ignore", "/harness/gpu_server.py")
@@ -635,7 +646,7 @@ class Run:
            "--network", gpu["relay_network"], "--network-alias", gpu["relay_alias"],
            "-e", f"WSP_RUN={self.name}", "-e", f"WSP_PRESENCE={self.cfg['presence_penalty']}",
            "-e", f"WSP_GPU_MEMORY={gpu['run_memory']}", "-e", f"WSP_PORT={gpu['relay_port']}",
-           "-v", f"{MODEL_DIR}:/model:ro", "-v", f"{PRACTICE}:/practice:ro", "-v", f"{self.dir}/work:/work",
+           "-v", f"{MODEL_DIR}:/model:ro", "-v", f"{self.cfg['practice']}:/practice:ro", "-v", f"{self.dir}/work:/work",
            "-v", f"{self.dir}/start:/start:ro", "-v", f"{req}:/requests", "-v", f"{HARNESS}:/harness:ro",
            "-v", f"{COLAB_KEY}:/colab:ro",
            IMAGE, "python3", "-u", "-W", "ignore", "/harness/colab_relay.py")
@@ -700,8 +711,6 @@ class Run:
         notes = open(notes_path, errors="replace").read() if os.path.exists(notes_path) else "(there is no notes file)"
         if len(notes) > 40_000:
             notes = notes[:8_000] + "\n[... middle of the notes cut ...]\n" + notes[-32_000:]
-        man_path = f"{self.dir}/work/edited/manifest.json"
-        manifest = open(man_path).read().strip() if os.path.exists(man_path) else "{}"
         s, c = self.state, self.cfg
         kernel = ("The kernel kept its variables." if kernel_kept else
                   "The kernel was restarted, so its variables are lost (files in /work are kept).")
@@ -709,10 +718,30 @@ class Run:
                          f"same run; the earlier conversation is not shown to you. {kernel} Forward passes used: "
                          f"{s['passes_used']} of {c['passes']}. Code runs used: {s['code_runs']} of "
                          f"{c['max_code_runs']}. Turns so far: {s['turn']}.\n\nYour notes, /work/notes.md:\n<<<\n"
-                         f"{notes}\n>>>\n\nYour current edits (/work/edited/manifest.json; "
-                         f"changed_entries = entries that differ from the original):\n{manifest}\n"
+                         f"{notes}\n>>>\n\n{self.manifest_text()}\n"
                          + (f"\nThe result of your last block, which the earlier conversation did not show you:"
                             f"\n<<<\n{pending}\n>>>\n" if pending else ""))
+
+    def manifest_text(self):
+        """The handoff's list of edits: /work/edited/manifest.json, and in a run with a start only the tensors whose
+        values differ from it (the kernel adds changed_from_start to each entry)."""
+        path = f"{self.dir}/work/edited/manifest.json"
+        text = open(path).read().strip() if os.path.exists(path) else "{}"
+        head = "Your current edits (/work/edited/manifest.json; changed_entries = entries that differ from the original"
+        if not self.has_start:
+            return f"{head}):\n{text}"
+        try:
+            entries = json.loads(text)
+            same = [n for n, e in entries.items() if e["changed_from_start"] == 0]
+        except (ValueError, AttributeError, KeyError, TypeError):  # the start's own manifest, before any save_edit
+            return f"{head}):\n{text}"
+        listed = {n: e for n, e in entries.items() if e["changed_from_start"] != 0}
+        dropped = sorted(os.path.basename(p)[:-4] for p in glob.glob(f"{self.dir}/start/*.npy")
+                         if os.path.basename(p)[:-4] not in entries)
+        return (f"{head}, changed_from_start = entries that differ from the starting model in /start; "
+                f"{len(same)} more tensors hold the starting model's values and are not listed):\n"
+                f"{json.dumps(listed, indent=1)}"
+                + (f"\nTensors of the start that drop_edit put back to the original: {dropped}" if dropped else ""))
 
     def run(self):
         self.lock_gpu()
@@ -1116,7 +1145,7 @@ class Run:
         r = sh("docker", "run", "--rm", "--network", "none", "--read-only", "--tmpfs", "/tmp:rw,size=2g,mode=1777",
                "--user", "65534:65534", "--cap-drop", "ALL", "--security-opt", "no-new-privileges",
                "--memory", "16g", "--pids-limit", "512", "--cpus", "12", "-w", "/tmp",
-               "-v", f"{PRACTICE}:/practice:ro", "-v", f"{HARNESS}:/harness:ro", "-v", f"{self.dir}/work:/work:ro",
+               "-v", f"{self.cfg['practice']}:/practice:ro", "-v", f"{HARNESS}:/harness:ro", "-v", f"{self.dir}/work:/work:ro",
                IMAGE, "python3", "-W", "ignore", "/harness/grade_run.py", f"/work/{raw_name}", timeout=7200)
         rows = [json.loads(l) for l in r.stdout.splitlines() if l.strip()]
         n_raw = sum(1 for _ in open(f"{self.dir}/work/{raw_name}"))
@@ -1366,6 +1395,8 @@ def main():
     ap.add_argument("--presence-penalty", type=float)
     ap.add_argument("--start-from", help="a submission/ folder whose edit a new run starts from")
     ap.add_argument("--brief", help="a text file added to the prompt under THIS RUN")
+    ap.add_argument("--practice", help="the practice problems' folder, mounted read-only at /practice "
+                                       "(default practice/final; an about.txt in it describes its files in the prompt)")
     ap.add_argument("--gpu", choices=sorted(GPUS),
                     help="the GPU of the run's GPU server (default 5090; colab: a Colab notebook, README)")
     ap.add_argument("--panel", action="store_true", default=None,

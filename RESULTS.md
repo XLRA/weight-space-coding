@@ -237,6 +237,7 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
   - the probes of every model.
 - **One grading failed and was redone.** One of G-E2's LiveCodeBench answers stopped the grader (plan, Deviations, 2026-11-12). It was a thinking loop that the grader took as code and that Python couldn't parse. It is now graded as a syntax error, as the code grader already did.
 - **The plan's runs are complete.** Its second-seed rule doesn't apply, since G-O and G-E2 ended more than 2 SE apart on code (below).
+- **Next, planned on 2026-11-12:** an editing session that starts from G-O (`pilot-20`, [`plans/edit-after-training.md`](plans/edit-after-training.md)). It waits for the user's go-ahead.
 - **The starting models' checks:**
   - **O** passes 5.2% of the validation answers and runs 76% of them to the 32k cap. Its panel mean is 26.7%.
   - **E** passes 10.0% and runs 4% to the cap. Its panel mean is 51.1%: choice 45.6%, math 61.6%, instructions 77.6%, code 19.6%.
@@ -426,10 +427,19 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
     - **At the same step,** G-E2 had been slightly ahead on the checks: at step 50 its panel mean was 54.9% and its validation pass rate 15.9%, against G-O's 52.9% and 14.9%.
     - **G-O kept improving to step 100. G-E2 did not.**
   - **Adding the edit to G-O cost a little on every suite,** −0.6 to −2.9, though it still ends loops. T runs 0.4% of its LiveCodeBench answers to the 32k cap, against G-O's 32.7%, and 0.8% of IFEval's, against 9.0%.
-  - **The edit may cut off reasoning that G-O uses.** On LiveCodeBench's medium problems:
-    - **G-O** runs 36% of its answers to the cap and solves 6.7%.
-    - **With the edit,** T runs 0.5% to the cap and solves 1.0%, and G-E2 none and 1.9%.
-    - **How sure:** each gap is only about 2 SE (T −5.8 (2.7), G-E2 −4.8 (2.3)). This is a pattern to test, not a finding.
+    - **Over the five suites,** T is −1.86 (0.57) against G-O, and G-E2 is −4.16 (0.62). This is the mean of the five suites' differences; its SE combines theirs as independent samples (`compare.py`'s last line).
+  - **Why T loses: after the edit's exit closes the thinking, the trained model often opens it again** (`scratch/go_failures.py` and `go_failures2.py`, 2026-11-12).
+    - **The share of finished answers that close the thinking two or more times:**
+
+      | Suite | E | G-O | T | G-E2 |
+      |---|---|---|---|---|
+      | LiveCodeBench | 91% | 1.1% | 43.3% | 68.2% |
+      | MATH-500 | 60.8% | 4.6% | 10.8% | 36.5% |
+
+    - **Few of those answers pass:** 4% of T's on LiveCodeBench.
+    - **Where T loses most:** on the 19 LiveCodeBench problems that G-O solves more often than T, 33% of T's answers close the thinking two or more times.
+    - **G-O's own long answers there are loops, not useful reasoning.** All of its LiveCodeBench answers cut at the cap are flagged as loops, and 96% of them never close the thinking. None of its passing LiveCodeBench answers is longer than 16k tokens (90th percentile 6,023).
+    - **Corrected:** a first version of this section suggested that the edit cuts off long reasoning that G-O uses on hard problems. On LiveCodeBench, the numbers above rule that out.
   - **The second-seed rule doesn't apply.**
     - **The gap on code:** G-E2 is 3.1 points (SE 1.3) below G-O at presence penalty 1.5, and 4.9 (1.3) at 0. That is 2.3 and 3.9 SE, both beyond the plan's 2, so the rule calls for no second seed.
     - **What the SE leaves out:** it covers the evaluation's sampling, not the training run's own seed. With one run per arm, that variation is unmeasured.
@@ -490,10 +500,10 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
 - **The edit and GRPO didn't add up.**
   - **Training from E (G-E2)** ended behind training from O on every suite but MMLU-Pro: code −3.1 (1.3), IFEval −7.8 (1.7), MATH-500 −5.8 (1.1). After step 75 its answers looped again under the evaluation's sampling, so the rule took its step-50 checkpoint.
   - **The edit added to G-O (T)** still ends loops: the share of answers cut at the cap fell on every suite, from 32.7% to 0.4% on LiveCodeBench. But it scored 0.6 to 2.9 points below G-O on every suite.
-  - **A possible reason:** on hard problems, some of the trained model's long reasoning is useful, and the edit's loop control may end it.
-    - **G-O,** on LiveCodeBench's medium problems, runs 36% of its answers to the cap and solves 6.7%.
-    - **T and G-E2** run almost none to the cap there, and solve 1.0% and 1.9%.
-    - **How sure:** each gap is only about 2 SE.
+  - **The likely reason:** after the edit's exit closes the thinking, the trained model often opens it again and doesn't settle.
+    - 43% of T's finished LiveCodeBench answers close the thinking two or more times, against 1.1% of G-O's, and 4% of those pass.
+    - G-O's own long LiveCodeBench answers are loops rather than useful reasoning: none of its passing answers is longer than 16k tokens.
+  - **Next (planned):** an editing session that starts from G-O and works on G-O's own failures ([`plans/edit-after-training.md`](plans/edit-after-training.md)).
 - **RFT on code matched the edit on held-out code, but not beyond it.** Two rounds of RFT from O on its own passing practice answers came level with `pilot-14`'s edit on MBPP+ and HumanEval+, and slightly ahead on LiveCodeBench. It finished 8.6 to 21.6 points behind on MMLU-Pro, IFEval and MATH-500.
 - **Training leaves the edit in place, but GRPO wears down its loop control.**
   - **The weights:** after RFT or GRPO from E, the edited weights still hold all of ΔE. Training barely touched them.

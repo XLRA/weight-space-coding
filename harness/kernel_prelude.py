@@ -1,10 +1,11 @@
 """Names defined in the editing kernel before the agent's first code block.
 
 NAMES, load(name), load_original(name), save_edit(name, tensor), drop_edit(name), edited(),
-tok (the tokenizer) and run_tests(code, problem_id). Gradients are disabled.
+restore_start(name), changed(), tok (the tokenizer) and run_tests(code, problem_id). Gradients are disabled.
 """
 import json as _json
 import os as _os
+import shutil as _shutil
 import sys as _sys
 
 import numpy as _np
@@ -18,6 +19,8 @@ _torch.set_num_threads(int(_os.environ.get("OMP_NUM_THREADS", "8")))
 _MODEL = "/model"
 _EDIT_DIR = "/work/edited"
 _os.makedirs(_EDIT_DIR, exist_ok=True)
+_START_DIR = "/start"  # the run's starting edit (driver.py --start-from), read-only; empty without one
+_HAS_START = _os.path.isdir(_START_DIR) and any(fn.endswith(".npy") for fn in _os.listdir(_START_DIR))
 _INDEX = _json.load(open(f"{_MODEL}/model.safetensors.index.json"))["weight_map"]
 NAMES = sorted(n for n in _INDEX if n.startswith("model.language_model."))
 _REFUSED = {
@@ -54,16 +57,42 @@ def load(name):
     return load_original(name)
 
 
+def _start(name):
+    """The starting edit's tensor (float32), or None if the start does not change it."""
+    path = f"{_START_DIR}/{name}.npy"
+    return _torch.from_numpy(_np.load(path, allow_pickle=False)) if _os.path.exists(path) else None
+
+
+_manifest_cache = {}  # file name -> ((mtime, size), entry); save_edit, drop_edit and restore_start drop theirs
+
+
 def _write_manifest():
     entries = {}
     for fn in sorted(_os.listdir(_EDIT_DIR)):
         if fn.endswith(".npy"):
             name = fn[:-4]
-            new = _np.load(f"{_EDIT_DIR}/{fn}", allow_pickle=False)
-            old = load_original(name).numpy()
-            entries[name] = {"shape": list(new.shape), "changed_entries": int((new != old).sum())}
+            st = _os.stat(f"{_EDIT_DIR}/{fn}")
+            key = (st.st_mtime_ns, st.st_size)
+            if fn not in _manifest_cache or _manifest_cache[fn][0] != key:
+                new = _np.load(f"{_EDIT_DIR}/{fn}", allow_pickle=False)
+                old = load_original(name).numpy()
+                entry = {"shape": list(new.shape), "changed_entries": int((new != old).sum())}
+                if _HAS_START:
+                    start = _start(name)
+                    entry["changed_from_start"] = int((new != (old if start is None else start.numpy())).sum())
+                _manifest_cache[fn] = (key, entry)
+            entries[name] = _manifest_cache[fn][1]
     with open(f"{_EDIT_DIR}/manifest.json", "w") as f:
         _json.dump(entries, f, indent=1)
+
+
+def _scaled(new, base):
+    """Whether new is base multiplied by one constant (its zeros kept)."""
+    nz = base != 0
+    if nz.any() and _torch.equal(new[~nz], base[~nz]):
+        ratio = new[nz] / base[nz]
+        return bool((ratio - ratio.mean()).abs().max() <= 1e-6 * max(ratio.mean().abs().item(), 1e-12))
+    return False
 
 
 def save_edit(name, tensor):
@@ -80,28 +109,56 @@ def save_edit(name, tensor):
     if _torch.equal(new, old):
         drop_edit(name)
         return f"{name}: identical to the original, so no edit is stored"
-    nz = old != 0
-    if nz.any() and _torch.equal(new[~nz], old[~nz]):
-        ratio = new[nz] / old[nz]
-        if (ratio - ratio.mean()).abs().max() <= 1e-6 * max(ratio.mean().abs().item(), 1e-12):
-            raise PermissionError("save_edit refused: the edit only multiplies the whole tensor by a constant")
+    if _scaled(new, old):
+        raise PermissionError("save_edit refused: the edit only multiplies the whole tensor by a constant")
+    start = _start(name)
+    if start is not None and not _torch.equal(new, start) and _scaled(new, start):
+        raise PermissionError("save_edit refused: the edit only multiplies the starting edit's whole tensor by a "
+                              "constant")
     _np.save(f"{_EDIT_DIR}/{name}.npy", new.numpy())
+    _manifest_cache.pop(f"{name}.npy", None)
     _write_manifest()
     changed = int((new != old).sum())
     return f"{name}: saved ({changed:,} of {old.numel():,} entries differ from the original)"
 
 
 def drop_edit(name):
-    """Remove your edit of a tensor (it goes back to the original)."""
+    """Remove your edit of a tensor (it goes back to the original, also where the run's start had changed it;
+    restore_start(name) goes back to the start)."""
     path = f"{_EDIT_DIR}/{name}.npy"
     if _os.path.exists(path):
         _os.remove(path)
+    _manifest_cache.pop(f"{name}.npy", None)
     _write_manifest()
 
 
+def restore_start(name):
+    """Put back the starting edit's tensor (/start/<name>.npy), undoing your changes to it; the original if the
+    start does not change it."""
+    _check_name(name)
+    if not _os.path.exists(f"{_START_DIR}/{name}.npy"):
+        drop_edit(name)
+        return f"{name}: back to the original, which the start does not change"
+    _shutil.copyfile(f"{_START_DIR}/{name}.npy", f"{_EDIT_DIR}/{name}.npy")
+    _manifest_cache.pop(f"{name}.npy", None)
+    _write_manifest()
+    return f"{name}: back to the starting edit's values"
+
+
 def edited():
-    """Names of the tensors you have edited."""
+    """Names of the tensors you have edited (in a run with a start, the start's tensors too)."""
     return sorted(fn[:-4] for fn in _os.listdir(_EDIT_DIR) if fn.endswith(".npy"))
+
+
+def changed():
+    """Names of the tensors whose current values differ from the run's start (from the original if it has none),
+    including the start's tensors that drop_edit put back to the original."""
+    _write_manifest()
+    key = "changed_from_start" if _HAS_START else "changed_entries"
+    entries = _json.load(open(f"{_EDIT_DIR}/manifest.json"))
+    dropped = [fn[:-4] for fn in _os.listdir(_START_DIR) if fn.endswith(".npy") and fn[:-4] not in entries] \
+        if _HAS_START else []
+    return sorted([n for n, e in entries.items() if e[key]] + dropped)
 
 
 tok = _AutoTokenizer.from_pretrained(_MODEL)

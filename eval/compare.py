@@ -6,6 +6,8 @@ report.md pairs each model with the original. This pairs any two: for each suite
 (averaged over its samples) minus B's, averaged over the problems, with its standard error over problems, as report.md
 computes it. A folder stands for its edited model; `:original` picks its original model's answers instead, so
 `compare.py results/X results/X:original` reproduces X's report. Both must have the same problems and samples.
+When both have all five suites, the last line is the mean of the five suites' differences, with the SE of that mean:
+the suites' SEs combined as independent, sqrt(sum of SE^2) / 5.
 """
 import json
 import math
@@ -44,6 +46,7 @@ def main():
     print(f"A = {a_spec}\nB = {b_spec}\n")
     print("| Suite | Set | A | B | A - B | SE | Problems | A better | B better |")
     print("|---|---|---|---|---|---|---|---|---|")
+    alls = {}  # suite -> (A - B, SE) over all its problems
     for suite, pattern in SUITES:
         a, b = load(a_spec, suite, pattern), load(b_spec, suite, pattern)
         if a is None or b is None:
@@ -61,6 +64,12 @@ def main():
             print(f"| {suite} | {name} | {100 * statistics.mean(a_rate[k][0] for k in ids):.1f}% "
                   f"| {100 * statistics.mean(b_rate[k][0] for k in ids):.1f}% | {mean:+.2f} | {se:.2f} | {len(ids)} "
                   f"| {sum(d > 0 for d in diffs)} | {sum(d < 0 for d in diffs)} |")
+            if name == "all":
+                alls[suite] = (mean, se)
+    if len(alls) == len(SUITES):
+        mean = statistics.mean(m for m, _ in alls.values())
+        se = math.sqrt(sum(s ** 2 for _, s in alls.values())) / len(alls)
+        print(f"\nMean of the five suites' A - B: {mean:+.2f} (SE {se:.2f})")
 
 
 if __name__ == "__main__":

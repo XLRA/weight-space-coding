@@ -75,7 +75,7 @@ Held out, on the same five benchmarks:
 - **Training leaves the edit in place, but wears down its loop control.** After training from E, the edited weights still hold all of E's change, and most of the parts it built still fire where the agent designed them to. One doesn't: a switch that stops the model from reopening and closing its thinking over and over. GRPO turned it off within 100 steps.
 - **A reward that tests only the examples a problem shows gets gamed.** Most APPS problems are tested only on the examples their statement shows. Our first GRPO run learned within 50 steps to print the example output instead of solving the problem. We built new tests from APPS's own human-written solutions, with no other model involved, and every GRPO result above uses them.
 
-**Status (2026-11-12):** the training phase's runs and evaluations are done.
+**Status (2026-11-12):** the training phase's runs and evaluations are done. Next, an editing session that starts from GRPO from O is planned ([`plans/edit-after-training.md`](plans/edit-after-training.md)).
 
 ## Repository
 
@@ -85,7 +85,7 @@ Held out, on the same five benchmarks:
 | `runs/` | Each session's brief, the agent's explanations and report, and its edit's manifest |
 | `eval/` | The held-out evaluation, the panel, and each model's report in `eval/results/` |
 | `train/` | The training phase: the trainers, the checkpoint checks and the new tests' builder |
-| `plans/` | The training plan: its recipe, fixed in advance, and every deviation from it |
+| `plans/` | The plans, each fixed in advance with every deviation from it: the training phase, and editing after training |
 | `paper/` | Every table and agent transcript, collected in `paper/data/` for a write-up |
 | `scripts/`, `baseline/` | Practice-set preparation and the original model's baseline |
 | `scratch/` | One-off analyses |
