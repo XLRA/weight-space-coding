@@ -8,7 +8,6 @@ train/analysis/probes/summary.md, and writes paper/figures/<name>.pdf and .png.
 Needs matplotlib, numpy and pandas. The server's venv has no matplotlib, so these were drawn on another machine
 (matplotlib 3.10, pandas 2.2); every number comes from the tables above.
 """
-import math
 import os
 
 import matplotlib
@@ -86,15 +85,9 @@ def fig_headline():
     save(fig, "headline")
 
 
-def five_suite_mean(ev, name):
-    rows = ev[(ev["eval"] == name) & (ev["subset"] == "all") & (ev["suite"].isin(SUITES))]
-    assert len(rows) == 5, name
-    return rows["diff"].mean(), math.sqrt((rows["se"] ** 2).sum()) / 5
-
-
 def fig_overview():
     """Every evaluated model: the mean over the five suites of its paired difference with the original."""
-    ev = pd.read_csv(os.path.join(DATA, "evals.csv"))
+    ov = pd.read_csv(os.path.join(FDATA, "overview.csv")).set_index("eval")
     rows = [
         ("Editing sessions", None, None, None),
         ("pilot-10 (10 passes, from O)", "pilot-10-pp15", "E", None),
@@ -125,7 +118,7 @@ def fig_overview():
                     transform=ax.get_yaxis_transform())
             y -= 1
             continue
-        m, se = five_suite_mean(ev, name)
+        m, se = ov.loc[name, "diff"], ov.loc[name, "se"]
         ax.errorbar(m, y, xerr=2 * se, fmt="o", color=COL[color], ecolor=COL[color], elinewidth=1.2,
                     markersize=4.5, capsize=0, zorder=3)
         ax.text(1.005, y, f"{m:+.1f}", transform=ax.get_yaxis_transform(), fontsize=7.5, color=INK2,
@@ -266,7 +259,7 @@ def fig_paper():
     sc = p[p.kind == "score"].set_index(["a", "suite"])["value"]
     suites = ["mmlupro", "ifeval", "math500"]
     series = [("paper-unedited", "Paper: original model"), ("paper-edit", "Paper: its 50-pass math edit"),
-              ("E", "Ours: best edit (E)"), ("G-O", "Ours: GRPO from O (G-O)")]
+              ("E", "This work: best edit (E)"), ("G-O", "This work: GRPO from O (G-O)")]
     fig, ax = plt.subplots(figsize=(4.6, 2.35))
     n, width = len(series), 0.82
     w = width / n

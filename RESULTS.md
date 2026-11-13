@@ -9,7 +9,7 @@ The agent is Claude Opus 5.5, at maximum effort. The model it edits is Qwen3.5-0
 **What the agent gets:**
 - The original weights, read-only, and a working directory where it saves edited tensors.
 - A persistent Python kernel with helpers to load tensors, save an edit, tokenize, and run tests. It has no network access.
-- A budget of **forward passes** (10–20 per run here; failed or refused requests are free) and 300 code runs of at most 15 minutes each.
+- A budget of **forward passes** (10–24 per run here; failed or refused requests are free) and 300 code runs of at most 15 minutes each.
 - Each forward pass is either a generation pass or a teacher-forced pass:
   - **Generation:** up to 512 sampled answers, graded automatically. The agent gets back pass rates, cut and loop shares, and failure counts. In paired mode ("both"), it also gets the difference against a baseline model with a standard error over problems.
   - **Teacher-forced:** log-probabilities and activations on given text.
@@ -24,7 +24,7 @@ The agent is Claude Opus 5.5, at maximum effort. The model it edits is Qwen3.5-0
 - Each reply holds one code block or one forward request, with at least ten words explaining it. A reply without that is sent back unrun.
 - Output is cut at 10,000 characters.
 - Edits to the final norm or the embedding/output layer, and whole-tensor scalings, are refused.
-- When the conversation passes 400k tokens, it restarts with the agent's own notes, the edit manifest and the last result. Kernel variables survive the restart.
+- The conversation restarts with the agent's own notes, the edit manifest and the last result, and kernel variables survive the restart. Through `pilot-15` it restarted every 40 turns (`pilot-14` switched partway through); from `pilot-16` on, only once it passes 400k tokens.
 - Everything runs in network-isolated containers. Graded code runs in a locked-down sandbox: unprivileged user, a 2 GB memory cap, process limits, and time limits.
 
 **Sampling** (the model card's coding setting): temperature 0.6, top_p 0.95, top_k 20, at most 32,768 new tokens. From `pilot-11` on, presence penalty is 1.5, the paper's setting; `pilot-10` used 0.
@@ -173,7 +173,7 @@ Held out, paired against `pilot-14` (SE in brackets):
   - **The edit:** two near-dead neurons of layer 22's MLP (6,144 weights) made into a capped pair. It fires on the last token of the prompt's function name in a `def` line and pushes toward `(`, so the first `def` no longer runs past the given name (`min_Num` → `min_Num_sum_even`).
   - **On its own practice problems,** paired against `pilot-14` on problems not used for choices: the targeted renames fell from 20 to 7 of 512 answers. Pass rates moved +1.2 (2.0) on MBPP-style and −2.8 (2.6) on HumanEval-style prompts, both within noise.
   - **Held out:** no code gain, −0.55 (0.94). The practice numbers' signs flipped (MBPP+ −1.7, HumanEval+ +2.1), and every suite stayed within two standard errors.
-- **None of the three edits lifted its target by much beyond noise held out, and one broke a suite the agent never measured.** That led to the panel.
+- **None of the three edits lifted its target by much beyond noise held out, and one broke a suite the agent had stopped checking.** That led to the panel.
 
 ### The panel
 
@@ -277,7 +277,7 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
   | Validation | 10.0% | 11.6% | 13.0% | +3.0 (1.1) |
   | Validation, the 96 problems | 13.5% | 14.6% | 13.0% | −0.5 (1.7) |
 
-  - **RFT gives E nothing on code and costs it most of its gains elsewhere.** After round 1, 31% of its validation answers run to the cap again, against E's 4%.
+  - **RFT gives E nothing on code and loses ground everywhere else.** After round 1, 31% of its validation answers run to the cap again, against E's 4%.
   - **Neither checkpoint is within 2.5 panel points of E,** so by the plan's rule R-E gets no held-out evaluation.
 - **G-E learned to print the example output instead of solving the problem.**
   - **Why it pays:** 956 of the 1,200 APPS training problems are tested only on the examples their statement shows. An answer that prints the example output passes them, and the reward can't tell.
@@ -410,11 +410,11 @@ E (`pilot-14`'s edit) and the original model (O) are trained on the same practic
   | Suite | G-O against O | G-O against E | G-E2 against E | G-E2 against G-O | T against G-O |
   |---|---|---|---|---|---|
   | MBPP+ and HumanEval+ | +25.7 (1.6) | +12.5 (1.4) | +9.3 (1.2) | −3.1 (1.3) | −2.4 (1.1) |
-  | The same at presence penalty 0 | +31.3 (1.6) | +15.0 (1.4) | +10.2 (1.2) | −4.9 (1.3) | |
+  | The same at presence penalty 0 | +31.3 (1.6) | +15.0 (1.4) | +10.1 (1.2) | −4.9 (1.3) | |
   | LiveCodeBench | +13.0 (2.2) | +7.6 (1.5) | +3.4 (0.9) | −4.1 (1.3) | −2.9 (1.3) |
   | MMLU-Pro | +5.1 (1.5) | +0.4 (1.4) | +0.4 (1.4) | 0.0 (1.4) | −0.6 (1.4) |
   | IFEval, prompt-level | +47.8 (1.8) | +11.8 (1.6) | +4.1 (1.6) | −7.8 (1.7) | −2.3 (1.6) |
-  | MATH-500 | +58.2 (1.8) | +8.1 (1.2) | +2.4 (1.1) | −5.8 (1.1) | −1.1 (1.0) |
+  | MATH-500 | +58.2 (1.8) | +8.1 (1.1) | +2.4 (1.1) | −5.8 (1.1) | −1.1 (1.0) |
 
   - **GRPO from O is the best model so far.** Against E it gains on every suite but MMLU-Pro, where the two tie.
   - **What it cost:** G-O's 100 steps took 22.9 hours of the 5090, plus 1.9 hours redone after the crash. E's four sessions (`pilot-10`, `-12`, `-13` and `-14`) held a GPU for 16.8 hours in all and used 2.7M Opus output tokens.
@@ -529,7 +529,7 @@ Can the agent's editing improve on the best trained model? E was built on O, and
 
 ## Against the paper's published answers
 
-The paper published every answer of its unedited model and of its 50-pass math edit on MMLU-Pro, IFEval and MATH-500 (`eval/raw/paper_samples/`). They cover the same questions, with the same number of samples, as our evaluation, and our graders agree with the paper's grades on 799 of the 800 answers checked ("Held-out evaluation", above). So our models can be paired with the paper's problem by problem (`scratch/paper_vs_ours.py`, 2026-11-12):
+The paper published every answer of its unedited model and of its 50-pass math edit on MMLU-Pro, IFEval and MATH-500 (`eval/raw/paper_samples/`). They cover the same questions, with the same number of samples, as my evaluation, and my graders agree with the paper's grades on 799 of the 800 answers checked ("Held-out evaluation", above). So my models can be paired with the paper's problem by problem (`scratch/paper_vs_ours.py`, 2026-11-12):
 
 | Suite | Paper: unedited | Paper: its edit | O | E | G-O |
 |---|---|---|---|---|---|
@@ -541,10 +541,10 @@ The paper published every answer of its unedited model and of its 50-pass math e
 - **E against the paper's edit:** MMLU-Pro −0.3 (1.4), IFEval −4.1 (1.8), MATH-500 +8.8 (1.2), and +1.48 (0.85) over the three, so level. E was chosen on code alone, the paper's edit on math.
 - **G-O against the paper's edit:** MMLU-Pro +0.1 (1.4), IFEval +7.8 (1.6), MATH-500 +16.9 (1.3), and +8.25 (0.85) over the three.
 - **The limits:**
-  - Only the paper's answers were graded here. Both evaluations sample with the same settings (temperature 0.6, top_p 0.95, top_k 20, presence penalty 1.5, up to 32,768 tokens), but the paper's edit wasn't run on our setup, so differences between the two inference stacks could still favour one side slightly.
-  - GPQA Diamond, the paper's fourth suite, isn't in our evaluation, and the paper reports no code results.
+  - Only the paper's answers were graded here. Both evaluations sample with the same settings (temperature 0.6, top_p 0.95, top_k 20, presence penalty 1.5, up to 32,768 tokens), but the paper's edit wasn't run on my setup, so differences between the two inference stacks could still favour one side slightly.
+  - GPQA Diamond, the paper's fourth suite, isn't in my evaluation, and the paper reports no code results.
 
-## What we've learned so far
+## What I've learned so far
 
 - **Weight-space programming carries over to code.** A 10-pass edit chosen only on code problems roughly doubled the held-out code pass rate at presence penalty 0, and transferred to math and instruction following.
   - **Against the paper's own answers,** problem by problem, E is level with the paper's 50-pass math edit over the three suites both evaluated, +1.48 (0.85): 8.8 points ahead on MATH-500 and 4.1 behind on IFEval. G-O is 8.25 (0.85) ahead of it.
@@ -562,9 +562,9 @@ The paper published every answer of its unedited model and of its 50-pass math e
     - +12.5 (1.4) on MBPP+ and HumanEval+;
     - +7.6 (1.5) on LiveCodeBench;
     - +11.8 (1.6) on IFEval;
-    - +8.1 (1.2) on MATH-500.
+    - +8.1 (1.1) on MATH-500.
     It ties on MMLU-Pro, +0.4 (1.4).
-  - **It learned to code better, not only to finish.** HumanEval+, which no edit moved, gains +14.5 (2.8). LiveCodeBench's medium problems go from none solved to 6.7%.
+  - **It learned to code better, not only to finish.** Over O, HumanEval+ gains +14.5 (2.8), where no edit gained more than 4.6 (1.8). LiveCodeBench's medium problems go to 6.7%, where E solved none.
   - **What it cost:** 22.9 hours of the 5090. E's four sessions held a GPU for 16.8 hours in all and used 2.7M Opus output tokens.
 - **The edit and GRPO didn't add up.**
   - **Training from E (G-E2)** ended behind training from O on every suite but MMLU-Pro: code −3.1 (1.3), IFEval −7.8 (1.7), MATH-500 −5.8 (1.1). After step 75 its answers looped again under the evaluation's sampling, so the rule took its step-50 checkpoint.

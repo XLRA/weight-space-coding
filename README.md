@@ -6,15 +6,15 @@ This repo recreates Experiment 8 of [*Sparks of Weight-Space Programming*](https
 
 ![Scores and loop cut-offs for the original model, the agent's best edit, and GRPO](paper/figures/headline.png)
 
-The short answer: editing works on code, and for the same reason it worked on math. The 0.8B model mostly fails because it gets stuck in loops while thinking and runs out of tokens, and the agent found small weight changes that stop that. Training on the same problems with GRPO works better, and it improves things the edits never touched. Combining the two didn't help.
+The short answer: editing works on code, and for the same reason it worked on math. The 0.8B model mostly fails because it gets stuck in loops while thinking and runs out of tokens, and the agent found small weight changes that stop that. Training on the same problems with GRPO works better, and it improves things the edits barely touched. Combining the two didn't help.
 
 ## How it works
 
 The agent gets the model's weights in a Python sandbox and 10 to 24 forward passes per session. A forward pass either has the model answer up to 512 practice problems, graded automatically, or returns its activations and token probabilities on some text. There's no gradient access and no training loop. The practice problems are 1,719 MBPP and APPS problems, kept apart from everything used for evaluation.
 
-Every edit is scored on five benchmarks the agent never sees: MBPP+ and HumanEval+, LiveCodeBench, MMLU-Pro, IFEval and MATH-500. Each model is compared with the original problem by problem, and we report the difference with its standard error. Sampling uses the original paper's settings (temperature 0.6, top-p 0.95, top-k 20, presence penalty 1.5, up to 32,768 tokens).
+Every edit is scored on five benchmarks the agent never sees: MBPP+ and HumanEval+, LiveCodeBench, MMLU-Pro, IFEval and MATH-500. Each model is compared with the original problem by problem, and I report the difference with its standard error. Sampling uses the original paper's settings (temperature 0.6, top-p 0.95, top-k 20, presence penalty 1.5, up to 32,768 tokens).
 
-For the comparison with training, we trained the original model on the same practice problems with rejection-sampling fine-tuning (RFT) and with GRPO rewarded by test results. The recipe and the rule for picking a checkpoint were written down before anything was evaluated ([the plan](plans/training-phase.md)).
+For the comparison with training, I trained the original model on the same practice problems with rejection-sampling fine-tuning (RFT) and with GRPO rewarded by test results. The recipe and the rule for picking a checkpoint were written down before anything was evaluated ([the plan](plans/training-phase.md)).
 
 ## Results
 
@@ -28,15 +28,15 @@ For the comparison with training, we trained the original model on the same prac
 
 The best edit took four sessions and 70 forward passes. Most of its gain comes from ending loops: the original model runs 94% of its MATH-500 answers and 98% of LiveCodeBench's to the token limit, and E brings that under 5% on every benchmark. The first edit in the chain changed only 6,144 of the model's 0.8 billion weights. Where looping wasn't the problem, nothing improved. HumanEval+ and LiveCodeBench's harder problems didn't move.
 
-GRPO from the original model took about 23 hours on one RTX 5090. It beats the edit on every benchmark except MMLU-Pro, where they tie, by 8.1 points on average (SE 0.6). It also gained 14.5 points on HumanEval+ over the original model and solved some of LiveCodeBench's medium problems, which no edit managed.
+GRPO from the original model took about 23 hours on one RTX 5090. It beats the edit on every benchmark except MMLU-Pro, where they tie, by 8.1 points on average (SE 0.6). It also gained 14.5 points on HumanEval+ over the original model, where no edit gained more than 4.6, and solved 6.7% of LiveCodeBench's medium problems, where no edit got past 1%.
 
-![Mean gain over the original model for every model we evaluated](paper/figures/overview.png)
+![Mean gain over the original model for every model I evaluated](paper/figures/overview.png)
 
 Later editing sessions tried narrower fixes and mostly traded points between benchmarks. One fixed what it was aimed at and lost 4.6 points on MMLU-Pro, which the agent hadn't been checking. After that, the agent got a fixed panel of 1,000 questions to check its edits against.
 
 ## Editing plus training
 
-We tried combining the two in three ways: training from the edited model, adding the edit's weight change to the trained model, and having the agent edit the trained model itself in a new session (`pilot-20`). None beat training alone.
+I tried combining the two in three ways: training from the edited model, adding the edit's weight change to the trained model, and having the agent edit the trained model itself in a new session (`pilot-20`). None beat training alone.
 
 ![Paired differences for the three combinations](paper/figures/combining.png)
 
@@ -44,7 +44,7 @@ The edit's loop fix still works on top of the trained model, but the trained mod
 
 ## A reward hack
 
-Most APPS problems are tested only on the examples printed in the problem statement. Within 50 steps, our first GRPO run learned to print the example output instead of solving the problem:
+Most APPS problems are tested only on the examples printed in the problem statement. Within 50 steps, my first GRPO run learned to print the example output instead of solving the problem:
 
 ```python
 def main():
@@ -57,13 +57,13 @@ def main():
 
 ![Validation pass rate on the reward's own tests and on new tests](paper/figures/reward_hacking.png)
 
-We threw that run out and built new tests by mutating each problem's example inputs, keeping an input only when eight of APPS's human-written solutions agree on its output. No other model was involved. All the GRPO results above use these tests.
+I threw that run out and built new tests by mutating each problem's example inputs, keeping an input only when eight of APPS's human-written solutions agree on its output. No other model was involved. All the GRPO results above use these tests.
 
 ## Compared with the original paper
 
-The original authors published all of their model's answers, so we graded them with our graders and paired them with ours problem by problem. On the three benchmarks both evaluations share, our edit, chosen only on code, is level with their 50-pass math edit, and GRPO is ahead of it by 8.3 points (SE 0.85).
+The original authors published their models' answers on MMLU-Pro, IFEval and MATH-500, so I graded them with my graders and paired them with mine problem by problem. On those three, the agent's edit, chosen only on code, is level with their 50-pass math edit, and GRPO is ahead of it by 8.3 points (SE 0.9).
 
-![Our models against the original paper's published answers](paper/figures/paper_comparison.png)
+![My models against the original paper's published answers](paper/figures/paper_comparison.png)
 
 Every number, session and check is in [RESULTS.md](RESULTS.md). A write-up is in progress.
 
@@ -82,7 +82,7 @@ Every number, session and check is in [RESULTS.md](RESULTS.md). A write-up is in
 
 Model weights, datasets and edit tensors aren't included. Everything comes from public datasets: MBPP, APPS, EvalPlus (MBPP+ and HumanEval+), MMLU-Pro, IFEval, LiveCodeBench, MATH, MATH-500 and `argilla/ifeval-like-data`. `train/prepare_data.py` rebuilds the training problems and `train/make-tests.sh` the new tests. The figures redraw from the tables with `python paper/figures.py`, which needs matplotlib, numpy and pandas.
 
-We used vLLM 0.32.0, transformers 5.19.0, torch 2.13.0 (CUDA 13.0) and Python 3.12 on an RTX 5090 and an RTX 5080, plus a cloud L4 for one session.
+I used vLLM 0.32.0, transformers 5.19.0, torch 2.13.0 (CUDA 13.0) and Python 3.12 on an RTX 5090 and an RTX 5080, plus a cloud L4 for one session.
 
 ## Citation
 

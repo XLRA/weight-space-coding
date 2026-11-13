@@ -8,6 +8,7 @@ paper/figures/data/:
                      syntax errors
   paper_compare.csv  scores and paired differences against the original paper's published answers
                      (as scratch/paper_vs_ours.py)
+  overview.csv       every evaluated model's mean paired difference with O over the five suites, with its SE
 
 Run on the server: cd /opt/wsp && venv/bin/python paper/figure_data.py
 paper/figures.py draws the figures from these tables and paper/data/.
@@ -41,6 +42,11 @@ PAIRS = [("E", "O"), ("R-O", "O"), ("G-O", "O"), ("R-O", "E"), ("G-O", "E"), ("G
          ("T", "G-O"), ("pilot-20", "G-O"), ("pilot-20", "T")]
 STEMS = {"code": "gen_{}", "mmlupro": "gen_mmlupro_{}", "ifeval": "gen_ifeval_{}", "lcb": "gen_lcb_{}",
          "math500": "gen_math500_{}"}
+# The overview figure's models, each from its <name>-pp15 evaluation and paired with O. compare.py prints the
+# five-suite mean to two decimals, and one that lands on x.x5 there can then show the wrong first decimal
+# (pilot-19's +21.1511 prints as +21.15, which was drawn as +21.1), so overview() keeps full precision.
+OVERVIEW = ["pilot-10", "pilot-12", "pilot-13", "combo-12-13", "pilot-14", "pilot-15", "pilot-16", "pilot-17",
+            "pilot-18", "pilot-19", "R-O", "G-O", "G-E2", "T", "pilot-20"]
 
 
 def spec(name):
@@ -132,6 +138,28 @@ def paper_compare():
     return rows
 
 
+def overview():
+    def scores(folder, side, stem):
+        d = defaultdict(list)
+        for line in open(os.path.join(RES, folder, stem.format(side) + ".jsonl")):
+            r = json.loads(line)
+            d[r["id"]].append(r["status"] == "pass")
+        return {k: (sum(v) / len(v), len(v)) for k, v in d.items()}
+
+    rows, base = [], {stem: scores(*MODELS["O"], stem) for stem in STEMS.values()}
+    for name in OVERVIEW:
+        diffs, ses = [], []
+        for stem in STEMS.values():
+            a, o = scores(f"{name}-pp15", "edited", stem), base[stem]
+            assert set(a) == set(o) and all(a[k][1] == o[k][1] for k in a), (name, stem)
+            d = [100 * (a[k][0] - o[k][0]) for k in sorted(a)]
+            diffs.append(statistics.mean(d))
+            ses.append(statistics.stdev(d) / len(d) ** 0.5)
+        rows.append({"model": name, "eval": f"{name}-pp15", "diff": round(statistics.mean(diffs), 4),
+                     "se": round(sum(s * s for s in ses) ** 0.5 / len(ses), 4)})
+    return rows
+
+
 def write(name, rows):
     with open(os.path.join(OUT, name), "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0]))
@@ -145,3 +173,4 @@ if __name__ == "__main__":
     write("pairs.csv", pairs())
     write("paper_compare.csv", paper_compare())
     write("shapes.csv", shapes())
+    write("overview.csv", overview())

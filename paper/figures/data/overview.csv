@@ -1,0 +1,16 @@
+model,eval,diff,se
+pilot-10,pilot-10-pp15,19.1035,0.7089
+pilot-12,pilot-12-pp15,20.745,0.707
+pilot-13,pilot-13-pp15,19.7369,0.7021
+combo-12-13,combo-12-13-pp15,21.5416,0.7185
+pilot-14,pilot-14-pp15,21.8929,0.7085
+pilot-15,pilot-15-pp15,21.3109,0.7095
+pilot-16,pilot-16-pp15,20.9016,0.6977
+pilot-17,pilot-17-pp15,21.9963,0.7142
+pilot-18,pilot-18-pp15,21.2756,0.7096
+pilot-19,pilot-19-pp15,21.1511,0.7124
+R-O,R-O-pp15,13.541,0.7485
+G-O,G-O-pp15,29.964,0.8062
+G-E2,G-E2-pp15,25.8054,0.7571
+T,T-pp15,28.1015,0.7763
+pilot-20,pilot-20-pp15,30.6473,0.8048
