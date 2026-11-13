@@ -541,7 +541,7 @@ The paper published every answer of its unedited model and of its 50-pass math e
 - **E against the paper's edit:** MMLU-Pro −0.3 (1.4), IFEval −4.1 (1.8), MATH-500 +8.8 (1.2), and +1.48 (0.85) over the three, so level. E was chosen on code alone, the paper's edit on math.
 - **G-O against the paper's edit:** MMLU-Pro +0.1 (1.4), IFEval +7.8 (1.6), MATH-500 +16.9 (1.3), and +8.25 (0.85) over the three.
 - **The limits:**
-  - Only the paper's answers were graded here. Its edit wasn't run on our setup, so a difference in sampling settings could still favour one side.
+  - Only the paper's answers were graded here. Both evaluations sample with the same settings (temperature 0.6, top_p 0.95, top_k 20, presence penalty 1.5, up to 32,768 tokens), but the paper's edit wasn't run on our setup, so differences between the two inference stacks could still favour one side slightly.
   - GPQA Diamond, the paper's fourth suite, isn't in our evaluation, and the paper reports no code results.
 
 ## What we've learned so far
