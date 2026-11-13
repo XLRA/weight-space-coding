@@ -52,7 +52,9 @@ plt.rcParams.update({
 
 def save(fig, name):
     for ext in ("pdf", "png"):
-        fig.savefig(os.path.join(OUT, f"{name}.{ext}"), facecolor="white")
+        # no creation date in the PDFs, so redrawing an unchanged figure leaves its file unchanged
+        meta = {"CreationDate": None} if ext == "pdf" else None
+        fig.savefig(os.path.join(OUT, f"{name}.{ext}"), facecolor="white", metadata=meta)
     plt.close(fig)
     print("wrote", name)
 
@@ -328,6 +330,7 @@ def fig_dose():
         ax.text(i, v * 1.6, f"{v:g}", ha="center", fontsize=7, color=INK2)
     ax.set_yscale("log")
     ax.set_ylim(3e-4, 2)
+    ax.set_xlim(-0.6, len(bins) - 0.4)  # room for the first value's label clear of the y tick labels
     ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: f"{v:g}"))
     ax.yaxis.set_minor_locator(NullLocator())
     ax.set_xticks(range(len(bins)), bins)
