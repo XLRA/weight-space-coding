@@ -25,27 +25,43 @@ DATA = os.path.join(HERE, "data")
 FDATA = os.path.join(HERE, "figures", "data")
 OUT = os.path.join(HERE, "figures")
 
-# Colours. Each model keeps one colour in every figure; the categorical hues are a fixed order checked for
-# colour-vision deficiencies on white. Aqua (pilot-20) and yellow (T) are below 3:1 contrast on white, so every
-# mark in those colours is labelled. Figures about something other than a model use neutral greys.
-INK, INK2, MUTED, GRID, AXIS = "#0b0b0b", "#52514e", "#898781", "#e1e0d9", "#c3c2b7"
-COL = {"O": "#a3a19a", "E": "#2a78d6", "G-O": "#eb6834", "pilot-20": "#1baf7a", "T": "#eda100",
-       "G-E2": "#6250d6", "R-O": "#008300", "paper-unedited": "#c3c2b7", "paper-edit": "#52514e"}
+# The paper is set in Latin Modern at 11pt, with 10pt captions. The figures use Computer Modern, which Latin
+# Modern was digitised from and which matplotlib ships (cmr10, and cmb10 for bold), at 9pt for labels and 8pt for
+# ticks and values. Each figure is drawn at the width it is printed at, so LaTeX includes it unscaled: TEXT is
+# the text width in inches, and the narrower figures use the fractions of it that main.tex gives them.
+TEXT = 6.5
+BOLD = "cmb10"
+# cmr10 keeps TeX's old OT1 layout: '<', '>', '|', '{', '}' and '_' show other glyphs, and it has no minus sign,
+# en dash, '±' or '≥'. Symbols go through mathtext ($\pm$, $<$, $\geq$), and so do tick labels, for the minus;
+# the en dash is typed as '{', which is its slot in OT1.
+ENDASH = "{"
+
+# Colours. Each model keeps one colour in every figure. The hues are Okabe and Ito's colour-blind-safe set,
+# checked on white; sky blue (pilot-20), orange (T) and reddish purple (G-E2) are below 3:1 contrast with white,
+# so every mark in those colours is labelled. Figures about something other than a model use neutral greys.
+INK, INK2, MUTED, GRID = "#000000", "#4d4d4d", "#8c8c8c", "#dcdcdc"
+COL = {"O": "#999999", "E": "#0072b2", "G-O": "#d55e00", "pilot-20": "#56b4e9", "T": "#e69f00",
+       "G-E2": "#cc79a7", "R-O": "#009e73", "paper-unedited": "#c8c8c8", "paper-edit": "#595959"}
 SUITES = ["code", "lcb", "mmlupro", "ifeval", "math500"]
 SUITE = {"code": "MBPP+ and HumanEval+", "lcb": "LiveCodeBench", "mmlupro": "MMLU-Pro", "ifeval": "IFEval",
          "math500": "MATH-500"}
 STEPS = [0, 25, 50, 75, 100, 125, 150]
 
 plt.rcParams.update({
-    "font.family": "DejaVu Sans", "font.size": 8, "axes.titlesize": 8, "axes.labelsize": 8,
-    "xtick.labelsize": 7.5, "ytick.labelsize": 7.5, "legend.fontsize": 7.5,
-    "axes.edgecolor": AXIS, "axes.linewidth": 0.7, "axes.spines.top": False, "axes.spines.right": False,
-    "xtick.color": AXIS, "ytick.color": AXIS, "xtick.labelcolor": INK2, "ytick.labelcolor": INK2,
-    "axes.labelcolor": INK2, "text.color": INK, "axes.titlecolor": INK, "axes.titlelocation": "left",
-    "axes.titlepad": 6, "grid.color": GRID, "grid.linewidth": 0.6, "axes.axisbelow": True,
-    "legend.frameon": False, "legend.handlelength": 1.0, "legend.columnspacing": 1.4,
-    "pdf.fonttype": 42, "ps.fonttype": 42, "savefig.dpi": 220, "savefig.bbox": "tight",
-    "savefig.pad_inches": 0.03, "xtick.major.size": 2.5, "ytick.major.size": 0,
+    "font.family": "cmr10", "mathtext.fontset": "cm", "axes.formatter.use_mathtext": True,
+    "font.size": 9, "axes.titlesize": 9, "axes.labelsize": 9, "legend.fontsize": 9,
+    "xtick.labelsize": 8, "ytick.labelsize": 8,
+    "text.color": INK, "axes.labelcolor": INK, "axes.titlecolor": INK, "axes.edgecolor": INK,
+    "xtick.color": INK, "ytick.color": INK, "axes.linewidth": 0.5,
+    "axes.spines.top": False, "axes.spines.right": False, "axes.axisbelow": True,
+    "axes.titlepad": 4, "axes.labelpad": 3, "grid.color": GRID, "grid.linewidth": 0.5,
+    "xtick.major.size": 2.5, "ytick.major.size": 2.5, "xtick.major.width": 0.5, "ytick.major.width": 0.5,
+    "xtick.major.pad": 2, "ytick.major.pad": 2,
+    "legend.frameon": False, "legend.handlelength": 1.2, "legend.handletextpad": 0.5,
+    "legend.columnspacing": 1.6, "legend.borderaxespad": 0.2,
+    "figure.constrained_layout.use": True, "figure.constrained_layout.w_pad": 0.02,
+    "figure.constrained_layout.h_pad": 0.02,
+    "pdf.fonttype": 42, "ps.fonttype": 42, "savefig.dpi": 220,
 })
 
 
@@ -68,20 +84,21 @@ def fig_headline():
     s = shapes()
     models = ["O", "E", "G-O"]
     names = ["Original model (O)", "Best weight edit (E)", "GRPO from the original model (G-O)"]
-    fig, axes = plt.subplots(1, 2, figsize=(6.6, 2.5), sharey=True, gridspec_kw={"wspace": 0.1})
+    fig, axes = plt.subplots(1, 2, figsize=(TEXT, 2.55), sharey=True)
     h = 0.26
     y = np.arange(len(SUITES))[::-1].astype(float)
-    for ax, col, title in zip(axes, ["pass", "cut"], ["Score (%)", "Answers cut at the 32,768-token limit (%)"]):
+    for ax, col, label in zip(axes, ["pass", "cut"], ["Score (%)", "Answers cut at the 32,768-token limit (%)"]):
         for i, m in enumerate(models):
             ax.barh(y + (1 - i) * h, [s[(m, su)][col] for su in SUITES], height=h, color=COL[m],
-                    edgecolor="white", linewidth=0.8, label=names[i], zorder=2)
+                    edgecolor="white", linewidth=0.4, label=names[i], zorder=2)
         ax.set_xlim(0, 100)
         ax.set_xticks(range(0, 101, 20))
         ax.xaxis.grid(True)
-        ax.set_title(title)
+        ax.set_xlabel(label)
+        ax.tick_params(axis="y", length=0)
     axes[0].set_yticks(y, [SUITE[x] for x in SUITES])
     axes[0].set_ylim(-0.55, len(SUITES) - 0.45)
-    axes[0].legend(loc="lower left", bbox_to_anchor=(0, 1.11), ncol=3, borderaxespad=0)
+    fig.legend(*axes[0].get_legend_handles_labels(), loc="outside upper center", ncol=3)
     save(fig, "headline")
 
 
@@ -108,20 +125,21 @@ def fig_overview():
         ("G-O plus E's weight change (T)", "T-pp15", "T", None),
         ("pilot-20: an edit made on G-O", "pilot-20-pp15", "pilot-20", None),
     ]
-    fig, ax = plt.subplots(figsize=(6.6, 4.3))
+    fig, ax = plt.subplots(figsize=(TEXT, 3.55))
     y = 0
-    ticks, labels, weights = [], [], []
+    ticks, labels, weights, heads = [], [], [], []
     for label, name, color, weight in rows:
         if name is None:
             y -= 0.35 if y else 0
-            ax.text(-0.5, y, label, fontsize=8, color=INK, ha="left", va="center", fontweight="bold",
-                    transform=ax.get_yaxis_transform())
+            # placed after the layout is done (below), so kept out of it
+            heads.append(ax.text(0, y, label, fontfamily=BOLD, ha="left", va="center", in_layout=False,
+                                 transform=ax.get_yaxis_transform()))
             y -= 1
             continue
         m, se = ov.loc[name, "diff"], ov.loc[name, "se"]
-        ax.errorbar(m, y, xerr=2 * se, fmt="o", color=COL[color], ecolor=COL[color], elinewidth=1.2,
-                    markersize=4.5, capsize=0, zorder=3)
-        ax.text(1.005, y, f"{m:+.1f}", transform=ax.get_yaxis_transform(), fontsize=7.5, color=INK2,
+        ax.errorbar(m, y, xerr=2 * se, fmt="o", color=COL[color], ecolor=COL[color], elinewidth=1.1,
+                    markersize=4, capsize=0, zorder=3)
+        ax.text(1.01, y, f"{m:+.1f}", transform=ax.get_yaxis_transform(), fontsize=8, color=INK2,
                 va="center", ha="left")
         ticks.append(y)
         labels.append(label)
@@ -130,43 +148,49 @@ def fig_overview():
     ax.set_yticks(ticks, labels)
     for t, w in zip(ax.get_yticklabels(), weights):
         if w:
-            t.set_fontweight("bold")
-            t.set_color(INK)
+            t.set_fontfamily(BOLD)
+    ax.tick_params(axis="y", length=0)
     ax.set_ylim(y + 0.4, 0.6)
-    ax.set_xlim(0, 34)
+    ax.set_xlim(-1.5, 34)  # a margin left of zero, where the longest group heading runs past the row labels
     ax.set_xticks(range(0, 31, 5))
     ax.xaxis.grid(True)
     ax.spines["left"].set_visible(False)
-    ax.set_xlabel("Mean gain over the original model across the five suites (points; bars are ±2 SE)")
+    ax.spines["bottom"].set_bounds(0, 34)
+    ax.set_xlabel(r"Mean gain over the original model across the five suites (points; bars are $\pm$2 SE)")
+    # the group headings start where the longest row label starts, which is known once the layout is done
+    fig.canvas.draw()
+    left = min(t.get_window_extent().x0 for t in ax.get_yticklabels())
+    for t in heads:
+        t.set_x(ax.transAxes.inverted().transform((left, 0))[0])
     save(fig, "overview")
 
 
 def fig_training():
     """GRPO checkpoints from O and from E, checked with the evaluation's sampling settings."""
     ck = pd.read_csv(os.path.join(DATA, "checkpoints.csv")).set_index("check")
-    runs = [("G-O", "start-O", "GRPO from the original model (G-O)", 100, "from O"),
-            ("G-E2", "start-E", "GRPO from the edit E (G-E2)", 50, "from E")]
+    runs = [("G-O", "start-O", "GRPO from O (G-O)", 100, "from O"),
+            ("G-E2", "start-E", "GRPO from E (G-E2)", 50, "from E")]
     panels = [("val2_pass", "Validation pass rate,\nnew tests (%)", (0, 25)),
               ("panel_mean", "Panel mean (%)", (20, 62)),
               ("val_cut", "Validation answers cut\nat 32k tokens (%)", (0, 80))]
-    fig, axes = plt.subplots(1, 3, figsize=(6.6, 2.2), gridspec_kw={"wspace": 0.34})
+    fig, axes = plt.subplots(1, 3, figsize=(TEXT, 2.45))
     for ax, (col, title, lim) in zip(axes, panels):
         for arm, start, _, pick, short in runs:
             ys = [ck.loc[start, col]] + [ck.loc[f"{arm}/step_{s}", col] for s in STEPS[1:]]
-            ax.plot(STEPS, ys, color=COL[arm], lw=1.6, marker="o", ms=3.2, zorder=3)
-            ax.plot([pick], [ys[STEPS.index(pick)]], "o", ms=8, mfc="none", mec=COL[arm], mew=1.2, zorder=4)
+            ax.plot(STEPS, ys, color=COL[arm], lw=1.3, marker="o", ms=3, zorder=3)
+            ax.plot([pick], [ys[STEPS.index(pick)]], "o", ms=7.5, mfc="none", mec=COL[arm], mew=1.0, zorder=4)
             if col == "val_cut":
-                ax.text(160, ys[-1], short, color=INK2, fontsize=7.5, va="center", clip_on=False)
+                ax.text(160, ys[-1], short, color=INK2, fontsize=8, va="center", clip_on=False)
         ax.set_xticks(STEPS[::2])
         ax.set_xlim(-6, 156)
         ax.set_ylim(*lim)
         ax.yaxis.grid(True)
         ax.set_title(title)
         ax.set_xlabel("GRPO step")
-    handles = [Line2D([], [], color=COL[a], lw=1.6, marker="o", ms=3.2, label=lab) for a, _, lab, _, _ in runs]
-    handles.append(Line2D([], [], ls="none", marker="o", ms=8, mfc="none", mec=INK2, mew=1.2,
+    handles = [Line2D([], [], color=COL[a], lw=1.3, marker="o", ms=3, label=lab) for a, _, lab, _, _ in runs]
+    handles.append(Line2D([], [], ls="none", marker="o", ms=7.5, mfc="none", mec=INK2, mew=1.0,
                           label="checkpoint the rule picked"))
-    fig.legend(handles=handles, loc="lower left", bbox_to_anchor=(0.11, 1.0), ncol=3, borderaxespad=0)
+    fig.legend(handles=handles, loc="outside upper center", ncol=3)
     save(fig, "training")
 
 
@@ -176,18 +200,20 @@ def fig_hacking():
     keys = ["start-E"] + [f"G-E/step_{s}" for s in STEPS[1:]]
     old = [ck.loc[k, "val_pass"] for k in keys]
     new = [ck.loc[k, "val2_pass"] for k in keys]
-    fig, ax = plt.subplots(figsize=(3.3, 2.3))
-    ax.plot(STEPS, old, color=MUTED, lw=1.6, marker="o", ms=3.2)
-    ax.plot(STEPS, new, color=INK, lw=1.6, marker="o", ms=3.2)
-    ax.text(154, old[-1], "tests the reward used\n(the statement's examples)", color=INK2, fontsize=7,
-            va="center")
-    ax.text(154, new[-1] + 1, "new tests it never saw", color=INK2, fontsize=7, va="center")
+    fig, ax = plt.subplots(figsize=(0.55 * TEXT, 2.2))
+    ax.plot(STEPS, old, color=MUTED, lw=1.3, marker="o", ms=3)
+    ax.plot(STEPS, new, color=INK, lw=1.3, marker="o", ms=3)
+    # labels above the right-hand end of each line, where both are flat
+    ax.text(150, max(old[3:]) + 4, "tests the reward used\n(the statement's examples)", color=INK2, fontsize=8,
+            ha="right", va="bottom")
+    ax.text(150, max(new[3:]) + 3, "new tests it never saw", color=INK2, fontsize=8, ha="right", va="bottom")
     ax.set_xticks(STEPS[::2])
-    ax.set_xlim(-6, 150)
-    ax.set_ylim(0, 75)
+    ax.set_xlim(-6, 156)
+    ax.set_ylim(0, 88)
+    ax.set_yticks(range(0, 81, 20))
     ax.yaxis.grid(True)
     ax.set_xlabel("GRPO step (step 0 is E)")
-    ax.set_title("Validation pass rate (%)")
+    ax.set_ylabel("Validation pass rate (%)")
     save(fig, "reward_hacking")
 
 
@@ -201,24 +227,23 @@ def fig_combine():
     order = SUITES + ["mean5"]
     names = [SUITE[s] for s in SUITES] + ["Mean of the five"]
     ys = [-i - (0.3 if s == "mean5" else 0) for i, s in enumerate(order)]
-    fig, axes = plt.subplots(1, 4, figsize=(6.6, 2.35), sharey=True, gridspec_kw={"wspace": 0.12})
+    fig, axes = plt.subplots(1, 4, figsize=(TEXT, 2.5), sharey=True)
     for ax, (a, b, title) in zip(axes, comps):
         for yy, suite in zip(ys, order):
             r = p[(p.a == a) & (p.b == b) & (p.suite == suite) & (p.subset == "all")].iloc[0]
             bold = suite == "mean5"
             ax.errorbar(r["diff"], yy, xerr=2 * r["se"], fmt="o", color=INK, ecolor=INK if bold else INK2,
-                        elinewidth=1.4 if bold else 1, ms=4.5 if bold else 3.5, capsize=0, zorder=3)
-        ax.axvline(0, color=MUTED, lw=0.8, zorder=1)
+                        elinewidth=1.3 if bold else 0.9, ms=4.5 if bold else 3.2, capsize=0, zorder=3)
+        ax.axvline(0, color=MUTED, lw=0.6, zorder=1)
         ax.set_xlim(-11, 17)
         ax.set_xticks([-10, 0, 10])
         ax.xaxis.grid(True)
-        ax.set_title(title, fontsize=7.5)
+        ax.set_title(title)
         ax.spines["left"].set_visible(False)
+        ax.tick_params(axis="y", length=0)
     axes[0].set_yticks(ys, names)
-    last = axes[0].get_yticklabels()[-1]
-    last.set_fontweight("bold")
-    last.set_color(INK)
-    fig.text(0.5, -0.04, "Paired difference in points (dots), ±2 SE (bars)", ha="center", fontsize=8, color=INK2)
+    axes[0].get_yticklabels()[-1].set_fontfamily(BOLD)
+    fig.supxlabel(r"Paired difference in points (dots), $\pm$2 SE (bars)", fontsize=9)
     save(fig, "combining")
 
 
@@ -227,10 +252,11 @@ def fig_endings():
     the thinking more than once, or finished cleanly. Shares of all answers."""
     s = shapes()
     models = ["O", "E", "R-O", "G-O", "G-E2", "T", "pilot-20"]
-    parts = [("Cut at the token limit", INK2, "white"),
-             ("Finished, thinking closed 2+ times", "#a9a79f", INK),
-             ("Finished, thinking closed once", "#e6e4dd", INK)]
-    fig, axes = plt.subplots(1, 2, figsize=(6.6, 2.45), sharey=True, gridspec_kw={"wspace": 0.08})
+    parts = [("Cut at the limit", "#4d4d4d", "white"),
+             ("Finished, thinking closed 2+ times", "#a6a6a6", INK),
+             ("Finished, thinking closed once", "#e3e3e3", INK)]
+    fig, axes = plt.subplots(1, 2, figsize=(TEXT, 2.65), sharey=True)
+    fig.get_layout_engine().set(wspace=0.05)  # keeps the left panel's 100 clear of the right panel's 0
     y = np.arange(len(models))[::-1]
     for ax, suite in zip(axes, ["lcb", "math500"]):
         for yi, m in zip(y, models):
@@ -238,18 +264,19 @@ def fig_endings():
             reopen = 100 * r["reclose_answers"] / r["answers"]
             left = 0.0
             for (name, color, tc), v in zip(parts, [r["cut"], reopen, 100 - r["cut"] - reopen]):
-                ax.barh(yi, v, left=left, height=0.64, color=color, edgecolor="white", linewidth=1.0, zorder=2,
+                ax.barh(yi, v, left=left, height=0.66, color=color, edgecolor="white", linewidth=0.6, zorder=2,
                         label=name if yi == y[0] else None)
                 if v >= 9:
-                    ax.text(left + v / 2, yi, f"{v:.0f}", ha="center", va="center", fontsize=7, color=tc)
+                    ax.text(left + v / 2, yi, f"{v:.0f}", ha="center", va="center", fontsize=8, color=tc)
                 left += v
         ax.set_xlim(0, 100)
         ax.set_xticks(range(0, 101, 25))
         ax.set_title(SUITE[suite])
         ax.spines["left"].set_visible(False)
+        ax.tick_params(axis="y", length=0)
         ax.set_xlabel("Share of answers (%)")
     axes[0].set_yticks(y, models)
-    axes[0].legend(loc="lower left", bbox_to_anchor=(0, 1.1), ncol=3, borderaxespad=0)
+    fig.legend(*axes[0].get_legend_handles_labels(), loc="outside upper center", ncol=3)
     save(fig, "answer_endings")
 
 
@@ -260,19 +287,20 @@ def fig_paper():
     suites = ["mmlupro", "ifeval", "math500"]
     series = [("paper-unedited", "Paper: original model"), ("paper-edit", "Paper: its 50-pass math edit"),
               ("E", "This work: best edit (E)"), ("G-O", "This work: GRPO from O (G-O)")]
-    fig, ax = plt.subplots(figsize=(4.6, 2.35))
+    fig, ax = plt.subplots(figsize=(0.72 * TEXT, 2.3))
     n, width = len(series), 0.82
     w = width / n
     x = np.arange(len(suites))
     for i, (k, name) in enumerate(series):
         ax.bar(x + (i - (n - 1) / 2) * w, [sc[(k, su)] for su in suites], width=w, color=COL[k], edgecolor="white",
-               linewidth=0.9, label=name, zorder=2)
+               linewidth=0.5, label=name, zorder=2)
     ax.set_xticks(x, [SUITE[su] for su in suites])
     ax.tick_params(axis="x", length=0)
     ax.yaxis.grid(True)
     ax.set_ylim(0, 80)
-    ax.set_title("Score (%)")
-    ax.legend(loc="upper left", ncol=1, bbox_to_anchor=(1.01, 1.0), borderaxespad=0)
+    ax.set_ylabel("Score (%)")
+    # two columns: the paper's bars in the first, mine in the second
+    fig.legend(*ax.get_legend_handles_labels(), loc="outside upper center", ncol=2)
     save(fig, "paper_comparison")
 
 
@@ -292,15 +320,15 @@ def probe_table():
 def fig_probes():
     """Do E's switches still fire where the agent built them to, as GRPO trains from E?"""
     t = probe_table()
-    units = [("L23.2664", "cycle stop", INK, 1.8), ("L23.3109", "brake", MUTED, 1.2),
-             ("L23.pair", "box pair", "#b9b7af", 1.2)]
-    fig, axes = plt.subplots(1, 2, figsize=(6.6, 2.25), sharey=True, gridspec_kw={"wspace": 0.1})
+    units = [("L23.2664", "cycle stop", INK, 1.5), ("L23.3109", "brake", MUTED, 1.1),
+             ("L23.pair", "box pair", "#b3b3b3", 1.1)]
+    fig, axes = plt.subplots(1, 2, figsize=(TEXT, 2.35), sharey=True)
     for ax, arm, title in zip(axes, ["G-E", "G-E2"], ["First GRPO run from E (G-E)", "GRPO from E (G-E2)"]):
         for unit, name, color, lw in units:
             ys = [t[unit]["E"]] + [t[unit][f"{arm}/step_{s}"] for s in STEPS[1:]]
             ax.plot(STEPS, ys, color=color, lw=lw, marker="o", ms=3, zorder=3)
             if arm == "G-E2":
-                ax.text(156, ys[-1], name, color=INK2, fontsize=7.5, va="center", clip_on=False)
+                ax.text(158, ys[-1], name, color=INK2, fontsize=8, va="center", clip_on=False)
         ax.set_xticks(STEPS[::2])
         ax.set_xlim(-6, 152)
         ax.set_ylim(-4, 90)
@@ -314,15 +342,18 @@ def fig_probes():
 def fig_dose():
     """pilot-20's teacher-forced check of how hard to push toward closing the thinking. The bins are the ones
     the agent reported in runs/pilot-20/final_answer.md."""
-    bins = ["<0.1", "0.3–0.6", "0.6–0.9", "0.9–1.2", "≥1.2"]
+    bins = [r"$<0.1$", f"0.3{ENDASH}0.6", f"0.6{ENDASH}0.9", f"0.9{ENDASH}1.2", r"$\geq 1.2$"]
     p = [0.0007, 0.02, 0.11, 0.24, 0.64]
-    fig, ax = plt.subplots(figsize=(3.3, 2.2))
+    fig, ax = plt.subplots(figsize=(0.5 * TEXT, 2.3))
     # dots rather than bars: on a log axis a bar's length depends on where the axis happens to start
-    ax.plot(range(len(bins)), p, color=COL["pilot-20"], lw=1.2, marker="o", ms=6, mec="white", mew=1, zorder=3)
+    ax.plot(range(len(bins)), p, color=COL["pilot-20"], lw=1.1, marker="o", ms=5.5, mec="white", mew=0.8,
+            zorder=3)
     for i, v in enumerate(p):
-        ax.text(i, v * 1.6, f"{v:g}", ha="center", fontsize=7, color=INK2)
+        # above each dot, except the first, where the line to the second dot would run through it
+        ax.text(i, v / 1.6 if i == 0 else v * 1.6, f"{v:g}", ha="center", va="top" if i == 0 else "baseline",
+                fontsize=8, color=INK2)
     ax.set_yscale("log")
-    ax.set_ylim(3e-4, 2)
+    ax.set_ylim(1.5e-4, 2)
     ax.set_xlim(-0.6, len(bins) - 0.4)  # room for the first value's label clear of the y tick labels
     ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: f"{v:g}"))
     ax.yaxis.set_minor_locator(NullLocator())
@@ -330,7 +361,7 @@ def fig_dose():
     ax.tick_params(axis="x", length=0)
     ax.yaxis.grid(True)
     ax.set_xlabel("Push along the model's own exit direction")
-    ax.set_title("P(</think>) at newlines inside loops")
+    ax.set_ylabel("Probability of closing\nthe thinking")
     save(fig, "exit_dose")
 
 
